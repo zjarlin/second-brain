@@ -6,10 +6,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.addzero.web.config.AppConfig
+import com.addzero.web.model.enums.Route
 
 @Composable
 fun MainLayout() {
     var isLoggedIn by remember { mutableStateOf(!AppConfig.ENABLE_LOGIN) }
+    var currentRoute by remember { mutableStateOf(Route.DOTFILES) }
     
     Box(
         modifier = Modifier
@@ -28,11 +30,14 @@ fun MainLayout() {
                 color = Color.White.copy(alpha = AppConfig.Theme.MICA_OPACITY)
             ) {
                 Row {
-                    SideMenu()
+                    SideMenu(
+                        currentRoute = currentRoute,
+                        onRouteChange = { currentRoute = it }
+                    )
                     Column {
                         TopBar()
-                        Breadcrumb()
-                        MainContent()
+                        Breadcrumb(currentRoute = currentRoute)
+                        MainContent(currentRoute = currentRoute)
                     }
                 }
             }

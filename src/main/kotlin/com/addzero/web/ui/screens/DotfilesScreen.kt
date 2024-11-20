@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.addzero.web.ui.components.crud.CrudLayout
+import com.addzero.web.ui.components.crud.Pagination
 import com.addzero.web.viewmodel.BizEnvVars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -224,96 +226,54 @@ private fun DotfilesTable(
 fun DotfilesScreen() {
     val scope = rememberCoroutineScope()
     val viewModel = remember { DotfilesViewModel(scope) }
-    val pageResult = viewModel.pageResult
-    val dotfilesList = pageResult?.content ?: emptyList()
 
     // 搜索条件状态
     var searchName by remember { mutableStateOf("") }
     var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
     var selectedOSTypes by remember { mutableStateOf(setOf<String>()) }
 
-    Column {
-        // 搜索区域
-        SearchPanel(
-            searchName = searchName,
-            onSearchNameChange = { searchName = it },
-            selectedPlatforms = selectedPlatforms,
-            onPlatformSelectionChange = { selectedPlatforms = it },
-            selectedOSTypes = selectedOSTypes,
-            onOSTypeSelectionChange = { selectedOSTypes = it },
-            onSearch = {
-                viewModel.searchDotfiles(
-                    name = searchName,
-                    platforms = selectedPlatforms,
-                    osTypes = selectedOSTypes,
-                    page = 0 // 搜索时重置到第一页
-                )
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 工具栏
-        ActionButtons(scope, viewModel)
-
-        // 加载状态
-        if (viewModel.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
-
-        // 错误提示
-        viewModel.error?.let { error ->
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(16.dp)
+    CrudLayout<BizEnvVars>(
+        isLoading = viewModel.isLoading,
+        error = viewModel.error,
+        // 搜索区域插槽
+        searchBar = {
+            SearchPanel(
+                searchName = searchName,
+                onSearchNameChange = { searchName = it },
+                selectedPlatforms = selectedPlatforms,
+                onPlatformSelectionChange = { selectedPlatforms = it },
+                selectedOSTypes = selectedOSTypes,
+                onOSTypeSelectionChange = { selectedOSTypes = it },
+                onSearch = {
+                    viewModel.searchDotfiles(
+                        name = searchName,
+                        platforms = selectedPlatforms,
+                        osTypes = selectedOSTypes
+                    )
+                }
             )
-        }
-
-        // 数据表格
-        DotfilesTable(
-            items = dotfilesList,
-            onEdit = { /* 显示编辑对话框 */ },
-            onDelete = { viewModel.deleteDotfile(it.id) }
-        )
-
-        // 分页控制
-        pageResult?.let { result ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { viewModel.previousPage() },
-                    enabled = !result.isFirst
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = "上一页"
-                    )
-                }
-
-                Text(
-                    "${result.pageNumber + 1}/${result.totalPages}",
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                IconButton(
-                    onClick = { viewModel.nextPage() },
-                    enabled = !result.isLast
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = "下一页"
-                    )
-                }
-
-                Text(
-                    "共 ${result.totalElements} 条",
-                    modifier = Modifier.padding(start = 16.dp)
+        },
+        // 操作按钮插槽
+        actionButtons = {
+            ActionButtons(scope, viewModel)
+        },
+        // 主内容区插槽
+        content = {
+            DotfilesTable(
+                items = viewModel.pageResult?.content ?: emptyList(),
+                onEdit = { /* 显示编辑对话框 */ },
+                onDelete = { viewModel.deleteDotfile(it.id) }
+            )
+        },
+        // 分页控制插槽
+        pagination = {
+            viewModel.pageResult?.let { result ->
+                Pagination(
+                    pageResult = result,
+                    onPrevious = viewModel::previousPage,
+                    onNext = viewModel::nextPage
                 )
             }
         }
-    }
+    )
 }

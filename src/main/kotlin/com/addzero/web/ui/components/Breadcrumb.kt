@@ -9,9 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.web.model.enums.Route
 
 @Composable
-fun Breadcrumb() {
+fun Breadcrumb(currentRoute: Route) {
     Surface(
         modifier = Modifier.fillMaxWidth().height(48.dp), color = MaterialTheme.colorScheme.surface, tonalElevation = 1.dp
     ) {
@@ -20,7 +21,10 @@ fun Breadcrumb() {
         ) {
             Text("首页")
             Text(" / ")
-            Text("Dotfiles 管理")
+            Text(when (currentRoute) {
+                Route.DOTFILES -> "Dotfiles 管理"
+                Route.SOFTWARE -> "软件管理"
+            })
         }
     }
 }

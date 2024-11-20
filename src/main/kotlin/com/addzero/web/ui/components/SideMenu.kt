@@ -3,13 +3,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.addzero.web.model.enums.Route
 
 @Composable
-fun SideMenu() {
-    var selectedItem by remember { mutableStateOf(0) }
-
+fun SideMenu(
+    currentRoute: Route,
+    onRouteChange: (Route) -> Unit
+) {
     Surface(
         modifier = Modifier.width(240.dp).fillMaxHeight(),
         color = MaterialTheme.colorScheme.surface,
@@ -21,12 +23,18 @@ fun SideMenu() {
             NavigationDrawerItem(
                 icon = { Icon(Icons.Default.Settings, "Dotfiles") },
                 label = { Text("Dotfiles 管理") },
-                selected = selectedItem == 0,
-                onClick = { selectedItem = 0 },
+                selected = currentRoute == Route.DOTFILES,
+                onClick = { onRouteChange(Route.DOTFILES) },
                 modifier = Modifier.padding(vertical = 4.dp)
             )
 
-            // 可以添加更多菜单项
+            NavigationDrawerItem(
+                icon = { Icon(Icons.Default.Menu, "软件") },
+                label = { Text("软件管理") },
+                selected = currentRoute == Route.SOFTWARE,
+                onClick = { onRouteChange(Route.SOFTWARE) },
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
     }
 }
