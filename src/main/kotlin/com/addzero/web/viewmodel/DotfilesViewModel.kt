@@ -1,4 +1,5 @@
 import androidx.compose.runtime.*
+import com.addzero.web.model.PageResult
 import com.addzero.web.service.DotfilesService
 import com.addzero.web.viewmodel.BizEnvVars
 import kotlinx.coroutines.CoroutineScope
@@ -9,7 +10,7 @@ class DotfilesViewModel(
 ) {
     private val service = DotfilesService()
 
-    var dotfilesList by mutableStateOf<List<BizEnvVars>>(emptyList())
+    var pageResult by mutableStateOf<PageResult<BizEnvVars>?>(null)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -18,21 +19,54 @@ class DotfilesViewModel(
     var error by mutableStateOf<String?>(null)
         private set
 
+    var currentPage by mutableStateOf(0)
+        private set
+
+    var pageSize by mutableStateOf(10)
+        private set
+
     init {
-        loadDotfiles()
+        searchDotfiles()
     }
 
-    fun loadDotfiles() {
+    fun searchDotfiles(
+        name: String = "",
+        platforms: Set<String> = emptySet(),
+        osTypes: Set<String> = emptySet(),
+        page: Int = currentPage,
+        size: Int = pageSize
+    ) {
         coroutineScope.launch {
             try {
                 isLoading = true
                 error = null
-                dotfilesList = service.listDotfiles()
+                pageResult = service.searchDotfiles(
+                    name = name,
+                    platforms = platforms,
+                    osTypes = osTypes,
+                    page = page,
+                    size = size
+                )
+                currentPage = page
             } catch (e: Exception) {
-                error = "加载失败: ${e.message}"
+                error = "搜索失败: ${e.message}"
             } finally {
                 isLoading = false
             }
+        }
+    }
+
+    fun nextPage() {
+        pageResult?.let {
+            if (!it.isLast) {
+                searchDotfiles(page = currentPage + 1)
+            }
+        }
+    }
+
+    fun previousPage() {
+        if (currentPage > 0) {
+            searchDotfiles(page = currentPage - 1)
         }
     }
 
@@ -42,7 +76,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.addDotfile(item)
-                loadDotfiles()
+                searchDotfiles()
             } catch (e: Exception) {
                 error = "添加失败: ${e.message}"
             } finally {
@@ -57,7 +91,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.updateDotfile(item)
-                loadDotfiles()
+                searchDotfiles()
             } catch (e: Exception) {
                 error = "更新失败: ${e.message}"
             } finally {
@@ -72,7 +106,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.deleteDotfile(id)
-                loadDotfiles()
+                searchDotfiles()
             } catch (e: Exception) {
                 error = "删除失败: ${e.message}"
             } finally {
@@ -87,7 +121,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.importDotfiles(files)
-                loadDotfiles()
+                searchDotfiles()
             } catch (e: Exception) {
                 error = "导入失败: ${e.message}"
             } finally {
@@ -119,30 +153,6 @@ class DotfilesViewModel(
             null
         } finally {
             isLoading = false
-        }
-    }
-
-    fun searchDotfiles(
-        name: String = "",
-        platforms: Set<String> = emptySet(),
-        osTypes: Set<String> = emptySet()
-    ) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                // 这里应该调用后端的搜索 API
-                // 暂时使用本地过滤模拟
-                dotfilesList = service.listDotfiles().filter { dotfile ->
-                    (name.isEmpty() || dotfile.name.contains(name, ignoreCase = true)) &&
-                    (platforms.isEmpty() || platforms.contains(dotfile.osStructure)) &&
-                    (osTypes.isEmpty() || osTypes.contains(dotfile.osType))
-                }
-            } catch (e: Exception) {
-                error = "搜索失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
         }
     }
 }

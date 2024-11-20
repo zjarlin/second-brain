@@ -1,5 +1,6 @@
 package com.addzero.web.service
 
+import com.addzero.web.model.PageResult
 import com.addzero.web.viewmodel.BizEnvVars
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -25,7 +26,8 @@ class DotfilesService {
     private val baseUrl = "http://localhost:12344/dotfiles"
 
     suspend fun listDotfiles(): List<BizEnvVars> {
-        return client.get("$baseUrl/list").body()
+        val body = client.get("$baseUrl/list").body<List<BizEnvVars>>()
+        return body
     }
 
     suspend fun addDotfile(item: BizEnvVars): BizEnvVars {
@@ -72,11 +74,17 @@ class DotfilesService {
     suspend fun searchDotfiles(
         name: String = "",
         platforms: Set<String> = emptySet(),
-        osTypes: Set<String> = emptySet()
-    ): List<BizEnvVars> {
-        return client.get("$baseUrl/search") {
+        osTypes: Set<String> = emptySet(),
+        page: Int = 0,
+        size: Int = 10
+    ): PageResult<BizEnvVars> {
+        val body = client.get("$baseUrl/search") {
             url {
-                parameters.append("name", name)
+                parameters.append("page", page.toString())
+                parameters.append("size", size.toString())
+                if (name.isNotEmpty()) {
+                    parameters.append("name", name)
+                }
                 platforms.forEach { platform ->
                     parameters.append("platforms", platform)
                 }
@@ -84,6 +92,7 @@ class DotfilesService {
                     parameters.append("osTypes", osType)
                 }
             }
-        }.body()
+        }.body<PageResult<BizEnvVars>>()
+        return body
     }
 }
