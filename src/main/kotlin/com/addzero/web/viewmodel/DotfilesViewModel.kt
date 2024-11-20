@@ -1,82 +1,148 @@
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import com.addzero.web.service.DotfilesService
 import com.addzero.web.viewmodel.BizEnvVars
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class DotfilesViewModel {
-    var dotfilesList by mutableStateOf<List<BizEnvVars>>(getMockData())
+class DotfilesViewModel(
+    private val coroutineScope: CoroutineScope
+) {
+    private val service = DotfilesService()
+
+    var dotfilesList by mutableStateOf<List<BizEnvVars>>(emptyList())
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
+    var error by mutableStateOf<String?>(null)
+        private set
+
+    init {
+        loadDotfiles()
+    }
+
+    fun loadDotfiles() {
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                dotfilesList = service.listDotfiles()
+            } catch (e: Exception) {
+                error = "加载失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun addDotfile(item: BizEnvVars) {
-        dotfilesList = dotfilesList + item
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                service.addDotfile(item)
+                loadDotfiles()
+            } catch (e: Exception) {
+                error = "添加失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
     fun updateDotfile(item: BizEnvVars) {
-        dotfilesList = dotfilesList.map {
-            if (it.id == item.id) item else it
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                service.updateDotfile(item)
+                loadDotfiles()
+            } catch (e: Exception) {
+                error = "更新失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
         }
     }
 
     fun deleteDotfile(id: String) {
-        dotfilesList = dotfilesList.filter { it.id != id }
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                service.deleteDotfile(id)
+                loadDotfiles()
+            } catch (e: Exception) {
+                error = "删除失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
-    fun importDotfiles(items: List<BizEnvVars>) {
-        dotfilesList = items
+    fun importDotfiles(files: List<ByteArray>) {
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                service.importDotfiles(files)
+                loadDotfiles()
+            } catch (e: Exception) {
+                error = "导入失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
-    fun exportDotfiles(): List<BizEnvVars> {
-        return dotfilesList
+    suspend fun exportDotfiles(): ByteArray? {
+        return try {
+            isLoading = true
+            error = null
+            service.exportDotfiles()
+        } catch (e: Exception) {
+            error = "导出失败: ${e.message}"
+            null
+        } finally {
+            isLoading = false
+        }
     }
 
-    // 模拟数据
-    private fun getMockData(): List<BizEnvVars> {
-        return listOf(
-            BizEnvVars(
-                id = "1",
-                osType = "Linux",
-                osStructure = "x86_64",
-                defType = "PATH",
-                name = "JAVA_HOME",
-                value = "/usr/lib/jvm/java-11-openjdk",
-                describtion = "Java 环境变量",
-                status = "ENABLED",
-                fileUrl = "/etc/profile.d/java.sh",
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis(),
-                createdBy = "admin",
-                updatedBy = "admin"
-            ),
-            BizEnvVars(
-                id = "2",
-                osType = "MacOS",
-                osStructure = "arm64",
-                defType = "PATH",
-                name = "MAVEN_HOME",
-                value = "/usr/local/maven",
-                describtion = "Maven 环境变量",
-                status = "ENABLED",
-                fileUrl = "~/.zshrc",
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis(),
-                createdBy = "admin",
-                updatedBy = "admin"
-            ),
-            BizEnvVars(
-                id = "3",
-                osType = "Windows",
-                osStructure = "x86_64",
-                defType = "USER_VAR",
-                name = "PYTHON_HOME",
-                value = "C:\\Python39",
-                describtion = "Python 环境变量",
-                status = "DISABLED",
-                fileUrl = "System Environment Variables",
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis(),
-                createdBy = "admin",
-                updatedBy = "admin"
-            )
-        )
+    suspend fun generateConfig(): ByteArray? {
+        return try {
+            isLoading = true
+            error = null
+            service.generateConfig()
+        } catch (e: Exception) {
+            error = "生成配置失败: ${e.message}"
+            null
+        } finally {
+            isLoading = false
+        }
+    }
+
+    fun searchDotfiles(
+        name: String = "",
+        platforms: Set<String> = emptySet(),
+        osTypes: Set<String> = emptySet()
+    ) {
+        coroutineScope.launch {
+            try {
+                isLoading = true
+                error = null
+                // 这里应该调用后端的搜索 API
+                // 暂时使用本地过滤模拟
+                dotfilesList = service.listDotfiles().filter { dotfile ->
+                    (name.isEmpty() || dotfile.name.contains(name, ignoreCase = true)) &&
+                    (platforms.isEmpty() || platforms.contains(dotfile.osStructure)) &&
+                    (osTypes.isEmpty() || osTypes.contains(dotfile.osType))
+                }
+            } catch (e: Exception) {
+                error = "搜索失败: ${e.message}"
+            } finally {
+                isLoading = false
+            }
+        }
     }
 }

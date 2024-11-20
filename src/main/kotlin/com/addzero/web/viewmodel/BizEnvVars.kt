@@ -1,5 +1,8 @@
 package com.addzero.web.viewmodel
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class BizEnvVars(
     /** ID */
     val id: String,
