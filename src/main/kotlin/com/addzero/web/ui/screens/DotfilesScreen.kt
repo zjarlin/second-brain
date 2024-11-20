@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.addzero.web.model.BizEnvVars
 import com.addzero.web.ui.components.crud.CrudLayout
 import com.addzero.web.ui.components.crud.Pagination
-import com.addzero.web.model.BizEnvVars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -245,7 +245,7 @@ fun DotfilesScreen() {
                 selectedOSTypes = selectedOSTypes,
                 onOSTypeSelectionChange = { selectedOSTypes = it },
                 onSearch = {
-                    viewModel.searchDotfiles(
+                    viewModel.loadData(
                         name = searchName,
                         platforms = selectedPlatforms,
                         osTypes = selectedOSTypes

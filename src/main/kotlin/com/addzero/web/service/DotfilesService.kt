@@ -78,7 +78,7 @@ class DotfilesService {
         page: Int = 0,
         size: Int = 10
     ): PageResult<BizEnvVars> {
-        val body = client.get("$baseUrl/search") {
+        return client.get("$baseUrl/search") {
             url {
                 parameters.append("page", page.toString())
                 parameters.append("size", size.toString())
@@ -92,7 +92,6 @@ class DotfilesService {
                     parameters.append("osTypes", osType)
                 }
             }
-        }.body<PageResult<BizEnvVars>>()
-        return body
+        }.body()
     }
 }

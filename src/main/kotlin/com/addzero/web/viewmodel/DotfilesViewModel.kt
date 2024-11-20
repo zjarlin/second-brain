@@ -1,7 +1,7 @@
 import androidx.compose.runtime.*
+import com.addzero.web.model.BizEnvVars
 import com.addzero.web.model.PageResult
 import com.addzero.web.service.DotfilesService
-import com.addzero.web.model.BizEnvVars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -26,10 +26,10 @@ class DotfilesViewModel(
         private set
 
     init {
-        searchDotfiles()
+        loadData()
     }
 
-    fun searchDotfiles(
+    fun loadData(
         name: String = "",
         platforms: Set<String> = emptySet(),
         osTypes: Set<String> = emptySet(),
@@ -59,14 +59,14 @@ class DotfilesViewModel(
     fun nextPage() {
         pageResult?.let {
             if (!it.isLast) {
-                searchDotfiles(page = currentPage + 1)
+                loadData(page = currentPage + 1)
             }
         }
     }
 
     fun previousPage() {
         if (currentPage > 0) {
-            searchDotfiles(page = currentPage - 1)
+            loadData(page = currentPage - 1)
         }
     }
 
@@ -76,7 +76,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.addDotfile(item)
-                searchDotfiles()
+                loadData()
             } catch (e: Exception) {
                 error = "添加失败: ${e.message}"
             } finally {
@@ -91,7 +91,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.updateDotfile(item)
-                searchDotfiles()
+                loadData()
             } catch (e: Exception) {
                 error = "更新失败: ${e.message}"
             } finally {
@@ -106,7 +106,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.deleteDotfile(id)
-                searchDotfiles()
+                loadData()
             } catch (e: Exception) {
                 error = "删除失败: ${e.message}"
             } finally {
@@ -121,7 +121,7 @@ class DotfilesViewModel(
                 isLoading = true
                 error = null
                 service.importDotfiles(files)
-                searchDotfiles()
+                loadData()
             } catch (e: Exception) {
                 error = "导入失败: ${e.message}"
             } finally {
