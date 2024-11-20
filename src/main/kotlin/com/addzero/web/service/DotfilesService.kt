@@ -1,7 +1,7 @@
 package com.addzero.web.service
 
 import com.addzero.web.model.PageResult
-import com.addzero.web.viewmodel.BizEnvVars
+import com.addzero.web.model.BizEnvVars
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*

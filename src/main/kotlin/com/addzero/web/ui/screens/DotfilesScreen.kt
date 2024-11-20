@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.components.crud.CrudLayout
 import com.addzero.web.ui.components.crud.Pagination
-import com.addzero.web.viewmodel.BizEnvVars
+import com.addzero.web.model.BizEnvVars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
