@@ -4,6 +4,9 @@ import com.addzero.web.model.notes.*
 
 class MockNotesService : NotesService {
     override suspend fun getKnowledgeGraph(query: String?): KnowledgeGraph {
+        // 模拟延迟
+        kotlinx.coroutines.delay(500)
+        
         // Mock 知识图谱数据
         val nodes = listOf(
             KnowledgeNode(
@@ -78,9 +81,13 @@ class MockNotesService : NotesService {
         )
 
         // 如果有搜索查询，过滤节点和边
-        return if (query != null) {
+        return if (!query.isNullOrBlank()) {
             val filteredNodes = nodes.filter { 
-                it.label.contains(query, ignoreCase = true) 
+                it.label.contains(query, ignoreCase = true) ||
+                it.type.contains(query, ignoreCase = true) ||
+                it.properties.values.any { value -> 
+                    value.contains(query, ignoreCase = true) 
+                }
             }
             val nodeIds = filteredNodes.map { it.id }.toSet()
             val filteredEdges = edges.filter { 

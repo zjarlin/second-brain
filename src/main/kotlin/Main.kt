@@ -19,7 +19,7 @@ fun main() = application {
     )
 
     Window(
-        onCloseRequest = ::exitApplication, title = "Compose for multiplatform", state = windowState
+        onCloseRequest = ::exitApplication, title = "Compose Multiplatform", state = windowState
     ) {
         App()
     }
