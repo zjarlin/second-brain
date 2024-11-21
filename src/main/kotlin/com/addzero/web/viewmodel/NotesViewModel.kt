@@ -4,18 +4,18 @@ import androidx.compose.runtime.*
 import com.addzero.web.model.notes.*
 import com.addzero.web.service.NotesService
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NotesViewModel(
-    private val coroutineScope: CoroutineScope
-) {
+class NotesViewModel {
     private val service = NotesService()
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     var notes by mutableStateOf<List<Note>>(emptyList())
         private set
 
     var currentNote by mutableStateOf<Note?>(null)
-        private set
+        public set
 
     var knowledgeGraph by mutableStateOf<KnowledgeGraph?>(null)
         private set

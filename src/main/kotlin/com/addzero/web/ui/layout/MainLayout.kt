@@ -7,12 +7,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.addzero.web.config.AppConfig
 import com.addzero.web.model.enums.Route
+import com.addzero.web.ui.components.Breadcrumb
+import com.addzero.web.ui.components.SideMenu
+import com.addzero.web.viewmodel.NotesViewModel
 
 @Composable
 fun MainLayout() {
     var isLoggedIn by remember { mutableStateOf(!AppConfig.ENABLE_LOGIN) }
     var currentRoute by remember { mutableStateOf(Route.DOTFILES) }
-    
+
+    val notesViewModel = remember { NotesViewModel() }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +42,10 @@ fun MainLayout() {
                     Column {
                         TopBar()
                         Breadcrumb(currentRoute = currentRoute)
-                        MainContent(currentRoute = currentRoute)
+                        MainContent(
+                            currentRoute = currentRoute,
+                            viewModel = notesViewModel
+                        )
                     }
                 }
             }

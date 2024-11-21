@@ -16,20 +16,19 @@ repositories {
 }
 
 dependencies {
-    // Note, if you develop a library, you should use compose.desktop.common.
-    // compose.desktop.currentOs should be used in launcher-sourceSet
-    // (in a separate module for demo project and in testMain).
-    // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     
+    // Material Icons
+    implementation(compose.materialIconsExtended)
+
     // Ktor client
     implementation("io.ktor:ktor-client-core:2.3.7")
     implementation("io.ktor:ktor-client-cio:2.3.7")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-    
+
     // Kotlinx serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 }
