@@ -1,7 +1,10 @@
+package com.addzero.web.ui.components
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,33 +28,27 @@ fun TopBar() {
         color = Color.Transparent
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Dotfiles 管理系统",
+                text = "Second Brain",
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.White
             )
             
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* 打开通知 */ }) {
+                IconButton(onClick = {}) {
                     Icon(
-                        Icons.Default.Notifications,
-                        contentDescription = "通知",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-                
-                IconButton(onClick = { /* 打开用户菜单 */ }) {
-                    Icon(
-                        Icons.Default.Person,
+                        imageVector = Icons.Default.Person,
                         contentDescription = "用户",
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = Color.White
                     )
                 }
             }

@@ -9,6 +9,7 @@ import com.addzero.web.config.AppConfig
 import com.addzero.web.model.enums.Route
 import com.addzero.web.ui.components.Breadcrumb
 import com.addzero.web.ui.components.SideMenu
+import com.addzero.web.ui.components.TopBar
 import com.addzero.web.viewmodel.NotesViewModel
 
 @Composable

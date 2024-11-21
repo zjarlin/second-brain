@@ -19,7 +19,7 @@ fun main() = application {
     )
 
     Window(
-        onCloseRequest = ::exitApplication, title = "Dotfiles 管理系统", state = windowState
+        onCloseRequest = ::exitApplication, title = "Compose for multiplatform", state = windowState
     ) {
         App()
     }

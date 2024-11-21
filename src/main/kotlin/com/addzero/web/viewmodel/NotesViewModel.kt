@@ -3,12 +3,19 @@ package com.addzero.web.viewmodel
 import androidx.compose.runtime.*
 import com.addzero.web.model.notes.*
 import com.addzero.web.service.NotesService
+import com.addzero.web.config.AppConfig
+import com.addzero.web.service.ApiNotesService
+import com.addzero.web.service.MockNotesService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NotesViewModel {
-    private val service = NotesService()
+    private val service: NotesService = if (AppConfig.USE_MOCK_DATA) {
+        MockNotesService()
+    } else {
+        ApiNotesService()
+    }
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     var notes by mutableStateOf<List<Note>>(emptyList())
@@ -146,4 +153,4 @@ class NotesViewModel {
             }
         }
     }
-} 
+}
