@@ -2,14 +2,16 @@ package com.addzero.web.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.text.*
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.addzero.web.model.notes.KnowledgeNode
 import com.addzero.web.model.notes.KnowledgeEdge
@@ -19,6 +21,7 @@ import kotlin.math.*
 fun ComposeKnowledgeGraphView(
     nodes: List<KnowledgeNode>,
     edges: List<KnowledgeEdge>,
+    onNodeClick: (KnowledgeNode) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var scale by remember { mutableStateOf(1f) }
@@ -40,6 +43,19 @@ fun ComposeKnowledgeGraphView(
                     scale *= zoom
                     offset += pan
                 }
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { tapPosition ->
+                        // 检查点击的是否是节点
+                        val clickedNodeId = findNodeAtPosition(tapPosition, nodePositions)
+                        clickedNodeId?.let { id ->
+                            nodes.find { it.id == id }?.let { node ->
+                                onNodeClick(node)
+                            }
+                        }
+                    }
+                )
             }
             .pointerInput(Unit) {
                 detectDragGestures(
@@ -64,6 +80,7 @@ fun ComposeKnowledgeGraphView(
                     val sourcePos = nodePositions[edge.source] ?: return@forEach
                     val targetPos = nodePositions[edge.target] ?: return@forEach
 
+                    // 绘制边的连线
                     drawLine(
                         color = Color.Gray,
                         start = sourcePos,
@@ -97,11 +114,12 @@ fun ComposeKnowledgeGraphView(
                 // 绘制节点
                 nodes.forEach { node ->
                     val position = nodePositions[node.id] ?: return@forEach
+                    val isBeingDragged = node.id == draggedNodeId
 
                     // 节点背景
                     drawCircle(
-                        color = Color(0xFF69B3A2),
-                        radius = 20f,
+                        color = if (isBeingDragged) Color(0xFF4CAF50) else Color(0xFF69B3A2),
+                        radius = if (isBeingDragged) 22f else 20f,
                         center = position
                     )
 
@@ -125,6 +143,61 @@ fun ComposeKnowledgeGraphView(
             }
         }
     }
+}
+
+@Composable
+fun NodeDetailsDialog(
+    node: KnowledgeNode,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { 
+            Column {
+                Text(
+                    node.label,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    "类型: ${node.type}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        text = {
+            Column {
+                node.properties.forEach { (key, value) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = key,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.weight(0.4f)
+                        )
+                        Text(
+                            text = value,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(0.6f)
+                        )
+                    }
+                    if (node.properties.entries.last().key != key) {
+                        Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("关闭")
+            }
+        }
+    )
 }
 
 private fun calculateInitialPositions(

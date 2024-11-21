@@ -8,11 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.viewmodel.NotesViewModel
 import com.addzero.web.ui.components.ComposeKnowledgeGraphView
+import com.addzero.web.model.notes.KnowledgeNode
+import com.addzero.web.ui.components.NodeDetailsDialog
 
 @Composable
 fun KnowledgeGraphPage(viewModel: NotesViewModel) {
     var searchQuery by remember { mutableStateOf("") }
-    
+    var selectedNode by remember { mutableStateOf<KnowledgeNode?>(null) }
+
     // 初始加载知识图谱
     LaunchedEffect(Unit) {
         viewModel.loadKnowledgeGraph()
@@ -52,7 +55,7 @@ fun KnowledgeGraphPage(viewModel: NotesViewModel) {
                 CircularProgressIndicator()
             }
         }
-        
+
         // 错误状态
         viewModel.error?.let { error ->
             Text(
@@ -75,9 +78,18 @@ fun KnowledgeGraphPage(viewModel: NotesViewModel) {
                 ComposeKnowledgeGraphView(
                     nodes = graph.nodes,
                     edges = graph.edges,
+                    onNodeClick = { node -> selectedNode = node },
                     modifier = Modifier.fillMaxSize()
                 )
             }
         }
+    }
+
+    // 显示节点详情对话框
+    selectedNode?.let { node ->
+        NodeDetailsDialog(
+            node = node,
+            onDismiss = { selectedNode = null }
+        )
     }
 }
