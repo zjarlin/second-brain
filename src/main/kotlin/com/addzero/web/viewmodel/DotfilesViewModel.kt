@@ -19,7 +19,7 @@ class DotfilesViewModel(
     var error by mutableStateOf<String?>(null)
         private set
 
-    var currentPage by mutableStateOf(0)
+    var currentPage by mutableStateOf(1)
         private set
 
     var pageSize by mutableStateOf(10)

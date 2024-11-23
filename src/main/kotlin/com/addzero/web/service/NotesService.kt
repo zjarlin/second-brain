@@ -1,9 +1,15 @@
 package com.addzero.web.service
 
+import com.addzero.web.model.PageResult
 import com.addzero.web.model.notes.*
+import kotlinx.serialization.Serializable
 
 interface NotesService {
-    suspend fun getNotes(parentId: String? = null): List<Note>
+    suspend fun <T: @Serializable Any> getNotes(
+        parentId: String? = null,
+        page: Int = 0,
+        size: Int = 20
+    ): PageResult<T>
     suspend fun createNote(note: Note): Note
     suspend fun updateNote(note: Note): Note
     suspend fun deleteNote(id: String)

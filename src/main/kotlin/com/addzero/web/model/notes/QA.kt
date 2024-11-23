@@ -2,7 +2,7 @@ package com.addzero.web.model.notes
 
 import kotlinx.serialization.Serializable
 
-@Serializable
+@kotlinx.serialization.Serializable
 data class Question(
     val id: String,
     val content: String,
@@ -10,7 +10,7 @@ data class Question(
     val createdBy: String
 )
 
-@Serializable
+@kotlinx.serialization.Serializable
 data class Answer(
     val id: String,
     val questionId: String,
@@ -25,4 +25,4 @@ data class AnswerSource(
     val title: String,
     val snippet: String,
     val relevance: Double
-) 
+)

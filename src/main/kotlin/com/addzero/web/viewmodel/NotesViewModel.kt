@@ -39,12 +39,27 @@ class NotesViewModel {
     var error by mutableStateOf<String?>(null)
         private set
 
+    var currentPage by mutableStateOf(0)
+        private set
+
+    var pageSize by mutableStateOf(20)
+        private set
+
+    var totalPages by mutableStateOf(0)
+        private set
+
+    var totalElements by mutableStateOf(0L)
+        private set
+
     fun loadNotes(parentId: String? = null) {
         coroutineScope.launch {
             try {
                 isLoading = true
                 error = null
-                notes = service.getNotes(parentId)
+                val result = service.getNotes<Note>(parentId, currentPage, pageSize)
+                notes = result.content
+                totalPages = result.totalPages
+                totalElements = result.totalElements
             } catch (e: Exception) {
                 error = "加载笔记失败: ${e.message}"
             } finally {
@@ -151,6 +166,21 @@ class NotesViewModel {
             } finally {
                 isLoading = false
             }
+        }
+    }
+
+    fun changePage(newPage: Int) {
+        if (newPage in 0 until totalPages) {
+            currentPage = newPage
+            loadNotes()
+        }
+    }
+
+    fun changePageSize(newSize: Int) {
+        if (newSize > 0) {
+            pageSize = newSize
+            currentPage = 0
+            loadNotes()
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.addzero.web.service
 
+import com.addzero.web.model.PageResult
 import com.addzero.web.model.notes.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -23,14 +24,29 @@ class ApiNotesService : NotesService {
     }
 
     private val baseUrl = "http://localhost:12344/notes"
-
-    override suspend fun getNotes(parentId: String?): List<Note> {
+    override suspend fun <T : Any> getNotes(parentId: String?, page: Int, size: Int): PageResult<T> {
         return client.get("$baseUrl/list") {
             url {
-                parentId?.let { parameters.append("parentId", it) }
+//                parentId?.let { parameters.append("parentId", it) }
+                parameters.append("page", page.toString())
+                parameters.append("size", size.toString())
             }
         }.body()
     }
+
+//    override suspend fun getNotes(
+//        parentId: String?,
+//        page: Int,
+//        size: Int
+//    ): PageResult<Note> {
+//        return client.get("$baseUrl/list") {
+//            url {
+//                parentId?.let { parameters.append("parentId", it) }
+//                parameters.append("page", page.toString())
+//                parameters.append("size", size.toString())
+//            }
+//        }.body()
+//    }
 
     override suspend fun createNote(note: Note): Note {
         return client.post("$baseUrl/create") {
@@ -80,4 +96,4 @@ class ApiNotesService : NotesService {
             }
         }.body()
     }
-} 
+}

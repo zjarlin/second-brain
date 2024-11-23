@@ -11,6 +11,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.jetbrains.skia.Path
 
 class DotfilesService {
     private val client = HttpClient(CIO) {
@@ -78,7 +79,7 @@ class DotfilesService {
         page: Int = 0,
         size: Int = 10
     ): PageResult<BizEnvVars> {
-        return client.get("$baseUrl/search") {
+        val body = client.get("$baseUrl/search") {
             url {
                 parameters.append("page", page.toString())
                 parameters.append("size", size.toString())
@@ -92,6 +93,7 @@ class DotfilesService {
                     parameters.append("osTypes", osType)
                 }
             }
-        }.body()
+        }.body<PageResult<BizEnvVars>>()
+        return body
     }
 }
