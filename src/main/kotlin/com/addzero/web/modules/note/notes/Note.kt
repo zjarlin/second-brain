@@ -9,6 +9,7 @@ data class Note(
     val content: String,
     val type: NoteType,
     val tags: List<String>,
+    val children: List<Note>? = null,
     val parentId: String?,
     val path: String,
     val fileUrl: String?,

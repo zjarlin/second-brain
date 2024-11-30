@@ -75,7 +75,7 @@ class DotfilesViewModel(
             try {
                 isLoading = true
                 error = null
-                service.addDotfile(item)
+                service.save(item)
                 loadData()
             } catch (e: Exception) {
                 error = "添加失败: ${e.message}"
@@ -90,7 +90,7 @@ class DotfilesViewModel(
             try {
                 isLoading = true
                 error = null
-                service.updateDotfile(item)
+                service.update(item)
                 loadData()
             } catch (e: Exception) {
                 error = "更新失败: ${e.message}"
@@ -105,7 +105,7 @@ class DotfilesViewModel(
             try {
                 isLoading = true
                 error = null
-                service.deleteDotfile(id)
+                service.delete(id)
                 loadData()
             } catch (e: Exception) {
                 error = "删除失败: ${e.message}"

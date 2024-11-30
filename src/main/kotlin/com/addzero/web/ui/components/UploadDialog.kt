@@ -1,56 +1,79 @@
 package com.addzero.web.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import java.awt.FileDialog
-import java.awt.Frame
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import java.io.File
+import javax.swing.JFileChooser
+import javax.swing.SwingUtilities
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-/**
- * @param [onDismiss]
- * @param [onUpload]
- */
 @Composable
 fun UploadDialog(
     onDismiss: () -> Unit,
-    onUpload: (ByteArray, String) -> Unit,
+    onUpload: (ByteArray, String) -> Unit
 ) {
     var selectedFile by remember { mutableStateOf<File?>(null) }
+    var isSelectingFile by remember { mutableStateOf(false) }
 
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("上传文档") }, text = {
-        Column {
-            Button(onClick = {
-                val fileDialog = FileDialog(Frame())
-                fileDialog.isVisible = true
-                fileDialog.file?.let { filename ->
-                    val file = File(fileDialog.directory, filename)
-                    selectedFile = file
+    LaunchedEffect(isSelectingFile) {
+        if (isSelectingFile) {
+            withContext(Dispatchers.IO) {
+                val fileChooser = JFileChooser().apply {
+                    dialogTitle = "选择文件"
+                    fileSelectionMode = JFileChooser.FILES_ONLY
                 }
-            }) {
-                Text("选择文件")
-            }
 
-            selectedFile?.let {
-                Text("已选择: ${it.name}")
+                SwingUtilities.invokeLater {
+                    val result = fileChooser.showOpenDialog(null)
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        selectedFile = fileChooser.selectedFile
+                    }
+                    isSelectingFile = false
+                }
             }
         }
-    }, confirmButton = {
-        Button(
-            onClick = {
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("上传文档") },
+        text = {
+            Column {
+                Button(
+                    onClick = { isSelectingFile = true },
+                    enabled = !isSelectingFile
+                ) {
+                    Text(if (isSelectingFile) "选择中..." else "选择文件")
+                }
+
                 selectedFile?.let {
-                    onUpload(it.readBytes(), it.name)
+                    Text(
+                        "已选择: ${it.name}",
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
-            }, enabled = selectedFile != null
-        ) {
-            Text("上传")
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    selectedFile?.let {
+                        onUpload(it.readBytes(), it.name)
+                    }
+                },
+                enabled = selectedFile != null
+            ) {
+                Text("上传")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
         }
-    }, dismissButton = {
-        TextButton(onClick = onDismiss) {
-            Text("取消")
-        }
-    })
+    )
 }

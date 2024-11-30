@@ -1,4 +1,4 @@
-package com.addzero.web.ui.components
+package com.addzero.web.modules.note.notes.treenote
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
