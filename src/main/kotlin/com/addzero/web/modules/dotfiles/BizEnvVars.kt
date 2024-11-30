@@ -1,4 +1,4 @@
-package com.addzero.web.model
+package com.addzero.web.modules.dotfiles
 
 import kotlinx.serialization.Serializable
 

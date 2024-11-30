@@ -9,7 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.addzero.web.model.BizEnvVars
+import com.addzero.web.modules.dotfiles.BizEnvVars
+import com.addzero.web.modules.dotfiles.DotfilesViewModel
 import com.addzero.web.ui.components.crud.CrudLayout
 import com.addzero.web.ui.components.crud.Pagination
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 // 先声明所有子组件
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchPanel(
+fun SearchPanel(
     searchName: String,
     onSearchNameChange: (String) -> Unit,
     selectedPlatforms: Set<String>,

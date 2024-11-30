@@ -1,4 +1,4 @@
-package com.addzero.web.model.notes
+package com.addzero.web.modules.note.qa
 
 import kotlinx.serialization.Serializable
 

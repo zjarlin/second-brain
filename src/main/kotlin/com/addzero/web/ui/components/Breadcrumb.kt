@@ -8,6 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.Route
 
+/**
+ * 面包屑
+ * @param [currentRoute]
+ */
 @Composable
 fun Breadcrumb(currentRoute: Route) {
     Surface(

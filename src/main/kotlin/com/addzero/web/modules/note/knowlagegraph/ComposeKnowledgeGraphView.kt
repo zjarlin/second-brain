@@ -1,4 +1,4 @@
-package com.addzero.web.ui.components
+package com.addzero.web.modules.note.knowlagegraph
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.*
@@ -13,8 +13,6 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.addzero.web.model.notes.KnowledgeNode
-import com.addzero.web.model.notes.KnowledgeEdge
 import kotlin.math.*
 
 @Composable
@@ -28,7 +26,7 @@ fun ComposeKnowledgeGraphView(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var draggedNodeId by remember { mutableStateOf<String?>(null) }
     var nodePositions by remember { mutableStateOf(mutableMapOf<String, Offset>()) }
-    
+
     val textMeasurer = rememberTextMeasurer()
 
     LaunchedEffect(nodes) {
@@ -93,7 +91,7 @@ fun ComposeKnowledgeGraphView(
                         (sourcePos.x + targetPos.x) / 2,
                         (sourcePos.y + targetPos.y) / 2
                     )
-                    
+
                     val textLayoutResult = textMeasurer.measure(
                         text = edge.label,
                         style = TextStyle(
@@ -101,7 +99,7 @@ fun ComposeKnowledgeGraphView(
                             fontSize = 12.sp
                         )
                     )
-                    
+
                     drawText(
                         textLayoutResult = textLayoutResult,
                         topLeft = Offset(
@@ -131,7 +129,7 @@ fun ComposeKnowledgeGraphView(
                             fontSize = 14.sp
                         )
                     )
-                    
+
                     drawText(
                         textLayoutResult = textLayoutResult,
                         topLeft = Offset(
@@ -152,7 +150,7 @@ fun NodeDetailsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { 
+        title = {
             Column {
                 Text(
                     node.label,

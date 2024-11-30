@@ -1,7 +1,6 @@
-package com.addzero.web.service
+package com.addzero.web.modules.dotfiles
 
 import com.addzero.web.model.PageResult
-import com.addzero.web.model.BizEnvVars
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -11,7 +10,6 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import org.jetbrains.skia.Path
 
 class DotfilesService {
     private val client = HttpClient(CIO) {

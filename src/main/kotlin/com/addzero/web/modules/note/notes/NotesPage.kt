@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.components.NotesList
 import com.addzero.web.ui.components.UploadDialog
-import com.addzero.web.viewmodel.NotesViewModel
+import com.addzero.web.modules.note.notes.NotesViewModel
 
 @Composable
 fun NotesPage(viewModel: NotesViewModel) {

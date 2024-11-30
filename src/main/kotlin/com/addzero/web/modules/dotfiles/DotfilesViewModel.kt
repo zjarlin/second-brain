@@ -1,7 +1,7 @@
+package com.addzero.web.modules.dotfiles
+
 import androidx.compose.runtime.*
-import com.addzero.web.model.BizEnvVars
 import com.addzero.web.model.PageResult
-import com.addzero.web.service.DotfilesService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

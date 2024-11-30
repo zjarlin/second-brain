@@ -1,4 +1,4 @@
-package com.addzero.web.model.notes
+package com.addzero.web.modules.note.knowlagegraph
 
 import kotlinx.serialization.Serializable
 
@@ -22,4 +22,4 @@ data class KnowledgeEdge(
 data class KnowledgeGraph(
     val nodes: List<KnowledgeNode>,
     val edges: List<KnowledgeEdge>
-) 
+)

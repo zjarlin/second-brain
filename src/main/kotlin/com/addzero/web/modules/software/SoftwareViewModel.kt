@@ -1,9 +1,9 @@
+package com.addzero.web.modules.software
+
 import androidx.compose.runtime.*
 import com.addzero.web.model.PageResult
-import com.addzero.web.model.Software
 import com.addzero.web.model.enums.OsType
 import com.addzero.web.model.enums.PlatformType
-import com.addzero.web.service.SoftwareService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

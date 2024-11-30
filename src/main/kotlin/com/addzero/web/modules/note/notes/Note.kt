@@ -1,7 +1,6 @@
-package com.addzero.web.model.notes
+package com.addzero.web.modules.note.notes
 
 import kotlinx.serialization.Serializable
-import java.time.Instant
 
 @Serializable
 data class Note(
@@ -25,4 +24,4 @@ enum class NoteType {
     WORD,
     EXCEL,
     TXT
-} 
+}

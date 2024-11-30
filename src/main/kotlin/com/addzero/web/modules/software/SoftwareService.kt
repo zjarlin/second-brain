@@ -1,7 +1,6 @@
-package com.addzero.web.service
+package com.addzero.web.modules.software
 
 import com.addzero.web.model.PageResult
-import com.addzero.web.model.Software
 import com.addzero.web.model.enums.OsType
 import com.addzero.web.model.enums.PlatformType
 import io.ktor.client.*
@@ -9,7 +8,6 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
@@ -59,4 +57,4 @@ class SoftwareService {
     suspend fun getSoftwareDetails(id: String): Software {
         return client.get("$baseUrl/details/$id").body()
     }
-} 
+}

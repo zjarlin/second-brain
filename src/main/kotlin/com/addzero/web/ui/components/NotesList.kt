@@ -8,7 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.model.notes.Note
+import com.addzero.web.modules.note.notes.Note
 
 @Composable
 fun NotesList(

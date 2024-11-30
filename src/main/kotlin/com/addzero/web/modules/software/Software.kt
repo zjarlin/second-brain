@@ -1,4 +1,4 @@
-package com.addzero.web.model
+package com.addzero.web.modules.software
 
 import kotlinx.serialization.Serializable
 
@@ -15,4 +15,4 @@ data class Software(
     val category: String,
     val downloadUrl: String,
     val iconUrl: String? = null
-) 
+)

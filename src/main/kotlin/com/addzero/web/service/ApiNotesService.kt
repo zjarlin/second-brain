@@ -11,6 +11,11 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import com.intellij.database.dataSource.DatabaseConnection
+import com.intellij.database.dataSource.DatabaseConnectionPoint
+import com.intellij.database.psi.DbPsiFacade
+import com.intellij.database.util.DbImplUtil
+import com.intellij.openapi.project.Project
 
 class ApiNotesService : NotesService {
     private val client = HttpClient(CIO) {
@@ -95,5 +100,69 @@ class ApiNotesService : NotesService {
                 query?.let { parameters.append("query", it) }
             }
         }.body()
+    }
+}
+
+object SqlExecutor {
+    /**
+     * 执行SQL查询
+     */
+    fun executeQuery(
+        project: Project,
+        dataSource: DatabaseConnectionPoint,
+        sql: String
+    ): List<Map<String, Any?>> {
+        val connection = getConnection(dataSource)
+        return try {
+            connection.executeQuery(sql) { resultSet ->
+                val results = mutableListOf<Map<String, Any?>>()
+                val metaData = resultSet.metaData
+                val columnCount = metaData.columnCount
+
+                while (resultSet.next()) {
+                    val row = mutableMapOf<String, Any?>()
+                    for (i in 1..columnCount) {
+                        val columnName = metaData.getColumnName(i)
+                        val value = resultSet.getObject(i)
+                        row[columnName] = value
+                    }
+                    results.add(row)
+                }
+                results
+            }
+        } finally {
+            connection.close()
+        }
+    }
+
+    /**
+     * 执行更新SQL（INSERT, UPDATE, DELETE等）
+     */
+    fun executeUpdate(
+        project: Project,
+        dataSource: DatabaseConnectionPoint,
+        sql: String
+    ): Int {
+        val connection = getConnection(dataSource)
+        return try {
+            connection.executeUpdate(sql)
+        } finally {
+            connection.close()
+        }
+    }
+
+    /**
+     * 获取数据库连接
+     */
+    private fun getConnection(dataSource: DatabaseConnectionPoint): DatabaseConnection {
+        return DbImplUtil.getConnection(dataSource)
+            ?: throw IllegalStateException("无法获取数据库连接")
+    }
+
+    /**
+     * 获取当前选中的数据源
+     */
+    fun getCurrentDataSource(project: Project): DatabaseConnectionPoint? {
+        return DbPsiFacade.getInstance(project).dataSources.firstOrNull()
     }
 }

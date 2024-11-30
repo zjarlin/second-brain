@@ -6,10 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.viewmodel.NotesViewModel
-import com.addzero.web.ui.components.ComposeKnowledgeGraphView
-import com.addzero.web.model.notes.KnowledgeNode
-import com.addzero.web.ui.components.NodeDetailsDialog
+import com.addzero.web.modules.note.notes.NotesViewModel
+import com.addzero.web.modules.note.knowlagegraph.ComposeKnowledgeGraphView
+import com.addzero.web.modules.note.knowlagegraph.KnowledgeNode
+import com.addzero.web.modules.note.knowlagegraph.NodeDetailsDialog
 
 @Composable
 fun KnowledgeGraphPage(viewModel: NotesViewModel) {

@@ -1,4 +1,4 @@
-package com.addzero.web.viewmodel.base
+package com.addzero.web.base
 
 import androidx.compose.runtime.*
 import com.addzero.web.model.PageResult
@@ -57,4 +57,4 @@ abstract class CrudViewModel<T>(
             search(currentPage - 1)
         }
     }
-} 
+}
