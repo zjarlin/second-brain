@@ -11,5 +11,5 @@ interface NotesService : BaseService<Note> {
     suspend fun askQuestion(question: String): Answer
     suspend fun getQuestionHistory(): List<Question>
     suspend fun getKnowledgeGraph(query: String? = null): KnowledgeGraph
-    suspend fun uploadFile(file: ByteArray, filename: String): String
+    suspend fun upload(file: ByteArray, filename: String): String
 }

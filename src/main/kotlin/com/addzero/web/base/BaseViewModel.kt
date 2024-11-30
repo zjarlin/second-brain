@@ -41,7 +41,7 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
             try {
                 isLoading = true
                 error = null
-                val result = service.getItems(
+                val result = service.page(
                     params = params,
                     page = currentPage,
                     size = pageSize
@@ -60,7 +60,7 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
             try {
                 isLoading = true
                 error = null
-                service.createItem(item)
+                service.save(item)
                 loadItems()
             } catch (e: Exception) {
                 error = "创建失败: ${e.message}"
@@ -75,7 +75,7 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
             try {
                 isLoading = true
                 error = null
-                service.updateItem(item)
+                service.update(item)
                 loadItems()
             } catch (e: Exception) {
                 error = "更新失败: ${e.message}"
@@ -90,7 +90,7 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
             try {
                 isLoading = true
                 error = null
-                service.deleteItem(id)
+                service.delete(id)
                 loadItems()
             } catch (e: Exception) {
                 error = "删除失败: ${e.message}"

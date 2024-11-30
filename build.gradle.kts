@@ -32,6 +32,7 @@ dependencies {
 
     // Kotlinx serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation(kotlin("reflect"))
 }
 
 compose.desktop {

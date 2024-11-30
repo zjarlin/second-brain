@@ -120,7 +120,7 @@ class DotfilesViewModel(
             try {
                 isLoading = true
                 error = null
-                service.importDotfiles(files)
+                service.uploadBatch(files)
                 loadData()
             } catch (e: Exception) {
                 error = "导入失败: ${e.message}"
@@ -134,7 +134,7 @@ class DotfilesViewModel(
         return try {
             isLoading = true
             error = null
-            service.exportDotfiles()
+            service.export()
         } catch (e: Exception) {
             error = "导出失败: ${e.message}"
             null

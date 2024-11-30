@@ -25,47 +25,9 @@ class NotesServiceImpl : NotesService {
         }
     }
 
-    private val baseUrl = "http://localhost:12344/notes"
-    override suspend fun <T : Any> getNotes(parentId: String?, page: Int, size: Int): PageResult<T> {
-        return client.get("$baseUrl/list") {
-            url {
-//                parentId?.let { parameters.append("parentId", it) }
-                parameters.append("page", page.toString())
-                parameters.append("size", size.toString())
-            }
-        }.body()
-    }
 
 
-    override suspend fun createNote(note: Note): Note {
-        return client.post("$baseUrl/create") {
-            contentType(ContentType.Application.Json)
-            setBody(note)
-        }.body()
-    }
 
-    override suspend fun updateNote(note: Note): Note {
-        return client.put("$baseUrl/update") {
-            contentType(ContentType.Application.Json)
-            setBody(note)
-        }.body()
-    }
-
-    override suspend fun deleteNote(id: String) {
-        client.delete("$baseUrl/delete/$id")
-    }
-
-    override suspend fun uploadFile(file: ByteArray, filename: String): String {
-        return client.post("$baseUrl/upload") {
-            setBody(MultiPartFormDataContent(
-                formData {
-                    append("file", file, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=$filename")
-                    })
-                }
-            ))
-        }.body()
-    }
 
     override suspend fun askQuestion(question: String): Answer {
         return client.post("$baseUrl/qa/ask") {
@@ -100,47 +62,6 @@ class ApiNotesService : NotesService {
 
     private val baseUrl = "http://localhost:12344/notes"
 
-    override suspend fun getItems(
-        params: Map<String, Any?>,
-        page: Int,
-        size: Int
-    ): PageResult<Note> {
-        return client.get("$baseUrl/list") {
-            url {
-                params["parentId"]?.let { parameters.append("parentId", it.toString()) }
-                parameters.append("page", page.toString())
-                parameters.append("size", size.toString())
-            }
-        }.body()
-    }
-
-    override suspend fun createItem(item: Note): Note {
-        return client.post("$baseUrl/create") {
-            contentType(ContentType.Application.Json)
-            setBody(item)
-        }.body()
-    }
-
-    override suspend fun updateItem(item: Note): Note {
-        return client.put("$baseUrl/update") {
-            contentType(ContentType.Application.Json)
-            setBody(item)
-        }.body()
-    }
-
-    override suspend fun deleteItem(id: String) {
-        client.delete("$baseUrl/delete/$id")
-    }
-
-    override suspend fun uploadFile(file: ByteArray, filename: String): String {
-        return client.post("$baseUrl/upload") {
-            setBody(MultiPartFormDataContent(formData {
-                append("file", file, Headers.build {
-                    append(HttpHeaders.ContentDisposition, "filename=$filename")
-                })
-            }))
-        }.body()
-    }
 
     override suspend fun askQuestion(question: String): Answer {
         return client.post("$baseUrl/qa/ask") {

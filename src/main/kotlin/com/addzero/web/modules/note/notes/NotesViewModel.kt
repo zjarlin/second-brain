@@ -27,7 +27,7 @@ class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(
             try {
                 isLoading = true
                 error = null
-                notesService.uploadFile(file, filename)
+                notesService.upload(file, filename)
             } catch (e: Exception) {
                 error = "上传文件失败: ${e.message}"
             } finally {
