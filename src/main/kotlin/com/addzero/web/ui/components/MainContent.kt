@@ -2,7 +2,6 @@ package com.addzero.web.ui.components
 
 import DotfilesScreen
 import KnowledgeGraphPage
-import NotesPage
 import NotesQAPage
 import SoftwareScreen
 import androidx.compose.foundation.layout.*
@@ -12,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.Route
 import com.addzero.web.modules.note.notes.NotesViewModel
+import com.addzero.web.modules.note.notes.treenote.NotesPage
 
 /**
  * 主要内容
@@ -21,7 +21,7 @@ import com.addzero.web.modules.note.notes.NotesViewModel
 @Composable
 fun MainContent(
     currentRoute: Route,
-    viewModel: NotesViewModel
+    notesViewModel: NotesViewModel
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -31,9 +31,9 @@ fun MainContent(
             when (currentRoute) {
                 Route.DOTFILES -> DotfilesScreen()
                 Route.SOFTWARE -> SoftwareScreen()
-                Route.NOTES -> NotesPage(viewModel)
-                Route.NOTES_QA -> NotesQAPage(viewModel)
-                Route.KNOWLEDGE_GRAPH -> KnowledgeGraphPage(viewModel)
+                Route.NOTES -> NotesPage(notesViewModel)
+                Route.NOTES_QA -> NotesQAPage(notesViewModel)
+                Route.KNOWLEDGE_GRAPH -> KnowledgeGraphPage(notesViewModel)
             }
         }
     }

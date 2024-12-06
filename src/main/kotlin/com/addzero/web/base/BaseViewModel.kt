@@ -13,10 +13,8 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
     protected val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     var items by mutableStateOf<List<T>>(emptyList())
-        private set
 
     var currentItem by mutableStateOf<T?>(null)
-        protected set
 
     var isLoading by mutableStateOf(false)
         protected set
@@ -25,16 +23,12 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
         protected set
 
     var currentPage by mutableStateOf(0)
-        private set
 
     var pageSize by mutableStateOf(20)
-        private set
 
     var totalPages by mutableStateOf(0)
-        private set
 
     var totalElements by mutableStateOf(0L)
-        private set
 
     fun loadItems(params: Map<String, Any?> = emptyMap()) {
         coroutineScope.launch {
