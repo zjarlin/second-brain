@@ -17,7 +17,7 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
         name: String = "",
         platforms: Set<String> = emptySet(),
         osTypes: Set<String> = emptySet(),
-        page: Int = 0,
+        page: Int = 1,
         size: Int = 10,
     ): PageResult<BizEnvVars> {
         val body = client.get("$thisUrl/search") {

@@ -67,7 +67,6 @@ internal fun ActionButtons(
                         fileFilter = FileNameExtensionFilter("Shell 脚本", "sh")
                         selectedFile = File("env_config.sh")
                     }
-
                     if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                         fileChooser.selectedFile.writeBytes(bytes)
                     }
