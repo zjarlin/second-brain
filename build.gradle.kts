@@ -21,8 +21,7 @@ dependencies {
 
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-
-
+    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.53") // 使用正确的版本号
 
     // Material Icons
     implementation(compose.materialIconsExtended)

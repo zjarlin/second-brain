@@ -1,7 +1,10 @@
 package com.addzero.web.base
 
+import BizEnvVars
 import com.addzero.web.config.AppConfig
 import com.addzero.web.model.PageResult
+import com.alibaba.fastjson2.JSON
+import com.alibaba.fastjson2.TypeReference
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -71,13 +74,23 @@ abstract class BaseServiceImpl< T : @Serializable Any> : BaseService<T> {
         page: Int,
         size: Int,
     ): PageResult<T> {
-        return client.get("$thisUrl$pageRestUtl") {
+        val get = client.get("$thisUrl$pageRestUtl") {
             url {
                 params[PARENT_ID]?.let { parameters.append(PARENT_ID, it.toString()) }
                 parameters.append("page", page.toString())
                 parameters.append("size", size.toString())
             }
-        }.body()
+        }
+//        val body = get.body<PageResult<T>>()
+
+        val responseBody = get.bodyAsText()
+//        // 手动反序列化 JSON 字符串为对象
+//        val result  : PageResult<BizEnvVars> = Json.decodeFromString(responseBody)
+        val typeReference =object : TypeReference<PageResult<T>>() {}
+        val parseObject = JSON.parseObject(responseBody, typeReference)
+        return parseObject
+
+//        return body
     }
 
     override suspend fun save(item: Any): Int {

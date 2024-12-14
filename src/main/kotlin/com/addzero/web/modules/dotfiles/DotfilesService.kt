@@ -1,9 +1,15 @@
 package com.addzero.web.modules.dotfiles
 
+import BizEnvVars
+import DotfilesExcelDTO
 import com.addzero.web.base.BaseServiceImpl
 import com.addzero.web.model.PageResult
+import com.alibaba.fastjson2.JSON
+import com.alibaba.fastjson2.TypeReference
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import kotlinx.serialization.json.Json
 
 private const val PAGE = "pageNum"
 
@@ -25,7 +31,7 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
         page: Int = 1,
         size: Int = 10,
     ): PageResult<BizEnvVars> {
-        val body = client.get("$thisUrl/page") {
+        val get = client.get("$thisUrl/page") {
             url {
 //                val mapOf = mapOf(
 //                    PAGE to page, SIZE to size, "name" to name, "platforms" to platforms, "osTypes" to osTypes
@@ -44,8 +50,17 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
                     parameters.append("osTypes", osType)
                 }
             }
-        }.body<PageResult<BizEnvVars>>()
-        return body
+        }
+        // 获取响应的字符串内容
+//        val body = get.body<PageResult<BizEnvVars>>()
+
+//        return body
+        val responseBody = get.bodyAsText()
+//        // 手动反序列化 JSON 字符串为对象
+//        val result  : PageResult<BizEnvVars> = Json.decodeFromString(responseBody)
+        val typeReference =object : TypeReference<PageResult<BizEnvVars>>() {}
+        val parseObject = JSON.parseObject(responseBody, typeReference)
+        return parseObject
     }
 
 }
