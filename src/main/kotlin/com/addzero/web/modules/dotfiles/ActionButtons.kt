@@ -14,6 +14,9 @@ import kotlinx.coroutines.launch
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
+val supportFiles = arrayOf(
+    "env", "sh", "xls", "xlsx"
+)
 
 @Composable
 internal fun ActionButtons(
@@ -30,7 +33,7 @@ internal fun ActionButtons(
         Button(onClick = {
             scope.launch {
                 val fileChooser = JFileChooser().apply {
-                    fileFilter = FileNameExtensionFilter("环境变量文件", "env", "sh")
+                    fileFilter = FileNameExtensionFilter("环境变量文件",*supportFiles )
                     isMultiSelectionEnabled = true
                 }
                 if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -46,7 +49,7 @@ internal fun ActionButtons(
             scope.launch {
                 viewModel.exportDotfiles()?.let { bytes ->
                     val fileChooser = JFileChooser().apply {
-                        fileFilter = FileNameExtensionFilter("环境变量文件", "env")
+                        fileFilter = FileNameExtensionFilter("环境变量文件", *supportFiles)
                         selectedFile = File("dotfiles_export.env")
                     }
 

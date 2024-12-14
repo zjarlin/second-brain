@@ -14,7 +14,8 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
         get() = "/dotfiles"
 
     suspend fun generateConfig(): ByteArray {
-        return client.get("$thisUrl/generate-config").body()
+        val body = client.get("$thisUrl/generate-config").body<ByteArray>()
+        return body
     }
 
     suspend fun searchDotfiles(

@@ -119,7 +119,7 @@ abstract class BaseServiceImpl< T : @Serializable Any> : BaseService<T> {
             url = "$thisUrl$importUrl",
             formData = formData {
                 files.forEach { file ->
-                    append("files", file.readBytes(), Headers.build {
+                    append("file", file.readBytes(), Headers.build {
                         append(HttpHeaders.ContentDisposition, "filename=${file.name}")
                     })
                 }
