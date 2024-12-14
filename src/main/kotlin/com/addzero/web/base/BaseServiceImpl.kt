@@ -8,10 +8,12 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.io.File
 
 private const val pageRestUtl = "/page"
 
@@ -32,7 +34,7 @@ private const val importSimgleUrl = "/upload"
 
 
 
-abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
+abstract class BaseServiceImpl< T : @Serializable Any> : BaseService<T> {
 //    private val type: Type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
 
     protected val client = HttpClient(CIO) {
@@ -111,21 +113,23 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
     }
 
 
-    override suspend fun uploadBatch(files: List<ByteArray>): List<T> {
-        val body = client.post("$thisUrl$importUrl") {
-            contentType(ContentType.MultiPart.FormData)
-            setBody(MultiPartFormDataContent(formData {
-                files.forEachIndexed { index, bytes ->
-                    append("file$index", bytes, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=file$index.env")
+    override suspend fun import(files: List<File>): Any {
+
+        val response = client.submitFormWithBinaryData(
+            url = "$thisUrl$importUrl",
+            formData = formData {
+                files.forEach { file ->
+                    append("files", file.readBytes(), Headers.build {
+                        append(HttpHeaders.ContentDisposition, "filename=${file.name}")
                     })
                 }
-            }))
-        }.body<List<T>>()
-        return body
+            }
+        )
+        val message = response.bodyAsText()
+        return message
     }
 
-    suspend fun export(): ByteArray {
+    override suspend fun export(): ByteArray {
         return client.get("$thisUrl$exportUrl").body()
     }
 

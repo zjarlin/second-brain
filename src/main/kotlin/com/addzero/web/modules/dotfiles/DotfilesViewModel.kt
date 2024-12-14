@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.addzero.web.model.PageResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 class DotfilesViewModel(
     private val coroutineScope: CoroutineScope
@@ -115,12 +116,12 @@ class DotfilesViewModel(
         }
     }
 
-    fun importDotfiles(files: List<ByteArray>) {
+    fun importDotfiles(files: List<File>) {
         coroutineScope.launch {
             try {
                 isLoading = true
                 error = null
-                service.uploadBatch(files)
+                service.import(files)
                 loadData()
             } catch (e: Exception) {
                 error = "导入失败: ${e.message}"

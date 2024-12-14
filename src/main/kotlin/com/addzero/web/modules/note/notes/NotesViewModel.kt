@@ -1,13 +1,15 @@
 package com.addzero.web.modules.note.notes
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.addzero.web.base.BaseViewModel
 import com.addzero.web.model.PageResult
 import com.addzero.web.modules.note.knowlagegraph.KnowledgeGraph
 import com.addzero.web.modules.note.qa.Answer
 import com.addzero.web.modules.note.qa.Question
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.*
 
 class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(service) {
     private val notesService = service

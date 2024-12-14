@@ -33,9 +33,8 @@ internal fun ActionButtons(
                     fileFilter = FileNameExtensionFilter("环境变量文件", "env", "sh")
                     isMultiSelectionEnabled = true
                 }
-
                 if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    val files = fileChooser.selectedFiles.map { it.readBytes() }
+                    val files = fileChooser.selectedFiles.map { it }
                     viewModel.importDotfiles(files)
                 }
             }

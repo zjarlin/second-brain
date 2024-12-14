@@ -1,7 +1,7 @@
 package com.addzero.web.config
 
 object AppConfig {
-     val API_BASE_URL = "http://localhost:12344"
+     val API_BASE_URL = "http://localhost:12344/api"
 
     const val ENABLE_LOGIN = false
     const val USE_MOCK_DATA = true

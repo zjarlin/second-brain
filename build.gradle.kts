@@ -18,8 +18,11 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+
 
     // Material Icons
     implementation(compose.materialIconsExtended)
@@ -33,6 +36,8 @@ dependencies {
     // Kotlinx serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation(kotlin("reflect"))
+
+    implementation("ch.qos.logback:logback-classic:1.4.11") // 版本号可根据需要调整
 }
 
 compose.desktop {
