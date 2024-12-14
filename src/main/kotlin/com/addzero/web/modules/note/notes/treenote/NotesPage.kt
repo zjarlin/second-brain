@@ -20,65 +20,70 @@ fun NotesPage(viewModel: NotesViewModel) {
         viewModel.loadItems()
     }
 
-    Row(modifier = Modifier.fillMaxSize()) {
-        // 左侧树状列表
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 工具栏
         Surface(
-            modifier = Modifier.width(300.dp).fillMaxHeight(),
+            modifier = Modifier.fillMaxWidth(),
             tonalElevation = 1.dp
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                // 工具栏
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(onClick = { showNewNoteDialog = true }) {
-                        Icon(Icons.Default.NoteAdd, "新建笔记")
-                        Spacer(Modifier.width(8.dp))
-                        Text("新建笔记")
-                    }
-
-                    IconButton(onClick = { showUploadDialog = true }) {
-                        Icon(Icons.Default.Upload, "上传文档")
-                    }
+            Row(
+                modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { showNewNoteDialog = true }) {
+                    Icon(Icons.Default.NoteAdd, "新建笔记")
+                    Spacer(Modifier.width(8.dp))
+                    Text("新建笔记")
                 }
+                
+                IconButton(onClick = { showUploadDialog = true }) {
+                    Icon(Icons.Default.Upload, "上传文档")
+                }
+            }
+        }
 
-                Spacer(Modifier.height(16.dp))
+        // 表头
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            tonalElevation = 0.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 展开图标占位
+                Spacer(Modifier.width(40.dp))
+                // 文件图标占位
+                Spacer(Modifier.width(32.dp))
+                // 标题列
+                Text(
+                    "标题",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.weight(1f)
+                )
+                // 操作按钮占位
+                Spacer(Modifier.width(96.dp)) // 两个按钮的宽度
+            }
+        }
 
-                // 笔记树
+        Divider()
+
+        // 笔记列表
+        Surface(
+            modifier = Modifier.weight(1f),
+            tonalElevation = 0.dp
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
                 viewModel.items.forEach { note ->
                     NoteTreeItem(
                         note = note,
                         selected = note == viewModel.currentItem,
                         onSelect = { viewModel.currentItem = it },
                         onDelete = { viewModel.deleteItem(it.id) },
-                        onAddChild = { parent ->
+                        onAddChild = { parent -> 
                             viewModel.createNote(parent.id)
                         }
-                    )
-                }
-            }
-        }
-
-        // 右侧编辑区
-        Surface(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            tonalElevation = 0.dp
-        ) {
-            viewModel.currentItem?.let { note ->
-                MarkdownEditor(
-                    value = note.content,
-                    onValueChange = { newContent ->
-                        viewModel.updateNote(note.copy(content = newContent))
-                    },
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
-                )
-            } ?: run {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        "选择或创建一个笔记开始编辑",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }

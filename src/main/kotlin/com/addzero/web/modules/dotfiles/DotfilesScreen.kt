@@ -45,8 +45,13 @@ fun DotfilesScreen() {
         content = {
             DotfilesTable(
                 items = viewModel.pageResult?.content ?: emptyList(),
-                onEdit = { /* 显示编辑对话框 */ },
-                onDelete = { viewModel.deleteDotfile(it.id) }
+                onEdit = { /* 处理编辑 */ },
+                onDelete = { viewModel.deleteDotfile(it.id) },
+                currentPage = viewModel.currentPage,
+                totalPages = viewModel.pageResult?.totalPages ?: 1,
+                onPageChange = { newPage -> 
+                    viewModel.loadData(page = newPage)
+                }
             )
         },
         // 分页控制插槽
