@@ -13,6 +13,25 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
+private const val pageRestUtl = "/page"
+
+private const val saveUrl = "/save"
+private const val deleteUrl = "/delete"
+
+private const val updateUrl = "/update"
+
+private const val listAllUrl = "/listAll"
+
+private const val PARENT_ID = "parentId"
+
+private const val importUrl = "/import"
+private const val exportUrl = "/export"
+
+private const val importSimgleUrl = "/upload"
+
+
+
+
 abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
 //    private val type: Type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
 
@@ -41,7 +60,7 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
 
 
     suspend fun listAll(): List<T> {
-        val body = client.get("$thisUrl/listAll").body<List<T>>()
+        val body = client.get("$thisUrl$listAllUrl").body<List<T>>()
         return body
     }
 
@@ -50,9 +69,9 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
         page: Int,
         size: Int,
     ): PageResult<T> {
-        return client.get("$thisUrl/page") {
+        return client.get("$thisUrl$pageRestUtl") {
             url {
-                params["parentId"]?.let { parameters.append("parentId", it.toString()) }
+                params[PARENT_ID]?.let { parameters.append(PARENT_ID, it.toString()) }
                 parameters.append("page", page.toString())
                 parameters.append("size", size.toString())
             }
@@ -60,7 +79,7 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
     }
 
     override suspend fun save(item: Any): Int {
-        val body = client.post("$thisUrl/add") {
+        val body = client.post("$thisUrl$saveUrl") {
             contentType(ContentType.Application.Json)
             setBody(item)
         }.body<Int>()
@@ -68,7 +87,7 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
     }
 
     override suspend fun update(item: Any): Int {
-        val body = client.put("$thisUrl/update") {
+        val body = client.put("$thisUrl$updateUrl") {
             contentType(ContentType.Application.Json)
             setBody(item)
         }.body<Int>()
@@ -76,11 +95,11 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
     }
 
     override suspend fun delete(id: String) {
-        client.delete("$thisUrl/delete/$id")
+        client.delete("$thisUrl$deleteUrl/$id")
     }
 
     override suspend fun upload(file: ByteArray, filename: String): String {
-        val body = client.post("$thisUrl/upload") {
+        val body = client.post("$thisUrl$importSimgleUrl") {
             val parts = formData {
                 append("file", file, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=$filename")
@@ -93,7 +112,7 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
 
 
     override suspend fun uploadBatch(files: List<ByteArray>): List<T> {
-        val body = client.post("$thisUrl/import") {
+        val body = client.post("$thisUrl$importUrl") {
             contentType(ContentType.MultiPart.FormData)
             setBody(MultiPartFormDataContent(formData {
                 files.forEachIndexed { index, bytes ->
@@ -107,7 +126,7 @@ abstract class BaseServiceImpl<T : @Serializable Any> : BaseService<T> {
     }
 
     suspend fun export(): ByteArray {
-        return client.get("$thisUrl/export").body()
+        return client.get("$thisUrl$exportUrl").body()
     }
 
 

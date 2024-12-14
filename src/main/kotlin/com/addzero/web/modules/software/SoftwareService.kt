@@ -1,5 +1,6 @@
 package com.addzero.web.modules.software
 
+import com.addzero.web.config.AppConfig.API_BASE_URL
 import com.addzero.web.model.PageResult
 import com.addzero.web.model.enums.OsType
 import com.addzero.web.model.enums.PlatformType
@@ -22,7 +23,7 @@ class SoftwareService {
         }
     }
 
-    private val baseUrl = "http://localhost:12344/software"
+    private val baseUrl ="$API_BASE_URL/software"
 
     suspend fun searchSoftware(
         keyword: String = "",
