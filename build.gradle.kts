@@ -18,25 +18,32 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(libs.compose.material3.desktop)
+    implementation(libs.compose.icons.extended)
 
-    implementation("org.jetbrains.compose.material3:material3-desktop:1.5.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.53") // 使用正确的版本号
+    implementation(libs.kotlinx.coroutines.core)
+
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation(libs.fastjson.kotlin)
+
 
     // Material Icons
     implementation(compose.materialIconsExtended)
 
-    // Ktor client
-    implementation("io.ktor:ktor-client-core:2.3.7")
-    implementation("io.ktor:ktor-client-cio:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.json)
 
     // Kotlinx serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-    implementation(kotlin("reflect"))
 
-    implementation("ch.qos.logback:logback-classic:1.4.11") // 版本号可根据需要调整
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlin.reflect)
+
+    // Logging
+    implementation(libs.logback.classic)
+
 }
 
 compose.desktop {
