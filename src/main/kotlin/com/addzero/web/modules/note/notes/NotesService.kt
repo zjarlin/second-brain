@@ -26,9 +26,7 @@ class NotesService : BaseServiceImpl<Note>() {
 
      suspend fun getKnowledgeGraph(query: String?): KnowledgeGraph {
         return client.get("$thisUrl/graph") {
-            url {
-                query?.let { parameters.append("query", it) }
-            }
+            url { query?.let { parameters.append("query", it) } }
         }.body()
 
 

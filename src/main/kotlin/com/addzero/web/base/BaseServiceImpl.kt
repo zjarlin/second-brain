@@ -34,9 +34,6 @@ private const val exportUrl = "/export"
 
 private const val importSimgleUrl = "/upload"
 
-
-
-
 abstract class BaseServiceImpl< T : @Serializable Any> : BaseService<T> {
 //    private val type: Type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
 
@@ -49,13 +46,6 @@ abstract class BaseServiceImpl< T : @Serializable Any> : BaseService<T> {
             })
         }
     }
-
-//    @Suppress("UNCHECKED_CAST")
-//    fun getGenericType(): KClass<T> {
-//        val superClass = this::class.supertypes.first().arguments.first().type
-//        return (superClass?.classifier as KClass<T>)
-//    }
-
 
     protected abstract val restPath: String
 
