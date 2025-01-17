@@ -1,16 +1,13 @@
 package com.addzero.web.base
 
 import androidx.compose.runtime.*
-import com.addzero.web.model.PageResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 
 abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
     protected val service: S
 ) {
-    protected val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     var items by mutableStateOf<List<T>>(emptyList())
 
@@ -30,67 +27,56 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
 
     var totalElements by mutableStateOf(0L)
 
-    fun loadItems(params: Map<String, Any?> = emptyMap()) {
+    private suspend fun executeWithLoading(block: suspend () -> Unit) {
+        isLoading = true
+        error = null
+        try {
+            block()
+        } catch (e: Exception) {
+            error = "操作失败: ${e.message}"
+        } finally {
+            isLoading = false
+        }
+    }
+
+    // 新增的DSL函数
+    fun executeWithLoadingInDsl(block: suspend CoroutineScope.() -> Unit) {
         coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                val result = service.page(
-                    params = params,
-                    page = currentPage,
-                    size = pageSize
-                )
-                handlePageResult(result)
-            } catch (e: Exception) {
-                error = "加载失败: ${e.message}"
-            } finally {
-                isLoading = false
+            executeWithLoading {
+                block()
             }
+        }
+    }
+
+    fun loadItems(params: Map<String, Any?> = emptyMap()) {
+        executeWithLoadingInDsl {
+            val result = service.page(params = params, page = currentPage, size = pageSize)
+            items = result.content
+            totalPages = result.totalPages
+            totalElements = result.totalElements
+            currentPage = result.pageNumber
+            pageSize = result.pageSize
         }
     }
 
     fun createItem(item: T) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.save(item)
-                loadItems()
-            } catch (e: Exception) {
-                error = "创建失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
+        executeWithLoadingInDsl {
+            service.save(item)
+            loadItems()
         }
     }
 
     fun updateItem(item: T) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.update(item)
-                loadItems()
-            } catch (e: Exception) {
-                error = "更新失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
+        executeWithLoadingInDsl {
+            service.update(item)
+            loadItems()
         }
     }
 
     fun deleteItem(id: String) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.delete(id)
-                loadItems()
-            } catch (e: Exception) {
-                error = "删除失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
+        executeWithLoadingInDsl {
+            service.delete(id)
+            loadItems()
         }
     }
 
@@ -109,11 +95,4 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
         }
     }
 
-    protected open fun handlePageResult(result: PageResult<T>) {
-        items = result.content
-        totalPages = result.totalPages
-        totalElements = result.totalElements
-        currentPage = result.pageNumber
-        pageSize = result.pageSize
-    }
 }
