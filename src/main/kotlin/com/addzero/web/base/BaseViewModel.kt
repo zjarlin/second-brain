@@ -1,7 +1,11 @@
 package com.addzero.web.base
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.*
+import com.addzero.web.model.PageResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
 abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
@@ -95,4 +99,11 @@ abstract class BaseViewModel<T : @Serializable Any, S : BaseService<T>>(
         }
     }
 
+    protected open fun handlePageResult(result: PageResult<T>) {
+        items = result.content
+        totalPages = result.totalPages
+        totalElements = result.totalElements
+        currentPage = result.pageNumber
+        pageSize = result.pageSize
+    }
 }

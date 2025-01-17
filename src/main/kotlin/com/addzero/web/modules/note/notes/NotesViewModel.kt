@@ -8,19 +8,20 @@ import com.addzero.web.model.PageResult
 import com.addzero.web.modules.note.knowlagegraph.KnowledgeGraph
 import com.addzero.web.modules.note.qa.Answer
 import com.addzero.web.modules.note.qa.Question
+import kotlinx.coroutines.launch
 import java.util.*
 
 class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(service) {
-    private val notesService = service
 
     // 知识图谱状态
     var knowledgeGraph by mutableStateOf<KnowledgeGraph?>(null)
         private set
 
     // 问答状态
-    var questions by mutableStateOf<List<Question>>(emptyList())
+    private var questions by mutableStateOf<List<Question>>(emptyList())
         private set
 
+    //当前回答
     var currentAnswer by mutableStateOf<Answer?>(null)
         private set
 
@@ -60,7 +61,7 @@ class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(
     // 文件上传
     fun uploadFile(file: ByteArray, filename: String) {
         executeWithLoadingInDsl {
-            notesService.upload(file, filename)
+            service.upload(file, filename)
             loadItems()
         }
     }
@@ -68,20 +69,20 @@ class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(
     // 问答功能
     fun askQuestion(question: String) {
         executeWithLoadingInDsl {
-            currentAnswer = notesService.askQuestion(question)
+            currentAnswer = service.askQuestion(question)
         }
     }
 
     fun loadQuestionHistory() {
         executeWithLoadingInDsl {
-            questions = notesService.getQuestionHistory()
+            questions = service.getQuestionHistory()
         }
     }
 
     // 知识图谱
     fun loadKnowledgeGraph(query: String? = null) {
         executeWithLoadingInDsl {
-            knowledgeGraph = notesService.getKnowledgeGraph(query)
+            knowledgeGraph = service.getKnowledgeGraph(query)
         }
     }
 
@@ -108,7 +109,7 @@ class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(
     }
 
     // 重写handlePageResult以支持树形结构
-    fun handlePageResult(result: PageResult<Note>) {
+    override fun handlePageResult(result: PageResult<Note>) {
         items = buildNoteTree(result.content)
         totalPages = result.totalPages
         totalElements = result.totalElements
