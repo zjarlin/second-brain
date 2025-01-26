@@ -30,11 +30,11 @@ class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(
         private set
 
     // 笔记树相关方法
-    fun createNote(parentId: String? = null, title: String = "新建笔记") {
+    fun createNote(parentId: String? = null, title: String = "新笔记",content:String ="") {
         val note = Note(
             id = UUID.randomUUID().toString(),
             title = title,
-            content = "",
+            content = content,
             type = NoteType.MARKDOWN,
             parentId = parentId,
             children = emptyList(),
