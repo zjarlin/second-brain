@@ -8,11 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.web.modules.note.notes.NotesService
 import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.ui.components.UploadDialog
 
 @Composable
-fun NotesPage(viewModel: NotesViewModel) {
+fun NotesPage() {
+    val viewModel = remember { NotesViewModel(NotesService()) }
     var showUploadDialog by remember { mutableStateOf(false) }
     var showNewNoteDialog by remember { mutableStateOf(false) }
 

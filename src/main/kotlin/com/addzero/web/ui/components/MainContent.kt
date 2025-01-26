@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.Route
+import com.addzero.web.modules.note.notes.NotesService
 import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.modules.note.notes.treenote.NotesPage
 
@@ -21,19 +22,19 @@ import com.addzero.web.modules.note.notes.treenote.NotesPage
 @Composable
 fun MainContent(
     currentRoute: Route,
-    notesViewModel: NotesViewModel
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+
         Box(modifier = Modifier.padding(16.dp)) {
             when (currentRoute) {
                 Route.DOTFILES -> DotfilesScreen()
                 Route.SOFTWARE -> SoftwareScreen()
-                Route.NOTES -> NotesPage(notesViewModel)
-                Route.NOTES_QA -> NotesQAPage(notesViewModel)
-                Route.KNOWLEDGE_GRAPH -> KnowledgeGraphPage(notesViewModel)
+                Route.NOTES -> NotesPage()
+                Route.NOTES_QA -> NotesQAPage()
+                Route.KNOWLEDGE_GRAPH -> KnowledgeGraphPage()
             }
         }
     }

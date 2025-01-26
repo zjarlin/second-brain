@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.Route
+import com.addzero.web.modules.note.notes.NotesService
 import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.ui.components.Breadcrumb
 import com.addzero.web.ui.components.MainContent
@@ -14,10 +15,7 @@ import com.addzero.web.ui.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainLayout(
-
-    notesViewModel: NotesViewModel,
-) {
+fun MainLayout() {
     var currentRoute by remember { mutableStateOf(Route.NOTES) }
 
     Scaffold(
@@ -46,7 +44,7 @@ fun MainLayout(
                     tonalElevation = 0.dp
                 ) {
                     MainContent(
-                        currentRoute = currentRoute, notesViewModel =notesViewModel
+                        currentRoute = currentRoute,
                     )
                 }
             }

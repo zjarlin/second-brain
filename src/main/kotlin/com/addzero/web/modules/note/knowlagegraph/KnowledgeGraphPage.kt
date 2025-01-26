@@ -10,9 +10,13 @@ import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.modules.note.knowlagegraph.ComposeKnowledgeGraphView
 import com.addzero.web.modules.note.knowlagegraph.KnowledgeNode
 import com.addzero.web.modules.note.knowlagegraph.NodeDetailsDialog
+import com.addzero.web.modules.note.notes.NotesService
 
 @Composable
-fun KnowledgeGraphPage(viewModel: NotesViewModel) {
+fun KnowledgeGraphPage() {
+
+    val viewModel = remember { NotesViewModel(NotesService()) }
+
     var searchQuery by remember { mutableStateOf("") }
     var selectedNode by remember { mutableStateOf<KnowledgeNode?>(null) }
 

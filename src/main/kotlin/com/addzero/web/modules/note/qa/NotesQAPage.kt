@@ -3,10 +3,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.web.modules.note.notes.NotesService
 import com.addzero.web.modules.note.notes.NotesViewModel
 
 @Composable
-fun NotesQAPage(viewModel: NotesViewModel) {
+fun NotesQAPage() {
+
+    val viewModel = remember { NotesViewModel(NotesService()) }
+
     var question by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {

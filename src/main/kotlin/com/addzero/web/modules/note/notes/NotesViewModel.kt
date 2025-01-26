@@ -2,9 +2,11 @@ package com.addzero.web.modules.note.notes
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.addzero.web.base.BaseViewModel
 import com.addzero.web.model.PageResult
+import com.addzero.web.model.enums.Route
 import com.addzero.web.modules.note.knowlagegraph.KnowledgeGraph
 import com.addzero.web.modules.note.qa.Answer
 import com.addzero.web.modules.note.qa.Question
@@ -12,6 +14,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class NotesViewModel(service: NotesService) : BaseViewModel<Note, NotesService>(service) {
+
+
 
     // 知识图谱状态
     var knowledgeGraph by mutableStateOf<KnowledgeGraph?>(null)
