@@ -45,6 +45,8 @@ fun NotesPage() {
                     showNewNoteEditor = true
                     content = ""
                     lastSavedContent = ""
+                    viewModel.createNote(null) // 创建根级别的新笔记
+                    focusRequester.requestFocus()
                 }) {
                     Icon(Icons.AutoMirrored.Filled.NoteAdd, "新建笔记")
                     Spacer(Modifier.width(8.dp))
