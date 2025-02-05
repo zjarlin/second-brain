@@ -9,6 +9,7 @@ import com.addzero.web.model.enums.Route
 import com.addzero.web.modules.dotfiles.DotfilesPage
 import com.addzero.web.modules.note.notes.treenote.NotesPage
 import com.addzero.web.modules.software.SoftwarePage
+import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteUtil
 import kotlin.reflect.full.createInstance
 
@@ -31,6 +32,8 @@ fun MainContent(
             val first = routeComponentByPath?.first
             // 使用反射创建实例
             val createInstance = first?.createInstance()
+            val metaSpec = createInstance as MetaSpec
+            metaSpec.render()
         }
     }
 }
