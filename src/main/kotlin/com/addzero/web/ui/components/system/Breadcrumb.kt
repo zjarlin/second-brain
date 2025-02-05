@@ -42,18 +42,20 @@ fun Breadcrumb(
                     )
                 }
 
-                Text(
-                    text = title!!,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (index == breadcrumbPath.lastIndex) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
-                    modifier = Modifier.clickable(enabled = index != breadcrumbPath.lastIndex) {
-                        onPathClick(path)
-                    }
-                )
+                title?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (index == breadcrumbPath.lastIndex) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                        modifier = Modifier.clickable(enabled = index != breadcrumbPath.lastIndex) {
+                            onPathClick(path)
+                        }
+                    )
+                }
             }
         }
     }
