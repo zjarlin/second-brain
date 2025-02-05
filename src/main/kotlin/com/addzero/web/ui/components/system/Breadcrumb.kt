@@ -41,9 +41,9 @@ fun Breadcrumb(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Text(
-                    text = title,
+                    text = title!!,
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (index == breadcrumbPath.lastIndex) {
                         MaterialTheme.colorScheme.primary

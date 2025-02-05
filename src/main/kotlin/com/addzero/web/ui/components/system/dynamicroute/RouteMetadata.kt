@@ -14,5 +14,6 @@ data class RouteMetadata(
     val icon: ImageVector? = Icons.Default.Home,
     val visible: Boolean = true,
     val permissions: List<String> = emptyList(),
+    val order: Double = 0.0, // 添加order字段用于菜单排序
 ) {
 }

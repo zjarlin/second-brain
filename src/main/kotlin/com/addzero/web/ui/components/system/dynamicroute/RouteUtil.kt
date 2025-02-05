@@ -29,16 +29,22 @@ object RouteUtil {
     }
 
     /**
-     * 获取所有路由组件
+     * 获取所有路由组件，按order字段排序
      */
-    fun getAllRouteComponents(): Map<KClass<*>, MetaSpec> = routeComponents
+    fun getAllRouteComponents(): Map<KClass<*>, MetaSpec> = routeComponents.toList()
+        .sortedBy { it.second.metadata.order }
+        .toMap()
 
-    fun getAllSpec(): List<RouteMetadata> = routeComponents.map { it.value.metadata }
+    fun getAllSpec(): List<RouteMetadata> = routeComponents
+        .map { it.value.metadata }
+        .sortedBy { it.order }
 
     /**
-     * 获取所有可见的路由组件（用于菜单渲染）
+     * 获取所有可见的路由组件（用于菜单渲染），按order字段排序
      */
-    fun getVisibleRouteComponents(): List<MetaSpec> = routeComponents.values.filter { it.metadata.visible }
+    fun getVisibleRouteComponents(): List<MetaSpec> = routeComponents.values
+        .filter { it.metadata.visible }
+        .sortedBy { it.metadata.order }
 
     /**
      * 根据路径获取路由组件
@@ -49,21 +55,18 @@ object RouteUtil {
     /**
      * 获取面包屑路径
      */
-    fun getBreadcrumbPath(currentPath: String): List<Pair<String, String>> {
-        val result = mutableListOf<Pair<String, String>>()
-        var currentSpec = getRouteComponentByPath(currentPath)?.second
-
-        while (currentSpec != null) {
-            result.add(
-                0, Pair(
-                    currentSpec.metadata.refPath, currentSpec.metadata.title
-                )
-            )
-            currentSpec = currentSpec.metadata.parentRefPath?.let { parentPath ->
-                getRouteComponentByPath(parentPath)?.second
+    fun getBreadcrumbPath(path: String): List<RouteMetadata> {
+        val result = mutableListOf<RouteMetadata>()
+        var currentPath = path
+        while (currentPath.isNotEmpty()) {
+            val component = getRouteComponentByPath(currentPath)
+            if (component != null) {
+                result.add(0, component.second.metadata)
+                currentPath = component.second.metadata.parentRefPath ?: ""
+            } else {
+                break
             }
         }
-
         return result
     }
 }
