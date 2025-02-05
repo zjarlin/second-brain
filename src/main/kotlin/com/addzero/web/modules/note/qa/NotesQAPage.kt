@@ -1,7 +1,9 @@
 package com.addzero.web.modules.note.qa
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -11,18 +13,16 @@ import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 
-class NotesQAPage :MetaSpec {
+class NotesQAPage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
             refPath = this.javaClass.name,
-
-//            refPath = this.javaClass.name,
-//            parentRefPath = "",
             title = "知识库问答",
-            icon = Icons.Filled.Apps,
+            icon = Icons.Default.QuestionAnswer,
             visible = true,
             permissions = emptyList()
         )
+
     @Composable
     override fun render() {
         val viewModel = remember { NotesViewModel(NotesService()) }

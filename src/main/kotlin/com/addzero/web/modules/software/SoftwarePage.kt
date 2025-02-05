@@ -22,12 +22,11 @@ class SoftwarePage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
             refPath = this.javaClass.name,
-
-//            refPath = "/software",
             parentRefPath = "管理",
             title = "软件管理",
             icon = Icons.Filled.Apps,
-            visible = true ,
+            visible = true,
+            order = 2.0,
             permissions = emptyList()
         )
 

@@ -1,6 +1,7 @@
 package com.addzero.web.modules.note.knowlagegraph
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -19,7 +20,7 @@ class KnowledgeGraphPage :MetaSpec {
             val routeMetadata = RouteMetadata(
                 refPath = this.javaClass.name,
                 title = "知识图谱",
-                icon = Icons.Filled.Apps,
+                icon = Icons.Default.AccountTree,
                 visible = true,
                 permissions = emptyList(),
             )

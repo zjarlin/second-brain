@@ -30,7 +30,7 @@ class NotesPage : MetaSpec {
 //            refPath = "/note",
 //            parentRefPath = "",
             title = "我的笔记",
-            icon = Icons.Filled.Apps,
+            icon = Icons.AutoMirrored.Filled.NoteAdd,
             visible = true,
             permissions = emptyList()
         )
