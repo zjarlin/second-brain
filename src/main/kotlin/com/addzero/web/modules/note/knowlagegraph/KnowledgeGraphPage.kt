@@ -23,6 +23,7 @@ class KnowledgeGraphPage :MetaSpec {
                 icon = Icons.Default.AccountTree,
                 visible = true,
                 permissions = emptyList(),
+                order = 30.0
             )
             return routeMetadata
         }

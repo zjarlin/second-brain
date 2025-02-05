@@ -21,6 +21,7 @@ class NotesQAPage : MetaSpec {
             icon = Icons.Default.QuestionAnswer,
             visible = true,
             permissions = emptyList()
+            , order = 20.0
         )
 
     @Composable

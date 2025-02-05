@@ -20,6 +20,7 @@ class DotfilesPage : MetaSpec {
             icon = Icons.Filled.Settings,
             visible = true,
             permissions = emptyList()
+            , order = 50.0
         )
 
 

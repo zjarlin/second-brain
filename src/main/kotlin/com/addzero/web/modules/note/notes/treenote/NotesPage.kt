@@ -33,6 +33,7 @@ class NotesPage : MetaSpec {
             icon = Icons.AutoMirrored.Filled.NoteAdd,
             visible = true,
             permissions = emptyList()
+            , order = 10.0
         )
 
     @Composable()

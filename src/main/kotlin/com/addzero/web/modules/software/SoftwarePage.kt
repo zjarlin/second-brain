@@ -26,7 +26,7 @@ class SoftwarePage : MetaSpec {
             title = "软件管理",
             icon = Icons.Filled.Apps,
             visible = true,
-            order = 2.0,
+            order = 40.0,
             permissions = emptyList()
         )
 
