@@ -1,20 +1,19 @@
 package com.addzero.web.modules.dotfiles
 
-import BizDotFiles
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.crud.CrudLayout
 import com.addzero.web.ui.components.crud.Pagination
+import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 
 class DotfilesPage : MetaSpec {
 
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            refPath = "/dotfiles",
+            refPath = this.javaClass.name,
             parentRefPath = "管理",
             title = "Dotfiles管理",
             icon = Icons.Filled.Apps,

@@ -1,3 +1,4 @@
+package com.addzero.web.modules.note.qa
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -10,27 +11,26 @@ import com.addzero.web.modules.note.notes.NotesViewModel
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 
-private const val 知识库问答 = "知识库问答"
-
 class NotesQAPage :MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
             refPath = this.javaClass.name,
-            parentRefPath = "",
-            title = 知识库问答,
+
+//            refPath = this.javaClass.name,
+//            parentRefPath = "",
+            title = "知识库问答",
             icon = Icons.Filled.Apps,
             visible = true,
             permissions = emptyList()
         )
     @Composable
-
     override fun render() {
         val viewModel = remember { NotesViewModel(NotesService()) }
 
         var question by remember { mutableStateOf("") }
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text(知识库问答, style = MaterialTheme.typography.headlineMedium)
+            Text("知识库问答", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(Modifier.height(16.dp))
 

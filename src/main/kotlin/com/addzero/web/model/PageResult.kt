@@ -1,6 +1,6 @@
 package com.addzero.web.model
 
-import BizDotFiles
+import com.addzero.web.modules.dotfiles.BizDotFiles
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.TypeReference
 import kotlinx.serialization.SerialName

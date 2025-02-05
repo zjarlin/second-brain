@@ -12,7 +12,7 @@ import com.addzero.web.ui.components.system.TopBar
 
 @Composable
 fun MainLayout() {
-    var currentRoute by remember { mutableStateOf("/note") }
+    var currentRoute by remember { mutableStateOf("com.addzero.web.modules.dotfiles.DotfilesPage") }
 
     Scaffold(
         topBar = { TopBar() }

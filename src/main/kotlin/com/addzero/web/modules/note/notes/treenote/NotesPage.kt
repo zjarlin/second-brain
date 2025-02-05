@@ -25,8 +25,10 @@ class NotesPage : MetaSpec {
 
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            refPath = "/note",
-            parentRefPath = "",
+            refPath = this.javaClass.name,
+
+//            refPath = "/note",
+//            parentRefPath = "",
             title = "我的笔记",
             icon = Icons.Filled.Apps,
             visible = true,

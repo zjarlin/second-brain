@@ -16,35 +16,36 @@ fun SideMenu(
     Column(modifier = Modifier.width(240.dp)) {
         // 获取所有路由的元数据
 
-        val routeComponentByPath = RouteUtil.getRouteComponentByPath(currentRoute)
-        val routeMetadataMap = if (routeComponentByPath != null) {
-            mapOf(routeComponentByPath.first.qualifiedName!! to routeComponentByPath.second)
-        } else {
-            emptyMap()
-        }
-
-
+        // 获取所有路由组件的元数据
+        val routeMetadataMap = RouteUtil.getAllRouteComponents()
+//        val allSpec = RouteUtil.getAllSpec()
         // 按父级路由分组
 
-        val groupedRoutes = routeMetadataMap.entries.filter { (_, spec) ->
-
-                spec.metadata.visible
-            }.groupBy { (_, metadata) -> metadata.metadata.parentRefPath }
-
+//        val groupedRoutes = routeMetadataMap.entries.filter { (_, spec) ->
+//            spec.metadata.visible
+//        }.groupBy { (_, metadata) -> metadata.metadata.parentRefPath }
         // 渲染菜单项
-        groupedRoutes[""]?.forEach { (route, spec) ->
+
+        routeMetadataMap.forEach {
+            val route = it.key
+            val spec = it.value
             val contentDescription = spec.metadata.title
 
+            val qualifiedName = route.qualifiedName
             NavigationDrawerItem(
                 icon = {
                     val imageVector = spec.metadata.icon
                     imageVector?.let { Icon(it, contentDescription = contentDescription) }
                 },
                 label = { Text(contentDescription) },
-                selected = currentRoute == route,
-                onClick = { onRouteChange(route) },
+                selected = currentRoute == qualifiedName,
+                onClick = { onRouteChange(qualifiedName!!) },
                 modifier = Modifier.padding(vertical = 4.dp)
             )
+
+
         }
+
+
     }
 }

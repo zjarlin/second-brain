@@ -1,3 +1,4 @@
+package com.addzero.web.modules.note.knowlagegraph
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -8,22 +9,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.modules.note.notes.NotesViewModel
-import com.addzero.web.modules.note.knowlagegraph.ComposeKnowledgeGraphView
-import com.addzero.web.modules.note.knowlagegraph.KnowledgeNode
-import com.addzero.web.modules.note.knowlagegraph.NodeDetailsDialog
 import com.addzero.web.modules.note.notes.NotesService
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 
 class KnowledgeGraphPage :MetaSpec {
     override val metadata: RouteMetadata
-        get() = RouteMetadata(
-            parentRefPath = "",
-            title = "知识图谱",
-            icon = Icons.Filled.Apps,
-            visible = true,
-            permissions = emptyList()
-        )
+        get() {
+            val routeMetadata = RouteMetadata(
+                refPath = this.javaClass.name,
+
+                title = "知识图谱",
+                icon = Icons.Filled.Apps,
+                visible = true,
+                permissions = emptyList(),
+            )
+            return routeMetadata
+        }
 
     @Composable
     override fun render() {

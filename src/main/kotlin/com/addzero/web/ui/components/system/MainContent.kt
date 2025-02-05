@@ -1,7 +1,5 @@
 package com.addzero.web.ui.components.system
 
-import KnowledgeGraphPage
-import NotesQAPage
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,7 +28,9 @@ fun MainContent(
 
         Box(modifier = Modifier.padding(16.dp)) {
             val routeComponentByPath = RouteUtil.getRouteComponentByPath(currentRoute)
-            val createInstance = routeComponentByPath?.first?.createInstance()
+            val first = routeComponentByPath?.first
+            // 使用反射创建实例
+            val createInstance = first?.createInstance()
         }
     }
 }

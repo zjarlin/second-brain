@@ -1,3 +1,4 @@
+package com.addzero.web.modules.dotfiles
 import com.addzero.web.ui.components.table.ColumnName
 import kotlinx.serialization.Serializable
 
