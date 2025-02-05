@@ -71,7 +71,7 @@ fun <T : Any> DataTable(
                 )
 
                 // 按声明顺序显示字段
-                fields.forEach{ field ->
+                fields.forEach { field ->
                     field.isAccessible = true
                     val columnName = field.getAnnotation(ColumnName::class.java)?.value
                         ?: field.name.replaceFirstChar { it.uppercase() }
@@ -141,6 +141,7 @@ fun <T : Any> DataTable(
         )
     }
 }
+
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ColumnName(val value: String)

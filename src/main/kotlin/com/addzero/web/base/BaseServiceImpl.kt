@@ -1,6 +1,6 @@
 package com.addzero.web.base
 
-import BizEnvVars
+import BizDotFiles
 import com.addzero.web.config.AppConfig
 import com.addzero.web.model.PageResult
 import com.alibaba.fastjson2.JSON

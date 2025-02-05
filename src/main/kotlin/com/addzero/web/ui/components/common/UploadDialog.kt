@@ -1,4 +1,4 @@
-package com.addzero.web.ui.components
+package com.addzero.web.ui.components.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

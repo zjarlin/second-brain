@@ -5,18 +5,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.model.enums.Route
-import com.addzero.web.modules.note.notes.NotesService
-import com.addzero.web.modules.note.notes.NotesViewModel
-import com.addzero.web.ui.components.Breadcrumb
-import com.addzero.web.ui.components.MainContent
-import com.addzero.web.ui.components.SideMenu
-import com.addzero.web.ui.components.TopBar
+import com.addzero.web.ui.components.system.Breadcrumb
+import com.addzero.web.ui.components.system.MainContent
+import com.addzero.web.ui.components.system.SideMenu
+import com.addzero.web.ui.components.system.TopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainLayout() {
-    var currentRoute by remember { mutableStateOf(Route.NOTES) }
+    var currentRoute by remember { mutableStateOf("/note") }
 
     Scaffold(
         topBar = { TopBar() }
@@ -36,7 +32,7 @@ fun MainLayout() {
             // 主内容区
             Column(modifier = Modifier.weight(1f)) {
                 // 面包屑导航
-                Breadcrumb(currentRoute = currentRoute)
+                Breadcrumb(currentRouteRefPath = currentRoute)
 
                 // 主要内容
                 Surface(

@@ -1,4 +1,4 @@
-package com.addzero.web.ui.components
+package com.addzero.web.ui.components.system
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,7 +20,8 @@ fun TopBar() {
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Second Brain", style = MaterialTheme.typography.titleLarge, color = Color.White
+                text = "个人知识库", style = MaterialTheme.typography.titleLarge,
+                color = Color.White
             )
 
             Row(

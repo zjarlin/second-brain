@@ -1,18 +1,18 @@
-package com.addzero.web.ui.components
+package com.addzero.web.ui.components.system
 
-import DotfilesScreen
 import KnowledgeGraphPage
 import NotesQAPage
-import SoftwareScreen
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.Route
-import com.addzero.web.modules.note.notes.NotesService
-import com.addzero.web.modules.note.notes.NotesViewModel
+import com.addzero.web.modules.dotfiles.DotfilesPage
 import com.addzero.web.modules.note.notes.treenote.NotesPage
+import com.addzero.web.modules.software.SoftwarePage
+import com.addzero.web.ui.components.system.dynamicroute.RouteUtil
+import kotlin.reflect.full.createInstance
 
 /**
  * 主要内容
@@ -21,7 +21,7 @@ import com.addzero.web.modules.note.notes.treenote.NotesPage
  */
 @Composable
 fun MainContent(
-    currentRoute: Route,
+    currentRoute: String,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -29,13 +29,8 @@ fun MainContent(
     ) {
 
         Box(modifier = Modifier.padding(16.dp)) {
-            when (currentRoute) {
-                Route.DOTFILES -> DotfilesScreen()
-                Route.SOFTWARE -> SoftwareScreen()
-                Route.NOTES -> NotesPage()
-                Route.NOTES_QA -> NotesQAPage()
-                Route.KNOWLEDGE_GRAPH -> KnowledgeGraphPage()
-            }
+            val routeComponentByPath = RouteUtil.getRouteComponentByPath(currentRoute)
+            val createInstance = routeComponentByPath?.first?.createInstance()
         }
     }
 }

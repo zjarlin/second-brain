@@ -1,6 +1,6 @@
 package com.addzero.web.modules.dotfiles
 
-import BizEnvVars
+import BizDotFiles
 import DotfilesExcelDTO
 import com.addzero.web.base.BaseServiceImpl
 import com.addzero.web.model.PageResult
@@ -15,7 +15,7 @@ private const val PAGE = "pageNum"
 
 private const val SIZE = "pageSize"
 
-class DotfilesService : BaseServiceImpl<BizEnvVars>() {
+class DotfilesService : BaseServiceImpl<BizDotFiles>() {
     override val restPath: String
         get() = "/dotfiles"
 
@@ -30,7 +30,7 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
         osTypes: Set<String> = emptySet(),
         page: Int = 1,
         size: Int = 10,
-    ): PageResult<BizEnvVars> {
+    ): PageResult<BizDotFiles> {
         val get = client.get("$thisUrl/page") {
             url {
 //                val mapOf = mapOf(
@@ -58,7 +58,7 @@ class DotfilesService : BaseServiceImpl<BizEnvVars>() {
         val responseBody = get.bodyAsText()
 //        // 手动反序列化 JSON 字符串为对象
 //        val result  : PageResult<BizEnvVars> = Json.decodeFromString(responseBody)
-        val typeReference =object : TypeReference<PageResult<BizEnvVars>>() {}
+        val typeReference = object : TypeReference<PageResult<BizDotFiles>>() {}
         val parseObject = JSON.parseObject(responseBody, typeReference)
         return parseObject
     }

@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.cn.hutool.hutool.all)
     implementation(compose.desktop.currentOs)
     implementation(libs.compose.material3.desktop)
     implementation(libs.compose.icons.extended)

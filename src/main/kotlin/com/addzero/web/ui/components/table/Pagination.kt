@@ -2,8 +2,9 @@ package com.addzero.web.ui.components.table
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,7 @@ fun Pagination(
             onClick = { onPageChange(currentPage - 1) },
             enabled = currentPage > 0
         ) {
-            Icon(Icons.Default.KeyboardArrowLeft, "上一页")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "上一页")
         }
 
         Text(
@@ -39,7 +40,7 @@ fun Pagination(
             onClick = { onPageChange(currentPage + 1) },
             enabled = currentPage < totalPages - 1
         ) {
-            Icon(Icons.Default.KeyboardArrowRight, "下一页")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "下一页")
         }
     }
 } 

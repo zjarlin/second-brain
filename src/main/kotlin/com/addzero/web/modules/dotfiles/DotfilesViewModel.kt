@@ -1,6 +1,6 @@
 package com.addzero.web.modules.dotfiles
 
-import BizEnvVars
+import BizDotFiles
 import androidx.compose.runtime.*
 import com.addzero.web.model.PageResult
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +12,7 @@ class DotfilesViewModel(
 ) {
     private val service = DotfilesService()
 
-    var pageResult by mutableStateOf<PageResult<BizEnvVars>?>(null)
+    var pageResult by mutableStateOf<PageResult<BizDotFiles>?>(null)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -72,7 +72,7 @@ class DotfilesViewModel(
         }
     }
 
-    fun addDotfile(item: BizEnvVars) {
+    fun addDotfile(item: BizDotFiles) {
         coroutineScope.launch {
             try {
                 isLoading = true
@@ -87,7 +87,7 @@ class DotfilesViewModel(
         }
     }
 
-    fun updateDotfile(item: BizEnvVars) {
+    fun updateDotfile(item: BizDotFiles) {
         coroutineScope.launch {
             try {
                 isLoading = true

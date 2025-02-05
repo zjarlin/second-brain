@@ -3,7 +3,7 @@ package com.addzero.web.ui.components.crud
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ fun <T> Pagination(
             onClick = onNext,
             enabled = !pageResult.isLast
         ) {
-            Icon(Icons.Default.KeyboardArrowRight, "下一页")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "下一页")
         }
 
         Text(

@@ -2,7 +2,7 @@ import com.addzero.web.ui.components.table.ColumnName
 import kotlinx.serialization.Serializable
 
 //@Serializable
-data class BizEnvVars(
+data class BizDotFiles(
    /** ID */
    val id: String = "",
 

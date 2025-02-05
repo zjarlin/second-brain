@@ -10,7 +10,7 @@ import io.ktor.http.*
 
 class NotesService : BaseServiceImpl<Note>() {
      override val restPath: String
-        get() = "/notes"
+        get() = "/note"
 
 
      suspend fun askQuestion(question: String): Answer {
