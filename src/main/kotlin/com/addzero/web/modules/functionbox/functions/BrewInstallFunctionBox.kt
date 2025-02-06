@@ -127,17 +127,36 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
                         }
                     }
 
-                    Button(
-                        onClick = {
-                            installJobs.values.forEach { it.cancel() }
-                            installJobs.clear()
-                            isOpen = false
-                        },
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp)
+                            .padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("取消")
+                        Button(
+                            onClick = {
+                                val uninstalledPackages = packageStatuses.filter { it.status == PackageStatus.Status.NOT_INSTALLED }
+                                uninstalledPackages.forEach { status ->
+                                    installJobs[status.name]?.cancel()
+                                    installJobs[status.name] = scope.launch {
+                                        packageManager.installPackage(status, scope)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f).padding(end = 8.dp)
+                        ) {
+                            Text("一键安装")
+                        }
+                        Button(
+                            onClick = {
+                                installJobs.values.forEach { it.cancel() }
+                                installJobs.clear()
+                                isOpen = false
+                            },
+                            modifier = Modifier.weight(1f).padding(start = 8.dp)
+                        ) {
+                            Text("关闭")
+                        }
                     }
                 }
             }

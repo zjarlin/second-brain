@@ -29,10 +29,10 @@ class BrewPackageManager : PackageManager {
     }
 
     override suspend fun installPackage(packageStatus: PackageStatus, scope: CoroutineScope) {
+        packageStatus.status = PackageStatus.Status.INSTALLING
         withContext(Dispatchers.IO) {
             try {
-                packageStatus.status = PackageStatus.Status.INSTALLING
-                val execute = CommandExecutor.execute("brew install ${packageStatus.name}",)
+                val execute = CommandExecutor.execute("brew install ${packageStatus.name}")
 
                 scope.launch(Dispatchers.Main) {
                     val contains = execute.contains("🍺")
