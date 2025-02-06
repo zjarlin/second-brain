@@ -17,14 +17,15 @@ repositories {
 }
 
 dependencies {
+
     implementation(libs.cn.hutool.hutool.all)
     implementation(compose.desktop.currentOs)
     implementation(libs.compose.material3.desktop)
     implementation(libs.compose.icons.extended)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation(libs.fastjson.kotlin)
 
 

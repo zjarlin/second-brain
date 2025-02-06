@@ -14,7 +14,7 @@ class DotfilesPage : MetaSpec {
 
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            refPath = this.javaClass.name,
+//            refPath = this.javaClass.name,
             parentRefPath = "管理",
             title = "Dotfiles管理",
             icon = Icons.Filled.Settings,

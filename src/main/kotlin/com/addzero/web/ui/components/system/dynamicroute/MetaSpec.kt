@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
  * 路由元数据规范接口
  */
 interface MetaSpec {
+    val refPath: String
+        get() = this.javaClass.name
 
     val metadata: RouteMetadata
         get() = RouteMetadata(

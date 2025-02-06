@@ -16,7 +16,7 @@ import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 class NotesQAPage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            refPath = this.javaClass.name,
+//            refPath = this.javaClass.name,
             title = "知识库问答",
             icon = Icons.Default.QuestionAnswer,
             visible = true,

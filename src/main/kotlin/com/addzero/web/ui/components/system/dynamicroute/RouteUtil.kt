@@ -49,8 +49,11 @@ object RouteUtil {
     /**
      * 根据路径获取路由组件
      */
-    fun getRouteComponentByPath(path: String): Pair<KClass<*>, MetaSpec>? =
-        routeComponents.entries.find { it.value.metadata.refPath == path }?.toPair()
+    fun getRouteComponentByPath(path: String): Pair<KClass<*>, MetaSpec>? {
+        //         .metadata.refPath
+        val routeComponents1 = routeComponents
+        return routeComponents1.entries.find { it.value.refPath == path }?.toPair()
+    }
 
     /**
      * 获取面包屑路径
