@@ -35,10 +35,11 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
         get() = Icons.Default.Home
 
     private val packageList = listOf(
-        "git",
-        "node",
-        "python",
-        "wget"
+        "wechatwebdevtools"
+//        "git",
+//        "node",
+//        "python",
+//        "wget"
     )
 
     @Composable

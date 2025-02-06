@@ -1,8 +1,7 @@
 package com.addzero.web.modules.functionbox.functions.`package`
 
+import com.addzero.web.util.shell.CommandExecutor
 import kotlinx.coroutines.*
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 class BrewPackageManager : PackageManager {
     override suspend fun checkPackageStatus(packageName: String): PackageStatus {
@@ -10,12 +9,9 @@ class BrewPackageManager : PackageManager {
             val status = PackageStatus(packageName)
             try {
                 withTimeout(5000) {
-                    val process = ProcessBuilder("brew", "list", packageName)
-                        .redirectErrorStream(true)
-                        .start()
-
-                    val exitCode = process.waitFor()
-                    status.status = if (exitCode == 0) {
+                    val execute = CommandExecutor.execute("brew list|grep $packageName")
+                    val notBlank = execute.isNotBlank()
+                    status.status = if (notBlank) {
                         PackageStatus.Status.INSTALLED
                     } else {
                         PackageStatus.Status.NOT_INSTALLED
@@ -36,23 +32,11 @@ class BrewPackageManager : PackageManager {
         withContext(Dispatchers.IO) {
             try {
                 packageStatus.status = PackageStatus.Status.INSTALLING
-                val process = ProcessBuilder("brew", "install", packageStatus.name)
-                    .redirectErrorStream(true)
-                    .start()
+                val execute = CommandExecutor.execute("brew install ${packageStatus.name}",)
 
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                var line: String?
-
-                while (reader.readLine().also { line = it } != null) {
-                    scope.launch(Dispatchers.Main) {
-                        packageStatus.progress += 0.1f
-                        if (packageStatus.progress > 1f) packageStatus.progress = 1f
-                    }
-                }
-
-                val exitCode = process.waitFor()
                 scope.launch(Dispatchers.Main) {
-                    if (exitCode == 0) {
+                    val contains = execute.contains("🍺")
+                    if (contains) {
                         packageStatus.status = PackageStatus.Status.INSTALLED
                     } else {
                         packageStatus.status = PackageStatus.Status.ERROR
@@ -70,10 +54,8 @@ class BrewPackageManager : PackageManager {
 
     override fun isAvailable(): Boolean {
         return try {
-            val process = ProcessBuilder("which", "brew")
-                .redirectErrorStream(true)
-                .start()
-            process.waitFor() == 0
+            val execute = CommandExecutor.execute("which brew")
+            execute.isNotBlank()
         } catch (e: Exception) {
             false
         }
