@@ -10,7 +10,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +31,7 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
     override val description: String
         get() = "brew自动安装所需软件"
     override val icon: ImageVector
-        get() = Icons.Default.Home
+        get() = Icons.Default.Download
 
     private val packageList = listOf(
         "wechatwebdevtools"
