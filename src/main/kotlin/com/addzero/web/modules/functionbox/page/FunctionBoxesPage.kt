@@ -16,20 +16,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cn.hutool.core.util.ClassUtil
+import com.addzero.web.modules.common.dialog.CommonDialog
 import com.addzero.web.modules.functionbox.model.FunctionBoxSpec
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import kotlinx.coroutines.launch
 
 @Composable
-fun <F : FunctionBoxSpec> FunctionBoxItem(function: F) {
-    var showContent by remember { mutableStateOf(false) }
-    
+fun <F : FunctionBoxSpec> FunctionBoxItem(
+    function: F,
+    showContent: Boolean,
+    onShowContentChange: (Boolean) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clickable { showContent = true },
+            .clickable { onShowContentChange(true) },
         elevation = 4.dp
     ) {
         Column(
@@ -58,21 +61,9 @@ fun <F : FunctionBoxSpec> FunctionBoxItem(function: F) {
             )
         }
     }
-    
+
     if (showContent) {
-        androidx.compose.ui.window.Dialog(
-            onDismissRequest = { showContent = false }
-        ) {
-            androidx.compose.material.Surface(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .fillMaxHeight(0.8f),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                color = androidx.compose.material.MaterialTheme.colors.surface
-            ) {
-                function.invoke()
-            }
-        }
+        function.invoke()
     }
 }
 
@@ -90,6 +81,7 @@ class FunctionBoxesPage : MetaSpec {
     @Composable
     override fun render() {
         var functionBoxes by remember { mutableStateOf<List<FunctionBoxSpec>>(emptyList()) }
+        var selectedFunctionClassName by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
             val scanPackageBySuper = ClassUtil.scanPackageBySuper(
@@ -119,7 +111,14 @@ class FunctionBoxesPage : MetaSpec {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(functionBoxes.size) { index ->
-                        FunctionBoxItem(functionBoxes[index])
+                        val function = functionBoxes[index]
+                        FunctionBoxItem(
+                            function = function,
+                            showContent = selectedFunctionClassName == function.javaClass.name,
+                            onShowContentChange = { show ->
+                                selectedFunctionClassName = if (selectedFunctionClassName == function.javaClass.name) null else function.javaClass.name
+                            }
+                        )
                     }
                 }
             }
