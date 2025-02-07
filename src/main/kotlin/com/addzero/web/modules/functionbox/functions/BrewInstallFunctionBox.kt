@@ -104,6 +104,12 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
         }
         val packageStatuses by coroutineManager.state.collectAsState()
 
+        DisposableEffect(Unit) {
+            onDispose {
+                coroutineManager.dispose()
+            }
+        }
+
         LaunchedEffect(Unit) {
             packageList.forEachIndexed { index, pkg ->
                 coroutineManager.launch("check_$pkg") {
@@ -126,16 +132,9 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
             }
         }
 
-        DisposableEffect(Unit) {
-            onDispose {
-                coroutineManager.dispose()
-            }
-        }
-
         if (isOpen) {
             CommonDialog(
                 onDismissRequest = {
-                    coroutineManager.dispose()
                     isOpen = false
                 },
                 title = "软件安装状态",
@@ -175,7 +174,6 @@ class BrewInstallFunctionBox : FunctionBoxSpec {
                 dismissButton = {
                     DefaultDialogButton(
                         onClick = {
-                            coroutineManager.dispose()
                             isOpen = false
                         },
                         text = "关闭"
