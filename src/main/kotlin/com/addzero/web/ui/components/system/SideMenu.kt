@@ -3,6 +3,9 @@ package com.addzero.web.ui.components.system
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -31,7 +34,7 @@ fun SideMenu(
                 val parentMetadata = RouteMetadata(
                     parentName = null,
                     title = parentName.toString(),
-                    icon = Icons.Default.Apps,
+                    icon = Icons.Default.Menu,
                     visible = true,
                     permissions = emptyList()
                 )
@@ -75,9 +78,22 @@ private fun renderTreeSider(
                     imageVector?.let { Icon(it, contentDescription = contentDescription) }
                 },
                 label = { Text(contentDescription) },
+                badge = {
+                    // 只有当存在子菜单时才显示箭头图标
+                    if (routeGroups[spec.metadata.title] != null) {
+                        val arrowIcon = if (isExpanded.value) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight
+                        Icon(
+                            imageVector = arrowIcon,
+                            contentDescription = if (isExpanded.value) "折叠" else "展开",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
                 selected = currentRoute == qualifiedName,
                 onClick = {
-                    qualifiedName?.let { onRouteChange(it) }
+                    if (qualifiedName != null) {
+                        onRouteChange(qualifiedName)
+                    }
                     isExpanded.value = !isExpanded.value
                 },
                 modifier = Modifier.padding(vertical = 4.dp)

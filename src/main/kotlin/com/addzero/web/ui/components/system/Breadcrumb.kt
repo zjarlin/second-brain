@@ -52,9 +52,7 @@ fun Breadcrumb(
                             MaterialTheme.colorScheme.onSurface
                         },
                         modifier = Modifier.clickable(enabled = index != breadcrumbPath.lastIndex) {
-                            if (path != null) {
-                                onPathClick(path)
-                            }
+                            onPathClick(path)
                         }
                     )
                 }
