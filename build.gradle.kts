@@ -27,8 +27,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
     implementation(libs.fastjson.kotlin)
-
-
     // Material Icons
     implementation(compose.materialIconsExtended)
 

@@ -32,6 +32,7 @@ object RouteUtil {
      * 获取所有路由组件，按order字段排序
      */
     fun getAllRouteComponents(): Map<KClass<*>, MetaSpec> = routeComponents.toList()
+        .filter { it.second.metadata.visible }
         .sortedBy { it.second.metadata.order }
         .toMap()
 

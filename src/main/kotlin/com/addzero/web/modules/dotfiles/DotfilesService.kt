@@ -1,6 +1,5 @@
 package com.addzero.web.modules.dotfiles
 
-import DotfilesExcelDTO
 import com.addzero.web.base.BaseServiceImpl
 import com.addzero.web.model.PageResult
 import com.alibaba.fastjson2.JSON
@@ -8,7 +7,6 @@ import com.alibaba.fastjson2.TypeReference
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.serialization.json.Json
 
 private const val PAGE = "pageNum"
 
