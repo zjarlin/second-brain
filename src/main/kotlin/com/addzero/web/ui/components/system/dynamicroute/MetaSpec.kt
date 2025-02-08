@@ -21,5 +21,7 @@ interface MetaSpec {
         )
 
     @Composable
-    fun render()
+    fun render(){
+        throw UnsupportedOperationException("未实现")
+    }
 }

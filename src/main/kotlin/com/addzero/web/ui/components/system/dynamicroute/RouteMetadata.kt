@@ -8,9 +8,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * 路由元数据实现类
  */
 data class RouteMetadata(
-//    val refPath: String ="",
-    val parentName: String? = null,
     val title: String,
+    val parentName: String? = null,
     val icon: ImageVector? = Icons.Default.Home,
     val visible: Boolean = true,
     val permissions: List<String> = emptyList(),

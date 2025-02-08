@@ -32,8 +32,10 @@ fun MainContent(
             val first = routeComponentByPath?.first
             // 使用反射创建实例
             val createInstance = first?.createInstance()
-            val metaSpec = createInstance as MetaSpec
-            metaSpec.render()
+            if (createInstance!=null) {
+                val metaSpec = createInstance as MetaSpec
+                metaSpec.render()
+            }
         }
     }
 }
