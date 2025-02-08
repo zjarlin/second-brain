@@ -78,4 +78,40 @@ class WingetPackageManager : PackageManager {
             false
         }
     }
+
+    override suspend fun uninstallPackage(packageStatus: PackageStatus, scope: CoroutineScope) {
+        withContext(Dispatchers.IO) {
+            try {
+                packageStatus.status = PackageStatus.Status.UNINSTALLING
+                val process = ProcessBuilder("winget", "uninstall", packageStatus.name)
+                    .redirectErrorStream(true)
+                    .start()
+
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+                var line: String?
+
+                while (reader.readLine().also { line = it } != null) {
+                    scope.launch(Dispatchers.Main) {
+                        packageStatus.progress += 0.1f
+                        if (packageStatus.progress > 1f) packageStatus.progress = 1f
+                    }
+                }
+
+                val exitCode = process.waitFor()
+                scope.launch(Dispatchers.Main) {
+                    if (exitCode == 0) {
+                        packageStatus.status = PackageStatus.Status.NOT_INSTALLED
+                    } else {
+                        packageStatus.status = PackageStatus.Status.ERROR
+                        packageStatus.error = "卸载失败"
+                    }
+                }
+            } catch (e: Exception) {
+                scope.launch(Dispatchers.Main) {
+                    packageStatus.status = PackageStatus.Status.ERROR
+                    packageStatus.error = e.message ?: "未知错误"
+                }
+            }
+        }
+    }
 }

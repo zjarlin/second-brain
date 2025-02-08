@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 interface PackageManager {
     suspend fun checkPackageStatus(packageName: String): PackageStatus
     suspend fun installPackage(packageStatus: PackageStatus, scope: CoroutineScope)
+    suspend fun uninstallPackage(packageStatus: PackageStatus, scope: CoroutineScope)
     fun isAvailable(): Boolean
 }
 
@@ -18,6 +19,7 @@ data class PackageStatus(
         CHECKING,
         INSTALLED,
         INSTALLING,
+        UNINSTALLING,
         ERROR,
         NOT_INSTALLED
     }

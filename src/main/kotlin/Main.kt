@@ -29,7 +29,7 @@ fun main() = application {
     )
 
     Window(
-        onCloseRequest = ::exitApplication, title = "个人知识库", state = windowState
+        onCloseRequest = ::exitApplication, title = "addzero soft", state = windowState
     ) {
         App()
     }

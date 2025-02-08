@@ -52,6 +52,28 @@ class BrewPackageManager : PackageManager {
         }
     }
 
+    override suspend fun uninstallPackage(packageStatus: PackageStatus, scope: CoroutineScope) {
+        packageStatus.status = PackageStatus.Status.UNINSTALLING
+        withContext(Dispatchers.IO) {
+            try {
+                val execute = CommandExecutor.execute("brew uninstall ${packageStatus.name}")
+                scope.launch(Dispatchers.Main) {
+                    if (execute.contains("Uninstalling")) {
+                        packageStatus.status = PackageStatus.Status.NOT_INSTALLED
+                    } else {
+                        packageStatus.status = PackageStatus.Status.ERROR
+                        packageStatus.error = "卸载失败"
+                    }
+                }
+            } catch (e: Exception) {
+                scope.launch(Dispatchers.Main) {
+                    packageStatus.status = PackageStatus.Status.ERROR
+                    packageStatus.error = e.message ?: "未知错误"
+                }
+            }
+        }
+    }
+
     override fun isAvailable(): Boolean {
         return try {
             val execute = CommandExecutor.execute("which brew")
