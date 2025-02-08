@@ -1,5 +1,6 @@
 package com.addzero.web.modules.functionbox.page
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,12 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cn.hutool.core.util.ClassUtil
-import com.addzero.web.modules.common.dialog.CommonDialog
 import com.addzero.web.modules.functionbox.model.FunctionBoxSpec
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
-import kotlinx.coroutines.launch
 
 @Composable
 fun <F : FunctionBoxSpec> FunctionBoxItem(
@@ -28,37 +28,61 @@ fun <F : FunctionBoxSpec> FunctionBoxItem(
     showContent: Boolean,
     onShowContentChange: (Boolean) -> Unit
 ) {
+    val colors = remember {
+        listOf(
+            Color(0xFF007AFF),
+            Color(0xFF34C759),
+            Color(0xFFFF9500),
+            Color(0xFFFF2D55),
+            Color(0xFF5856D6),
+            Color(0xFFAF52DE)
+        )
+    }
+    val startColor = remember { colors.random() }
+    val endColor = remember { colors.random() }
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
+            .fillMaxWidth(0.8f)
+            .aspectRatio(1.0f)
             .clickable { onShowContentChange(true) },
-        elevation = 4.dp
+        elevation = 2.dp,
+        backgroundColor = Color.Transparent,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                        colors = listOf(startColor, endColor)
+                    )
+                )
         ) {
-            Icon(
-                imageVector = function.icon,
-                contentDescription = function.name,
-                modifier = Modifier.size(32.dp),
-                tint = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = function.name,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = function.description,
-                textAlign = TextAlign.Center,
-                color = Color.Gray
-            )
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = function.icon,
+                    contentDescription = function.name,
+                    modifier = Modifier.size(32.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = function.description,
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 13.dp.value.sp,
+                        lineHeight = 18.dp.value.sp
+                    )
+                )
+            }
         }
     }
 
@@ -70,7 +94,7 @@ fun <F : FunctionBoxSpec> FunctionBoxItem(
 class FunctionBoxesPage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            parentRefPath = null,
+            parentName = null,
             title = "功能盒子",
             icon = Icons.Filled.Apps,
             visible = true,

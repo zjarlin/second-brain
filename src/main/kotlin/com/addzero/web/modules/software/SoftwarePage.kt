@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.addzero.web.model.enums.OsType
 import com.addzero.web.model.enums.PlatformType
@@ -22,7 +21,7 @@ class SoftwarePage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
 //            refPath = this.javaClass.name,
-            parentRefPath = "管理",
+            parentName = "管理",
             title = "软件管理",
             icon = Icons.Filled.Apps,
             visible = true,

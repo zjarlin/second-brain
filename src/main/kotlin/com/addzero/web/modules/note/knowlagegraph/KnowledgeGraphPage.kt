@@ -19,6 +19,7 @@ class KnowledgeGraphPage :MetaSpec {
         get() {
             val routeMetadata = RouteMetadata(
 //                refPath = this.javaClass.name,
+                parentName = "RAG",
                 title = "知识图谱",
                 icon = Icons.Default.AccountTree,
                 visible = true,

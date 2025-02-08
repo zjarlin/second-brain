@@ -28,8 +28,8 @@ class NotesPage : MetaSpec {
 //            refPath = this.javaClass.name,
 
 //            refPath = "/note",
-//            parentRefPath = "",
-            title = "我的笔记",
+            parentName = "RAG",
+            title = "我的知识",
             icon = Icons.AutoMirrored.Filled.NoteAdd,
             visible = true,
             permissions = emptyList()
@@ -65,9 +65,9 @@ class NotesPage : MetaSpec {
                         viewModel.createNote(null) // 创建根级别的新笔记
                         focusRequester.requestFocus()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.NoteAdd, "新建笔记")
+                        Icon(Icons.AutoMirrored.Filled.NoteAdd, "新建知识")
                         Spacer(Modifier.width(8.dp))
-                        Text("新建笔记")
+                        Text("新建知识")
                     }
 
                     IconButton(onClick = { showUploadDialog = true }) {

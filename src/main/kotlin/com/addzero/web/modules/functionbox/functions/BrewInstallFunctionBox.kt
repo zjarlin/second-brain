@@ -30,9 +30,9 @@ package com.addzero.web.modules.functionbox.functions
         )
 
         override val name: String
-            get() = "brew auto install"
+            get() = "auto install"
         override val description: String
-            get() = "brew自动安装所需软件"
+            get() = "自动安装所需软件"
         override val icon: ImageVector
             get() = Icons.Default.Download
 

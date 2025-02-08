@@ -65,7 +65,7 @@ object RouteUtil {
             val component = getRouteComponentByPath(currentPath)
             if (component != null) {
                 result.add(0, component.second.metadata)
-                currentPath = component.second.metadata.parentRefPath ?: ""
+                currentPath = component.second.metadata.parentName ?: ""
             } else {
                 break
             }

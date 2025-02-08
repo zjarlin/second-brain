@@ -13,7 +13,7 @@ interface MetaSpec {
 
     val metadata: RouteMetadata
         get() = RouteMetadata(
-            parentRefPath = null,
+            parentName = null,
             title = "标题",
             icon = Icons.Filled.Apps,
             visible = true,
