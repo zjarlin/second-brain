@@ -1,59 +1,40 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization") version "1.9.10"
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.spring) apply false
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.compose) apply false
+    alias(libs.plugins.jetbrainsCompose) apply false
+//    id("org.jetbrains.compose") apply false
+//    id("org.jetbrains.kotlin.plugin.compose") apply false
 }
 
-group = "com.addzero"
-version = "1.0-SNAPSHOT"
+subprojects {
+    group = "com.addzero"
+    version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()
+    repositories {
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
+    }
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 
 dependencies {
 
-    implementation(libs.cn.hutool.hutool.all)
-    implementation(compose.desktop.currentOs)
-    implementation(libs.compose.material3.desktop)
-    implementation(libs.compose.icons.extended)
 
-    implementation(libs.kotlinx.coroutines.core)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
-    implementation(libs.fastjson.kotlin)
-    // Material Icons
-    implementation(compose.materialIconsExtended)
-
-    // Ktor
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.json)
-
-    // Kotlinx serialization
-
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlin.reflect)
-
-    // Logging
-    implementation(libs.logback.classic)
+//    implementation(libs.kotlin.reflect)
 
 }
 
-compose.desktop {
-    application {
-        mainClass = "MainKt"
 
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "second-brain"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+
+
+

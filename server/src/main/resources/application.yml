@@ -1,0 +1,153 @@
+server:
+  port: 12344
+  servlet:
+    context-path: /api
+jimmer:
+  language: kotlin
+  database-validation-mode: none    #验证数据库结构与实体
+  in-list-padding-enabled: true     #开启Padding优化
+  expanded-in-list-padding-enabled: false  #关闭Expanded Padding优化
+  #  dialect: org.babyfish.jimmer.sql.dialect.MySqlDialect
+  show-sql: true
+  pretty-sql: true
+  inline-sql-variables: true         #sql内联变量
+  #  executor-context-prefixes:
+  #    - com.example.springaiollama.biz
+  client:
+    ts:
+      path: /ts.zip
+    openapi:
+      path: /openapi.yml
+      ui-path: /openapi-ui.html
+      properties:
+        info:
+          description: document
+#      ref-path: ${server.servlet.context-path}${jimmer.client.openapi.path}
+
+
+spring:
+  jackson:
+    time-zone: GMT+8
+    #    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  ai:
+    vectorstore:
+      pgvector:
+        distance-type: COSINE_DISTANCE
+        schema-name: public
+        table-name: vector_store
+        initialize-schema: true
+        index-type: none
+    #        dimensions: 1536
+    #          model: llava       #多模态
+    ollama:
+      init:
+        pull-model-strategy: never
+        embedding:
+          additional-models:
+            - nomic-embed-text
+        chat:
+          additional-models:
+            - deepseek-r1
+            - qwen2.5-coder:14b
+        timeout: 5m
+      #          include: false
+      base-url: http://${OLLAMA_URL:localhost}:11434
+      chat:
+        model: llava
+    # kimi
+    moonshot:
+      api-key: 2
+    zhipuai:
+      api-key: xxxxxxxxxxxxxx
+
+
+    openai:
+      chat:
+        api-key: xxxxxxxxxxxxx
+
+    # 阿里灵积
+    dashscope:
+      api-key: xxxxxxxxxxxxxxxxx
+      chat:
+        enabled: true
+        options:
+          model: qwen-max
+      embedding:
+        options:
+          model: text-embedding-v2
+      image:
+        options:
+          model: wanx-v1
+# springdoc-openapi项目配置
+springdoc:
+  # 默认是false，需要设置为true
+  default-flat-param-object: true
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.addzero
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: token
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  active-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: true
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
+  # 自动续签
+  auto-renew: true
+defaultctx:
+  #  * * 0 = "dashScopeAiVLChatModel"
+  #  * * 1 = "dashScopeAiChatModel"
+  #  * * 2 = "moonshotChatModel"
+  #  * * 3 = "ollamaChatModel"
+  #  *         ------qwen2.5:1.5b
+  #  *         qwen2.5-coder:1.5b
+  #llava
+  #  deepseek-r1:latest
+  #  * * 4 = "openAiChatModel"
+  #  * * 5 = "zhiPuAiChatModel"
+  defaultChatModel: deepseek-r1:latest
+  #  tomcat:
+  #    connection-timeout: 50000
+  #    keep-alive-timeout: 300000
+  #false生产环境可不输出sql
+
+dromara:
+  x-file-storage: #文件存储配置
+    default-platform: minio #默认使用的存储平台
+    minio:
+      - platform: minio-1 # 存储平台标识
+        enable-storage: true  # 启用存储
+        access-key: ${MINIO_USERNAME:zjarlin}
+        secret-key: ${MINIO_PASSWORD:zhou9955}
+        end-point: http://${MINIO_HOST:localhost}:${MINIO_PORT:19000}
+        bucket-name: ${MINIO_BUCKET_NAME:jl-starter}
+
+    thumbnail-suffix: ".min.jpg" #缩略图后缀，例如【.min.jpg】【.png】
+    #对应平台的配置写在这里，注意缩进要对齐
