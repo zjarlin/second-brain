@@ -1,15 +1,20 @@
 package com.addzero.web.modules.dotfiles
 
 import androidx.compose.runtime.*
+import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
+import com.addzero.web.modules.second_brain.dotfiles.DotfilesController2
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
+
 
 class DotfilesViewModel(
     private val coroutineScope: CoroutineScope
 ) {
     private val service = DotfilesService()
+    private val repo = DotfilesService()
 
     var pageResult by mutableStateOf<PageResult<BizDotFiles>?>(null)
         private set
@@ -37,10 +42,16 @@ class DotfilesViewModel(
         page: Int = currentPage,
         size: Int = pageSize
     ) {
+
         coroutineScope.launch {
             try {
                 isLoading = true
                 error = null
+
+                val bean = SpringUtil.getBean(DotfilesController2::class.java)
+
+
+
                 pageResult = service.searchDotfiles(
                     name = name,
                     platforms = platforms,

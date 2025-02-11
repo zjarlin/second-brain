@@ -22,14 +22,20 @@ enum class EnumOsStructure(
     /**
      * arm64
      */
-    @EnumItem(name = "arm64")
-    ARM64("arm64", "arm64"),
+    @EnumItem(name = "1")
+    ARM64("code_arm64", "arm64"),
 
     /**
      * x86
      */
-    @EnumItem(name = "x86")
-    X86("x86", "x86");
+    @EnumItem(name = "2")
+    X86("code_x86", "x86"),
+
+    /**
+     * 不限
+     */
+    @EnumItem(name = "0")
+    BUXIAN("code_0", "不限");
 
     @JsonValue
     fun getValue(): String {

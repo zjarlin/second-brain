@@ -7,6 +7,8 @@ import cn.idev.excel.read.listener.ReadListener
 import cn.idev.excel.util.ListUtils
 import com.addzero.common.kt_util.isNotEmpty
 import com.addzero.common.kt_util.isNotNew
+import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
+import com.addzero.web.infra.jimmer.base.pagefactory.createPageFactory
 import com.addzero.web.infra.upload.DownloadUtil
 import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSaveDTO
 import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
@@ -16,6 +18,8 @@ import io.swagger.v3.oas.annotations.Operation
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.ast.mutation.AffectedTable
 import org.babyfish.jimmer.sql.kt.KSqlClient
+import org.babyfish.jimmer.sql.kt.ast.expression.eq
+import org.babyfish.jimmer.sql.kt.ast.expression.valueIn
 import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -159,6 +163,28 @@ class DotfilesController2(
             FastExcel.write(it, BizDotfilesExcelDTO::class.java).sheet(sheetName).doWrite(toList)
         }
     }
+
+    fun searchDotfiles(name: String, platforms: Set<String>, osTypes:
+    Set<String>, page: Int, size: Int): PageResult<BizDotfiles> ?{
+        val createPageFactory = createPageFactory<BizDotfiles>()
+
+
+        val fetchPage = sql.createQuery(BizDotfiles::class) {
+            where(table.name eq name)
+            select(table)
+        }.fetchPage(page, size,null,createPageFactory)
+        return fetchPage
+    }
+
+//    fun searchDotfiles1(
+//        name: String,
+//        platforms: Set<String>,
+//        osTypes: Set<String>,
+//        page: Int,
+//        size: Int
+//    ): PageResult<com.addzero.web.modules.dotfiles.BizDotFiles>? {
+//        TODO("Not yet implemented")
+//    }
 
 }
 

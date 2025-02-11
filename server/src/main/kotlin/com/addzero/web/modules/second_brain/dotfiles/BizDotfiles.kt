@@ -2,11 +2,8 @@ package com.addzero.web.modules.second_brain.dotfiles
 
 import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
-import org.babyfish.jimmer.sql.Default
-import org.babyfish.jimmer.sql.Entity
-import org.babyfish.jimmer.sql.Key
+import org.babyfish.jimmer.sql.*
 //import org.babyfish.jimmer.sql.Key
-import org.babyfish.jimmer.sql.Table
 
 
 /**
@@ -24,22 +21,24 @@ public interface BizDotfiles : BaseEntity {
 
     /**
      *  操作系统
-     *  1=win
-     * 2-linux
-     * 3 mac
-     *null.不限
+     *  win=win
+     * linux=linux
+     * mac=mac
+     *null=不限
      */
     @Key
-    val osType: EnumOsType
+    @Serialized
+    val osType: List<EnumOsType>?
 
     /**
      *  系统架构
      *  arm64=arm64
      *  x86=x86
+     *  不限=不限
      */
 //    @Column(name = "os_structure")
     @Key
-    val osStructure: EnumOsStructure
+    val osStructure: EnumOsStructure?
 
     /**
      *  定义类型

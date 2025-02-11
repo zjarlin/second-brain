@@ -48,7 +48,7 @@ dependencies {
     // ----------------------------------------
 //    implementation(libs.kotlinx.serialization.json)
 
-//    implementation("org.tomlj:tomlj:1.1.1")
+    implementation("org.tomlj:tomlj:1.1.1")
     // 引入 Spring Boot 相关依赖
     api(libs.bundles.spring.boot)
 

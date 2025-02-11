@@ -13,7 +13,7 @@ import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
 
 @Composable
 fun <T> Pagination(
-    pageResult: com.addzero.web.infra.jimmer.base.pagefactory.PageResult<T>,
+    pageResult: PageResult<T>,
     onPrevious: () -> Unit,
     onNext: () -> Unit
 ) {

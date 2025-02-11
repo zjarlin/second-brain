@@ -3,6 +3,7 @@ package com.addzero.web.infra.jimmer.base.pagefactory
 import org.babyfish.jimmer.sql.ast.impl.query.PageSource
 import org.babyfish.jimmer.sql.ast.query.PageFactory
 
+
 fun <E, P> createPageFactory(block: (List<E>, Long, PageSource) -> P): PageFactory<E, P> {
     return PageFactory {
             rows,

@@ -79,7 +79,7 @@ public open class BizDotfilesExcelDTO {
 
         return BizDotfiles {
 
-            osType = EnumOsType.MAC
+            osType = listOf(EnumOsType.MAC)
 
 
             osStructure = EnumOsStructure.X86
