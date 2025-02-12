@@ -12,8 +12,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":server"))
 
+    api(project(":backend"))
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
     implementation(libs.compose.material3.desktop)

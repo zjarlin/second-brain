@@ -1,6 +1,6 @@
 include(
-    ":ui",
-    ":server",
+    ":front",
+    ":backend",
 )
 
 pluginManagement {
