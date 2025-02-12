@@ -6,8 +6,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.addzero.App
-import com.addzero.App.Companion.runSpringBootApp
+import com.addzero.SpringBootApp
+import com.addzero.SpringBootApp.Companion.runSpringBootApp
 import com.addzero.web.ui.layout.MainLayout
 import com.addzero.web.ui.theme.AppTheme
 import org.slf4j.Logger

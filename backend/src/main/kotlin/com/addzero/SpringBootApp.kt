@@ -2,7 +2,7 @@ package com.addzero
 
 import cn.hutool.core.net.NetUtil
 import cn.hutool.core.util.StrUtil
-import com.addzero.App.Companion.runSpringBootApp
+import com.addzero.SpringBootApp.Companion.runSpringBootApp
 import org.babyfish.jimmer.client.EnableImplicitApi
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -11,10 +11,10 @@ import java.util.*
 
 @SpringBootApplication
 @EnableImplicitApi
-open class App {
+open class SpringBootApp {
     companion object {
         fun runSpringBootApp(args: Array<String>) {
-            val run = runApplication<App>(*args)
+            val run = runApplication<SpringBootApp>(*args)
             val env: Environment = run.environment
             // 获取本机IP地址
             val ip = NetUtil.getLocalhostStr()

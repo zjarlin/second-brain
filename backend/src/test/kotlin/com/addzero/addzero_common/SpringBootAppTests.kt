@@ -14,7 +14,7 @@ import org.springframework.test.context.TestConstructor
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class AppTests(
+class SpringBootAppTests(
     val kSqlClient: KSqlClient,
     val bizNoteController: BizNoteController,
 ) {
