@@ -28,6 +28,7 @@ public interface BizDotfiles : BaseEntity {
      */
     @Key
     @Serialized
+    @get:Schema(description = "操作系统")
     val osType: List<EnumOsType>?
 
     /**
@@ -38,6 +39,7 @@ public interface BizDotfiles : BaseEntity {
      */
 //    @Column(name = "os_structure")
     @Key
+    @get:Schema(description = "系统架构")
     val osStructure: EnumOsStructure?
 
     /**

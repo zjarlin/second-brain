@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
         )
 
         Window(
-            onCloseRequest = ::exitApplication, title = "addzero soft", state = windowState
+            onCloseRequest = ::exitApplication, title = "+0 后台管理系统", state = windowState
         ) {
             App()
         }

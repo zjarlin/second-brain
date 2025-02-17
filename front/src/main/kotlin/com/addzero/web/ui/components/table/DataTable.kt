@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.swagger.v3.oas.annotations.media.Schema
 import java.awt.SystemColor.text
 import java.util.LinkedList
 import kotlin.reflect.KProperty1
@@ -21,12 +22,14 @@ import kotlin.reflect.full.memberExtensionProperties
 import kotlin.reflect.jvm.internal.impl.descriptors.runtime.structure.ReflectClassUtilKt
 
 // 默认的排除字段
+
+
+//val commentAnnoClass = ColumnName::class.java
+val commentAnnoClass = Schema::class.java
+
+
 val DEFAULT_EXCLUDE_FIELDS = setOf(
-    "createTime",
-    "createdBy",
-    "updateTime",
-    "updatedBy",
-    "id"
+    "createTime", "createdBy", "updateTime", "updatedBy", "id"
 )
 
 @Composable
@@ -40,6 +43,8 @@ fun <T : Any> DataTable(
     totalPages: Int,
     onPageChange: (Int) -> Unit
 ) {
+
+
     // 使用declaredMemberProperties保持定义顺序
     val fields = items.firstOrNull()?.let { item ->
 
@@ -49,15 +54,13 @@ fun <T : Any> DataTable(
 //            .filterIsInstance<KProperty1<T, *>>()
             .filter { field ->
                 !java.lang.reflect.Modifier.isStatic(field.modifiers) && field.name !in excludeFields
-            }
-            .toList()
+            }.toList()
     } ?: emptyList()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // 表头
         Surface(
-            modifier = Modifier.fillMaxWidth(),
-            tonalElevation = 1.dp
+            modifier = Modifier.fillMaxWidth(), tonalElevation = 1.dp
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -65,28 +68,25 @@ fun <T : Any> DataTable(
             ) {
                 // 序号列
                 Text(
-                    text = "序号",
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.width(60.dp)
+                    text = "序号", style = MaterialTheme.typography.titleSmall, modifier = Modifier.width(60.dp)
                 )
 
                 // 按声明顺序显示字段
                 fields.forEach { field ->
                     field.isAccessible = true
-                    val columnName = field.getAnnotation(ColumnName::class.java)?.value
-                        ?: field.name.replaceFirstChar { it.uppercase() }
+//                    val columnName = field.getAnnotation(commentAnnoClass)?.value
+                    val annotation = field.getAnnotation(commentAnnoClass)
+
+
+                    val columnName = annotation?.description ?: field.name.replaceFirstChar { it.uppercase() }
                     Text(
-                        text = columnName,
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.weight(1f)
+                        text = columnName, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f)
                     )
                 }
 
                 // 操作列
                 Text(
-                    text = "操作",
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.width(96.dp)
+                    text = "操作", style = MaterialTheme.typography.titleSmall, modifier = Modifier.width(96.dp)
                 )
             }
         }
@@ -104,22 +104,19 @@ fun <T : Any> DataTable(
                 ) {
                     // 序号列
                     Text(
-                        text = (startIndex + index + 1).toString(),
-                        modifier = Modifier.width(60.dp)
+                        text = (startIndex + index + 1).toString(), modifier = Modifier.width(60.dp)
                     )
 
                     // 按声明顺序显示字段值
                     fields.forEach { field ->
                         Text(
-                            text = field.get(item)?.toString() ?: "",
-                            modifier = Modifier.weight(1f)
+                            text = field.get(item)?.toString() ?: "", modifier = Modifier.weight(1f)
                         )
                     }
 
                     // 操作按钮
                     Row(
-                        modifier = Modifier.width(96.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.width(96.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(onClick = { onEdit(item) }) {
                             Icon(Icons.Default.Edit, "编辑")
@@ -135,9 +132,7 @@ fun <T : Any> DataTable(
 
         // 添加分页控件
         Pagination(
-            currentPage = currentPage,
-            totalPages = totalPages,
-            onPageChange = onPageChange
+            currentPage = currentPage, totalPages = totalPages, onPageChange = onPageChange
         )
     }
 }

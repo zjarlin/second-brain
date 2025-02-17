@@ -20,7 +20,7 @@ fun TopBar() {
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "个人知识库", style = MaterialTheme.typography.titleLarge,
+                text = "🤔", style = MaterialTheme.typography.titleLarge,
                 color = Color.White
             )
 
