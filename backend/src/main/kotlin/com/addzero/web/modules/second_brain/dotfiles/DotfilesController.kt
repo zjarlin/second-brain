@@ -1,113 +1,189 @@
-//package com.addzero.web.modules.second_brain.dotfiles
-//
-//import cn.idev.excel.FastExcel
-//import com.addzero.common.kt_util.isNotEmpty
-//import com.addzero.common.kt_util.isNotNew
-//import com.addzero.web.infra.jimmer.base.BaseCrudController
-//import com.addzero.web.infra.jimmer.base.BaseFastExcelApi
-//import com.addzero.web.infra.jimmer.base.ExcelDataListener
-//import com.addzero.web.modules.second_brain.dotfiles.dto.DotfilesOutVO
-//import com.addzero.web.modules.second_brain.dotfiles.dto.DotfilesSaveInputDTO
-//import com.addzero.web.modules.second_brain.dotfiles.dto.DotfilesSpec
-//import com.addzero.web.modules.second_brain.dotfiles.dto.DotfilesUpdateInputDTO
-//import org.springframework.web.bind.annotation.PostMapping
-//import org.springframework.web.bind.annotation.RequestMapping
-//import org.springframework.web.bind.annotation.RequestPart
-//import org.springframework.web.bind.annotation.RestController
-//import org.springframework.web.multipart.MultipartFile
-//
-//
-//@RestController
-//@RequestMapping("/dotfiles")
-//class DotfilesController(
-//) : BaseCrudController<BizDotfiles, DotfilesSpec, DotfilesSaveInputDTO, DotfilesUpdateInputDTO, DotfilesOutVO>,
-//    BaseFastExcelApi<BizDotfiles, DotfilesSpec, BizDotfilesExcelDTO> {
-//
-//
-//    @PostMapping("/import")
-//
-//    override fun import(@RequestPart file: MultipartFile): Int {
-//
-//        val use = file.inputStream.use {
-//            val excelDataListener = ExcelDataListener<BizDotfilesExcelDTO>()
-//            val excelWriteDTOCLASS = BizDotfilesExcelDTO::class.java
-//            FastExcel.read(it, excelWriteDTOCLASS, excelDataListener).sheet().doRead()
-//            val caches = excelDataListener.caches
-//            caches
-//        }
-//        val map = use.filter { it.isNotEmpty() }.filter { it.isNotNew() }.map { toEntity(it) }
-//        val filter = map.filter {
-//            val b = false
-//            b
-//        }
-//        val totalAffectedRowCount = sql.saveEntities(map).totalAffectedRowCount
-//        return totalAffectedRowCount
+package com.addzero.web.modules.second_brain.dotfiles
+
+import cn.idev.excel.FastExcel
+import cn.idev.excel.cache.Ehcache.BATCH_COUNT
+import cn.idev.excel.context.AnalysisContext
+import cn.idev.excel.read.listener.ReadListener
+import cn.idev.excel.util.ListUtils
+import com.addzero.common.kt_util.isNotEmpty
+import com.addzero.common.kt_util.isNotNew
+import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
+import com.addzero.web.infra.jimmer.base.pagefactory.createPageFactory
+import com.addzero.web.infra.upload.DownloadUtil
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSaveDTO
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesUpdateDTO
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesView
+import io.swagger.v3.oas.annotations.Operation
+import org.babyfish.jimmer.Page
+import org.babyfish.jimmer.sql.ast.mutation.AffectedTable
+import org.babyfish.jimmer.sql.kt.KSqlClient
+import org.babyfish.jimmer.sql.kt.ast.expression.eq
+import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+
+@RestController
+@RequestMapping("/dotfiles")
+class DotfilesController(
+    private val sql: KSqlClient
+) {
+    @GetMapping("/page")
+    @Operation(summary = "分页查询")
+    fun page(
+        spec: BizDotfilesSpec,
+        @RequestParam(defaultValue = "0") pageNum: Int,
+        @RequestParam(defaultValue = "10") pageSize: Int,
+    ): Page<BizDotfilesView> {
+        val createQuery = sql.createQuery(BizDotfiles::class) {
+            where(spec)
+            orderBy(table.makeOrders("id desc"))
+            select(
+                table.fetch(BizDotfilesView::class)
+            )
+        }
+        val fetchPage = createQuery.fetchPage(pageNum, pageSize)
+        return fetchPage
+    }
+
+    @GetMapping("listAll")
+    @Operation(summary = "查询所有")
+    fun list(): List<BizDotfilesView> {
+        val createQuery = sql.createQuery(BizDotfiles::class) {
+            select(table.fetch(BizDotfilesView::class))
+        }
+        val execute = createQuery.execute()
+        return execute
+    }
+
+    @PostMapping("/saveBatch")
+    @Operation(summary = "批量保存")
+    fun saveBatch(
+        @RequestBody input: List<BizDotfilesSaveDTO>,
+    ): Int {
+        val toList = input.map { it.toEntity() }.toList()
+        val saveEntities = sql.saveEntities(toList)
+        return saveEntities.totalAffectedRowCount
+    }
+
+    /**
+     * id查询单条
+     */
+    @GetMapping("/findById")
+    @Operation(summary = "id查询单条")
+    fun findById(id: String): BizDotfiles? {
+        val byId = sql.findById(BizDotfiles::class, id)
+        return byId
+    }
+
+    /**
+     *批量删除
+     */
+    @DeleteMapping("/delete")
+    @Operation(summary = "批量删除")
+    fun deleteByIds(@RequestParam vararg ids: String): Int {
+        val affectedRowCountMap = sql.deleteByIds(
+            BizDotfiles::class, listOf(*ids)
+        ).totalAffectedRowCount
+        return affectedRowCountMap
+    }
+
+    @PostMapping("/save")
+    @Operation(summary = "保存")
+    fun save(@RequestBody inputDTO: BizDotfilesSaveDTO): Int {
+        val modifiedEntity = sql.save(inputDTO).totalAffectedRowCount
+        return modifiedEntity
+    }
+
+    @PostMapping("/update")
+    @Operation(summary = "编辑")
+    fun edit(@RequestBody inputDTO: BizDotfilesUpdateDTO): Int {
+        val update = sql.update(inputDTO).totalAffectedRowCount
+        return update
+    }
+
+
+    @PostMapping("/import")
+    fun import(@RequestPart file: MultipartFile): Map<AffectedTable, Int> {
+        val dataDtoList = file.inputStream.use {
+            val readListener = object : ReadListener<BizDotfilesExcelDTO> {
+                /**
+                 * 缓存的数据
+                 */
+                val caches: MutableList<BizDotfilesExcelDTO> = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT)
+
+                /**
+                 * 这个每一条数据解析都会来调用
+                 */
+                override fun invoke(input: BizDotfilesExcelDTO, context: AnalysisContext?) {
+                    caches.add(input)
+                    // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
+                    if (caches.size >= BATCH_COUNT) {
+                        // 存储完成清理 list
+                        caches.clear()
+                    }
+                }
+
+                /**
+                 * 所有数据解析完成了 都会来调用
+                 *
+                 * @param context
+                 */
+                override fun doAfterAllAnalysed(context: AnalysisContext?) {
+                    // 这里也要保存数据，确保最后遗留的数据也存储到数据库
+                    println("所有数据解析完成")
+                }
+            }
+            val excelWriteDTOCLASS = BizDotfilesExcelDTO::class.java
+            FastExcel.read(it, excelWriteDTOCLASS, readListener).sheet().doRead()
+            val caches = readListener.caches
+            caches
+        }
+
+        val map = dataDtoList.filter { it.isNotEmpty() }.filter { it.isNotNew() }.map { it.toEntity() }
+        val totalAffectedRowCount = sql.saveEntities(map).affectedRowCountMap
+        return totalAffectedRowCount
+    }
+
+    @GetMapping("/export")
+    fun exportExcel(
+        fileName: String, spec: BizDotfilesSpec, sheetName: String = "sheet1"
+    ) {
+        val data = sql.createQuery(BizDotfiles::class) {
+            where(spec)
+            select(table.fetchBy {
+                allTableFields()
+            })
+        }.execute()
+
+        val toList = data.map { it.toExcelDTO() }.toList()
+
+        DownloadUtil.downloadExcel(fileName) {
+            FastExcel.write(it, BizDotfilesExcelDTO::class.java).sheet(sheetName).doWrite(toList)
+        }
+    }
+
+    fun searchDotfiles(name: String, platforms: Set<String>, osTypes:
+    Set<String>, page: Int, size: Int): PageResult<BizDotfiles> ?{
+        val createPageFactory = createPageFactory<BizDotfiles>()
+
+
+        val fetchPage = sql.createQuery(BizDotfiles::class) {
+            where(table.name eq name)
+            select(table)
+        }.fetchPage(page, size,null,createPageFactory)
+        return fetchPage
+    }
+
+//    fun searchDotfiles1(
+//        name: String,
+//        platforms: Set<String>,
+//        osTypes: Set<String>,
+//        page: Int,
+//        size: Int
+//    ): PageResult<com.addzero.web.modules.dotfiles.BizDotFiles>? {
+//        TODO("Not yet implemented")
 //    }
-//
-//
-//    override fun toExcelWriteDTO(entity: BizDotfiles): BizDotfilesExcelDTO {
-//        val toExcelDTO = entity.toExcelDTO()
-//        return toExcelDTO
-//    }
-//
-//    override fun toEntity(excelWriteDTO: BizDotfilesExcelDTO): BizDotfiles {
-//        val toEntity = excelWriteDTO.toEntity()
-//        return toEntity
-//    }
-//
-//
-////    @GetMapping(pageRestUtl)
-////    @Operation(summary = "分页查询")
-////    fun page(
-////        @RequestParam spec: BizEnvVarsSpec,
-////        @RequestParam(defaultValue = "1") pageNum: Int,
-////        @RequestParam(defaultValue = "10") pageSize: Int,
-////    ): Page<DotfilesItem> {
-////
-////        var pageNum = pageNum
-////        pageNum -= 1
-////
-////
-////        val execute1 = sql.createQuery(CLASS()) {
-////            orderBy(table.createTime.desc())
-////            select(
-////                table.fetch(DotfilesItem::class)
-////            )
-////        }.fetchPage(pageNum, pageSize)
-////
-////        return execute1
-////    }
-//
-////    @PostMapping("/create")
-////    @SaIgnore
-////    fun doaijsdoi(@RequestBody dotfilesInput: DotfilesInput) {
-////
-////        val listOf = listOf("export", "alias", "function", "sh")
-////        val map = listOf.map {
-////            val bizEnvVars = BizEnvVars(dotfilesInput.toEntity { }) {
-////                name = it
-////            }
-////        }
-////    }
-////
-////    @GetMapping("linuxConfigurationFileContentExtractionAssistant")
-////    @Operation(summary = "linux配置文件内容抽取助手")
-////    fun linuxConfigurationFileContentExtractionAssistant(@RequestParam hello: String): List<DotfilesStructuredOutput>? {
-////        val readUtf8Lines =
-////            FileUtil.readUtf8String("/Users/zjarlin/IdeaProjects/jl-tools/jl-starter-web/src/main/resources/dotfiles/.zshrc")
-////        val promptTemplate = """
-////            你是一个dotfiles管理助手,你能从unix文件中找出有用的信息,包括但不限于
-////            环境变量export, 别名alias,  自定义函数function, 自定义脚本片段sh
-////        """.trimIndent()
-////
-////        val chatClient = AiCtx.defaultChatClient(ChatModels.KIMI_MOONSHOT)
-////        val formatClass = DotfilesStructuredOutput::class.java
-////        val (newPrompt, quesCtx) = structuredOutputContext(readUtf8Lines, promptTemplate, formatClass)
-////        val call = chatClient.prompt().user { u: ChatClient.PromptUserSpec -> u.text(newPrompt).params(quesCtx) }.call()
-////        val entity = call.entity(object : ParameterizedTypeReference<List<DotfilesStructuredOutput>>() {})
-////        val toJson = entity.toJSONString()
-////        return entity
-////    }
-//
-//
-//}
+
+}
+

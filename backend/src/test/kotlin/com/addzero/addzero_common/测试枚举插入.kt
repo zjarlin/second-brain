@@ -16,7 +16,7 @@ class 测试枚举插入(
         val bizDotfiles = BizDotfiles {
             osType = listOf(EnumOsType.LINUX, EnumOsType.MAC)
 
-            osStructure = EnumOsStructure.ARM64
+            osStructure = Enumplatforms.ARM64
             defType = EnumDefType.FUNCTION
             name = "visual-studio-code"
             value = "oxxxxxxxxxxxx"

@@ -15,7 +15,7 @@ import org.babyfish.jimmer.sql.EnumItem
  * @author AutoDDL
  * @date 2025-02-06 17:23:17
  */
-enum class EnumOsStructure(
+enum class Enumplatforms(
     val code: String?,
     val desc: String
 ) {
@@ -44,6 +44,6 @@ enum class EnumOsStructure(
 
     companion object {
         @JsonCreator
-        fun fromCode(code: String?): EnumOsStructure? = values().find { it.code == code }
+        fun fromCode(code: String?): Enumplatforms? = values().find { it.code == code }
     }
 }

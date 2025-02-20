@@ -185,7 +185,7 @@ fun NodeDetailsDialog(
                         )
                     }
                     if (node.properties.entries.last().key != key) {
-                        Divider(modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     }
                 }
             }

@@ -2,169 +2,33 @@ package com.addzero.web.modules.dotfiles
 
 import androidx.compose.runtime.*
 import cn.hutool.extra.spring.SpringUtil
+import com.addzero.web.base.BaseViewModel
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
-import com.addzero.web.modules.second_brain.dotfiles.DotfilesController2
+import com.addzero.web.modules.second_brain.dotfiles.BizDotfiles
+import com.addzero.web.modules.second_brain.dotfiles.BizDotfilesExcelDTO
+import com.addzero.web.modules.second_brain.dotfiles.EnumOsType
+import com.addzero.web.modules.second_brain.dotfiles.Enumplatforms
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSaveDTO
 import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesUpdateDTO
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
 
-class DotfilesViewModel(
-    private val coroutineScope: CoroutineScope
-) {
-    private val service = DotfilesService()
-    private val repo = DotfilesService()
+class DotfilesViewModel : BaseViewModel<BizDotfiles, BizDotfilesSpec, BizDotfilesSaveDTO, BizDotfilesUpdateDTO, BizDotfilesView, BizDotfilesExcelDTO>() {
 
-    var pageResult by mutableStateOf<PageResult<BizDotFiles>?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var error by mutableStateOf<String?>(null)
-        private set
-
-    var currentPage by mutableStateOf(1)
-        private set
-
-    var pageSize by mutableStateOf(10)
-        private set
-
-    init {
-        loadData()
+    fun generateConfig(byte: Byte): Any {
+        TODO("Not yet implemented")
     }
 
-    fun loadData(
-        name: String = "",
-        platforms: Set<String> = emptySet(),
-        osTypes: Set<String> = emptySet(),
-        page: Int = currentPage,
-        size: Int = pageSize
-    ) {
-
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-
-                val bean = SpringUtil.getBean(DotfilesController2::class.java)
-
-
-
-                pageResult = service.searchDotfiles(
-                    name = name,
-                    platforms = platforms,
-                    osTypes = osTypes,
-                    page = page,
-                    size = size
-                )
-                currentPage = page
-            } catch (e: Exception) {
-                error = "搜索失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
+    override fun toEntity(excelWriteDTO: BizDotfilesExcelDTO): BizDotfiles {
+        TODO("Not yet implemented")
     }
 
-    fun nextPage() {
-        pageResult?.let {
-            if (!it.isLast) {
-                loadData(page = currentPage + 1)
-            }
-        }
+    override fun toExcelWriteDTO(entity: BizDotfiles): BizDotfilesExcelDTO {
+        TODO("Not yet implemented")
     }
 
-    fun previousPage() {
-        if (currentPage > 0) {
-            loadData(page = currentPage - 1)
-        }
-    }
-
-    fun addDotfile(item: BizDotFiles) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.save(item)
-                loadData()
-            } catch (e: Exception) {
-                error = "添加失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun updateDotfile(item: BizDotFiles) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.update(item)
-                loadData()
-            } catch (e: Exception) {
-                error = "更新失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun deleteDotfile(id: String) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.delete(id)
-                loadData()
-            } catch (e: Exception) {
-                error = "删除失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun importDotfiles(files: List<File>) {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                error = null
-                service.import(files)
-                loadData()
-            } catch (e: Exception) {
-                error = "导入失败: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    suspend fun exportDotfiles(): ByteArray? {
-        return try {
-            isLoading = true
-            error = null
-            service.export()
-        } catch (e: Exception) {
-            error = "导出失败: ${e.message}"
-            null
-        } finally {
-            isLoading = false
-        }
-    }
-
-    suspend fun generateConfig(): ByteArray? {
-        return try {
-            isLoading = true
-            error = null
-            service.generateConfig()
-        } catch (e: Exception) {
-            error = "生成配置失败: ${e.message}"
-            null
-        } finally {
-            isLoading = false
-        }
-    }
 }

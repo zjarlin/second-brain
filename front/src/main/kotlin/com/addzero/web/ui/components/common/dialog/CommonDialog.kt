@@ -1,4 +1,4 @@
-package com.addzero.web.modules.common.dialog
+package com.addzero.web.ui.components.common.dialog
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -40,11 +40,11 @@ fun CommonDialog(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
-                
+
                 Box(modifier = Modifier.weight(1f, false)) {
                     content()
                 }
-                
+
                 if (confirmButton != null || dismissButton != null) {
                     Row(
                         modifier = Modifier

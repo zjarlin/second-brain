@@ -18,12 +18,14 @@ import org.babyfish.jimmer.sql.*
 @Entity
 @Table(name = "sys_user")
 interface SysUser : BaseDateTime {
+    @get:Schema(description = "主键")
     @Id
     @GeneratedValue(generatorType = SnowflakeIdGenerator::class)
     val id: Long
 
     /** 手机号
      */
+    @get:Schema(description = "手机号")
     @Key
     @get:Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     val phone: String
@@ -32,26 +34,32 @@ interface SysUser : BaseDateTime {
      * 密码
      */
     @get:Schema(description = "密码")
-    @get:Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$", message = "密码至少8位，至少1个大写字母，1个小写字母，1个数字")
+    @get:Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
+        message = "密码至少8位，至少1个大写字母，1个小写字母，1个数字"
+    )
 //    @get:ExcelProperty("密码")
     val password: String
 
     /**
-     * 头像
+    头像
      */
+    @get:Schema(description = "头像")
     val avatar: String?
 
 
     /**
      * 昵称
      */
+    @get:Schema(description = "昵称")
     val nickname: String?
 
     /**
      * 性别  0：男
-      1=女
-      2-未知
+    1=女
+    2-未知
      */
+    @get:Schema(description = "性别 0：男 1=女 2-未知")
     val gender: EnumGender?
 
     @ManyToOne

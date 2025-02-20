@@ -12,20 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.swagger.v3.oas.annotations.media.Schema
-import java.awt.SystemColor.text
-import java.util.LinkedList
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.memberExtensionProperties
-import kotlin.reflect.jvm.internal.impl.descriptors.runtime.structure.ReflectClassUtilKt
 
 // 默认的排除字段
-
-
-//val commentAnnoClass = ColumnName::class.java
-val commentAnnoClass = Schema::class.java
 
 
 val DEFAULT_EXCLUDE_FIELDS = setOf(
@@ -34,19 +22,19 @@ val DEFAULT_EXCLUDE_FIELDS = setOf(
 
 @Composable
 fun <T : Any> DataTable(
-    items: List<T>,
+    records: List<T>,
     onEdit: (T) -> Unit,
     onDelete: (T) -> Unit,
     excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
     startIndex: Int = 0,
-    currentPage: Int,
+    pageIndex: Int,
     totalPages: Int,
     onPageChange: (Int) -> Unit
 ) {
 
 
     // 使用declaredMemberProperties保持定义顺序
-    val fields = items.firstOrNull()?.let { item ->
+    val fields = records.firstOrNull()?.let { item ->
 
 //        item::class.memberExtensionProperties
         val declaredMemberProperties = item::class.java.declaredFields
@@ -75,7 +63,7 @@ fun <T : Any> DataTable(
                 fields.forEach { field ->
                     field.isAccessible = true
 //                    val columnName = field.getAnnotation(commentAnnoClass)?.value
-                    val annotation = field.getAnnotation(commentAnnoClass)
+                    val annotation = field.getAnnotation(Schema::class.java)
 
 
                     val columnName = annotation?.description ?: field.name.replaceFirstChar { it.uppercase() }
@@ -91,13 +79,13 @@ fun <T : Any> DataTable(
             }
         }
 
-        Divider()
+        HorizontalDivider()
 
         // 数据行
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
-            itemsIndexed(items) { index, item ->
+            itemsIndexed(records) { index, item ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -126,17 +114,14 @@ fun <T : Any> DataTable(
                         }
                     }
                 }
-                Divider()
+                HorizontalDivider()
             }
         }
 
         // 添加分页控件
         Pagination(
-            currentPage = currentPage, totalPages = totalPages, onPageChange = onPageChange
+            currentPage = pageIndex, totalPages = totalPages, onPageChange = onPageChange
         )
     }
 }
 
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ColumnName(val value: String)

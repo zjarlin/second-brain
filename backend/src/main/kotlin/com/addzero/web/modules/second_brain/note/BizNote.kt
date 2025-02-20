@@ -16,7 +16,7 @@ interface BizNote : BaseEntity {
 
     @Formula(dependencies = ["children"])
     val leafFlag: Boolean
-        get() = children.isNotEmpty()
+        get() = children.isEmpty()
 
     /**
      * 笔记的子节点列表，表示当前笔记的子笔记。
@@ -71,9 +71,7 @@ interface BizNote : BaseEntity {
      */
     @ManyToMany
     @JoinTable(
-        name = "biz_note_tag",
-        joinColumnName = "note_id",
-        inverseJoinColumnName = "tag_id"
+        name = "biz_note_tag", joinColumnName = "note_id", inverseJoinColumnName = "tag_id"
     )
     val tags: List<BizTag>
 

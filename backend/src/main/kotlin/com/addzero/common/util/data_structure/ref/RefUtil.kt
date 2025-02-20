@@ -3,6 +3,7 @@ package com.addzero.common.util.data_structure.ref
 import cn.hutool.core.collection.CollUtil
 import cn.hutool.core.util.ReflectUtil
 import cn.hutool.core.util.StrUtil
+import cn.hutool.core.util.TypeUtil
 import com.addzero.common.util.BigDecimals
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
@@ -10,6 +11,7 @@ import com.alibaba.fastjson2.JSONObject
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * 反射工具类
@@ -19,6 +21,12 @@ import java.util.*
  */
 @Suppress("unused")
 object RefUtil {
+
+    fun <T : Any> currentClass(): KClass<T> {
+        val typeArgument = TypeUtil.getTypeArgument(this.javaClass, 0)
+        val type = typeArgument as Class<T>
+        return type.kotlin
+    }
 
 
     /**
@@ -74,7 +82,7 @@ object RefUtil {
         }
         return !isPrimitiveOrWrapper(obj.javaClass)
 //        &&         !IPage::class.java.isAssignableFrom(obj.javaClass)
-         && !MutableCollection::class.java.isAssignableFrom(
+                && !MutableCollection::class.java.isAssignableFrom(
             obj.javaClass
         ) && !BigDecimals::class.java.isAssignableFrom(obj.javaClass) && !Enum::class.java.isAssignableFrom(
             obj.javaClass

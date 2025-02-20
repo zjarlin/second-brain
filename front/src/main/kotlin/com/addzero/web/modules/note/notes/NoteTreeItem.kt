@@ -1,4 +1,4 @@
-package com.addzero.web.modules.note.notes.treenote
+package com.addzero.web.modules.note.notes
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -10,30 +10,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.modules.note.notes.Note
-import com.addzero.web.modules.note.notes.NoteType
+import com.addzero.common.kt_util.isNotEmpty
+import com.addzero.web.modules.second_brain.note.BizNote
+import com.addzero.web.modules.second_brain.note.dto.BizNoteView
 
 @Composable
 fun NoteTreeItem(
-    note: Note,
+    note: BizNote,
     level: Int = 0,
     selected: Boolean = false,
-    onSelect: (Note) -> Unit,
-    onDelete: (Note) -> Unit,
-    onAddChild: (Note) -> Unit
+    onSelect: (BizNote) -> Unit,
+    onDelete: (Long) -> Unit,
+    onAddChild: (BizNote) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onSelect(note) }
-                .padding(start = (level * 16).dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.fillMaxWidth().clickable { onSelect(note) }
+            .padding(start = (level * 16).dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically) {
             // 展开/折叠图标
-            if (note.children?.isNotEmpty() == true) {
+            if (note.children.isNotEmpty()) {
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         if (expanded) Icons.Default.ExpandMore else Icons.Default.ChevronRight,
@@ -46,16 +43,12 @@ fun NoteTreeItem(
 
             // 笔记图标
             Icon(
-                if (note.type == NoteType.MARKDOWN) Icons.Default.Folder else Icons.Default.Description,
-                contentDescription = "类型",
-                modifier = Modifier.padding(end = 8.dp)
+                Icons.Default.Description, contentDescription = "类型", modifier = Modifier.padding(end = 8.dp)
             )
 
             // 标题
             Text(
-                text = note.title,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
+                text = note.title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f)
             )
 
             // 操作按钮
@@ -63,7 +56,7 @@ fun NoteTreeItem(
                 IconButton(onClick = { onAddChild(note) }) {
                     Icon(Icons.Default.Add, "添加子笔记")
                 }
-                IconButton(onClick = { onDelete(note) }) {
+                IconButton(onClick = { onDelete(note.id) }) {
                     Icon(Icons.Default.Delete, "删除")
                 }
             }
@@ -72,7 +65,7 @@ fun NoteTreeItem(
         // 子节点
         AnimatedVisibility(visible = expanded) {
             Column(modifier = Modifier.padding(start = 16.dp)) {
-                note.children?.forEach { child ->
+                note.children.forEach { child ->
                     NoteTreeItem(
                         note = child,
                         level = level + 1,

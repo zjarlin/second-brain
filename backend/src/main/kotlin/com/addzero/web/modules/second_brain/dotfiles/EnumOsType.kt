@@ -1,6 +1,5 @@
 package com.addzero.web.modules.second_brain.dotfiles
 
-import com.alibaba.fastjson2.JSONObject
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import org.babyfish.jimmer.sql.EnumItem
@@ -18,6 +17,7 @@ import org.babyfish.jimmer.sql.EnumItem
  * @date 2025-02-11 10:14:36
  */
 enum class EnumOsType(
+
     val code: String?, val desc: String
 ) {
     /**

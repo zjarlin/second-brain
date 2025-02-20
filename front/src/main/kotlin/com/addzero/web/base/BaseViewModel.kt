@@ -1,109 +1,39 @@
 package com.addzero.web.base
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.window.Dialog
+import cn.hutool.core.util.TypeUtil
+import cn.hutool.extra.spring.SpringUtil
+import cn.idev.excel.FastExcel
+import com.addzero.common.kt_util.isNotEmpty
+import com.addzero.common.kt_util.isNotNew
+import com.addzero.web.infra.jimmer.base.BaseController
+import com.addzero.web.infra.jimmer.base.BaseCrudController
+import com.addzero.web.infra.jimmer.base.BaseFastExcelApi
+import com.addzero.web.infra.jimmer.base.ExcelDataListener
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
+import com.addzero.web.infra.jimmer.base.pagefactory.createPageFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import org.apache.poi.ss.formula.functions.T
+import org.babyfish.jimmer.Input
+import org.babyfish.jimmer.View
+import org.babyfish.jimmer.sql.kt.KSqlClient
+import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
+import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
+import org.springframework.stereotype.Component
+import java.io.ByteArrayOutputStream
+import kotlin.reflect.KClass
+
+@Component
+abstract class BaseViewModel<T : Any, Spec : KSpecification<T>, SaveInputDTO : Input<T>, UpdateInputDTO : Input<T>, V : View<T>, ExcelDTO : Any> :
+    BaseCrudController<T, Spec, SaveInputDTO, UpdateInputDTO, V>, BaseFastExcelApi<T, Spec, ExcelDTO> {
 
 
-abstract class BaseViewModel<T :  Any, S : BaseService<T>>(
-    protected val service: S
-) {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    var items by mutableStateOf<List<T>>(emptyList())
 
-    var currentItem by mutableStateOf<T?>(null)
 
-    var isLoading by mutableStateOf(false)
-        protected set
 
-    var error by mutableStateOf<String?>(null)
-        protected set
 
-    var currentPage by mutableStateOf(0)
 
-    var pageSize by mutableStateOf(20)
-
-    var totalPages by mutableStateOf(0)
-
-    var totalElements by mutableStateOf(0L)
-
-    private suspend fun executeWithLoading(block: suspend () -> Unit) {
-        isLoading = true
-        error = null
-        try {
-            block()
-        } catch (e: Exception) {
-            error = "操作失败: ${e.message}"
-        } finally {
-            isLoading = false
-        }
-    }
-
-    // 新增的DSL函数
-    fun executeWithLoadingInDsl(block: suspend CoroutineScope.() -> Unit) {
-        coroutineScope.launch {
-            executeWithLoading {
-                block()
-            }
-        }
-    }
-
-    fun loadItems(params: Map<String, Any?> = emptyMap()) {
-        executeWithLoadingInDsl {
-            val result = service.page(params = params, page = currentPage, size = pageSize)
-            items = result.content
-            totalPages = result.totalPages
-            totalElements = result.totalElements
-            currentPage = result.pageNumber
-            pageSize = result.pageSize
-        }
-    }
-
-    fun createItem(item: T) {
-        executeWithLoadingInDsl {
-            service.save(item)
-            loadItems()
-        }
-    }
-
-    fun updateItem(item: T) {
-        executeWithLoadingInDsl {
-            service.update(item)
-            loadItems()
-        }
-    }
-
-    fun deleteItem(id: String) {
-        executeWithLoadingInDsl {
-            service.delete(id)
-            loadItems()
-        }
-    }
-
-    fun changePage(newPage: Int) {
-        if (newPage in 0 until totalPages) {
-            currentPage = newPage
-            loadItems()
-        }
-    }
-
-    fun changePageSize(newSize: Int) {
-        if (newSize > 0) {
-            pageSize = newSize
-            currentPage = 0
-            loadItems()
-        }
-    }
-
-    protected open fun handlePageResult(result: PageResult<T>) {
-        items = result.content
-        totalPages = result.totalPages
-        totalElements = result.totalElements
-        currentPage = result.pageNumber
-        pageSize = result.pageSize
-    }
 }

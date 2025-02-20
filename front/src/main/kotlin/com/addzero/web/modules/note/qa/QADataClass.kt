@@ -1,8 +1,5 @@
 package com.addzero.web.modules.note.qa
 
-
-
-@kotlinx.serialization.Serializable
 data class Question(
     val id: String,
     val content: String,
@@ -10,7 +7,6 @@ data class Question(
     val createdBy: String
 )
 
-@kotlinx.serialization.Serializable
 data class Answer(
     val id: String,
     val questionId: String,
@@ -18,7 +14,6 @@ data class Answer(
     val sources: List<AnswerSource>,
     val createdAt: Long
 )
-
 
 data class AnswerSource(
     val noteId: String,

@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.web.modules.dotfiles.DotfilesPage
 import com.addzero.web.ui.components.system.Breadcrumb
 import com.addzero.web.ui.components.system.MainContent
 import com.addzero.web.ui.components.system.SideMenu
@@ -12,7 +13,7 @@ import com.addzero.web.ui.components.system.TopBar
 
 @Composable
 fun MainLayout() {
-    var currentRoute by remember { mutableStateOf("com.addzero.web.modules.dotfiles.DotfilesPage") }
+    var currentRoute by remember { mutableStateOf(DotfilesPage::class.qualifiedName!!) }
 
     Scaffold(
         topBar = { TopBar() }

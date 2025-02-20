@@ -1,4 +1,4 @@
-package com.addzero.web.modules.note.notes.treenote
+package com.addzero.web.modules.note.notes
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

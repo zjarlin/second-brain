@@ -82,7 +82,7 @@ public open class BizDotfilesExcelDTO {
             osType = listOf(EnumOsType.MAC)
 
 
-            osStructure = EnumOsStructure.X86
+            osStructure = Enumplatforms.X86
 
 
             defType =EnumDefType.VAR

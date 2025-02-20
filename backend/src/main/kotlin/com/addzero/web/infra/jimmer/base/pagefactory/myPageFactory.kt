@@ -32,7 +32,7 @@ fun <E> createPageFactory(): PageFactory<E, PageResult<E>> {
             content = rows,
             totalElements = totalCount,
             totalPages = totalPages.toInt(),
-            pageNumber = pageIndex + 1, // 页码从 1 开始
+            pageIndex = pageIndex + 1, // 页码从 1 开始
             pageSize = pageSize,
             isFirst = pageIndex == 0,
             isLast = pageIndex + 1 >= totalPages

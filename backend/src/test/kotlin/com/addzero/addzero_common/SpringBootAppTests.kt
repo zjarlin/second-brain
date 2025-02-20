@@ -3,7 +3,6 @@ package com.addzero.addzero_common
 import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.modules.metadata.DatabaseMetadataService
 import com.addzero.web.modules.second_brain.note.BizNote
-import com.addzero.web.modules.second_brain.note.BizNoteController
 import com.addzero.web.modules.sys.low.metadata.impl.PostgresMetadataService
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.babyfish.jimmer.sql.runtime.Customizer
@@ -16,7 +15,6 @@ import org.springframework.test.context.TestConstructor
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class SpringBootAppTests(
     val kSqlClient: KSqlClient,
-    val bizNoteController: BizNoteController,
 ) {
     @Autowired
     private lateinit var databaseMetadataService: DatabaseMetadataService
@@ -39,11 +37,11 @@ class SpringBootAppTests(
 
 
 
-    @Test
-    fun djoaisdjoij(): Unit {
-        val 测试笔记upsert = bizNoteController.测试笔记upsert()
-        println(测试笔记upsert)
-    }
+//    @Test
+//    fun djoaisdjoij(): Unit {
+//        val 测试笔记upsert = bizNoteController.测试笔记upsert()
+//        println(测试笔记upsert)
+//    }
 
     @Test
     fun `test biz notes upsert`() {

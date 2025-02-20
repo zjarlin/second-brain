@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 
 interface BaseCrudController<T : Any, Spec : KSpecification<T>, SaveInputDTO : Input<T>, UpdateInputDTO : Input<T>, V : View<T>> {
 
-   private val idName: String
+    private val idName: String
         get() = "id"
 
     // 懒加载 sqlClient，确保只初始化一次并缓存结果
@@ -26,9 +26,9 @@ interface BaseCrudController<T : Any, Spec : KSpecification<T>, SaveInputDTO : I
     @GetMapping("/page")
     @Operation(summary = "分页查询")
     fun page(
-        spec: Spec,
-        @RequestParam(defaultValue = "0") pageNum: Int,
-        @RequestParam(defaultValue = "10") pageSize: Int,
+        spec: Spec? = null,
+        @RequestParam(defaultValue = "0") pageNum: Int = 0,
+        @RequestParam(defaultValue = "10") pageSize: Int = 10,
     ): PageResult<V> {
 //        var pageNum = pageNum
         // 这里需要实现分页查询逻辑
@@ -43,7 +43,7 @@ interface BaseCrudController<T : Any, Spec : KSpecification<T>, SaveInputDTO : I
         }
         val createPageFactory = createPageFactory<V>()
 
-        val fetchPage = createQuery.fetchPage(pageNum, pageSize,null,createPageFactory)
+        val fetchPage = createQuery.fetchPage(pageNum, pageSize, null, createPageFactory)
 //        val fetchPage = createQuery.fetchSpringPage(pageNum, pageSize)
         return fetchPage
     }
@@ -79,8 +79,8 @@ interface BaseCrudController<T : Any, Spec : KSpecification<T>, SaveInputDTO : I
 
     @DeleteMapping(RestConsts.deleteUrl)
     @Operation(summary = "批量删除")
-    fun deleteByIds(@RequestParam vararg ids: String): Int {
-        val affectedRowCountMap = sql.deleteByIds(CLASS(), listOf(*ids)).totalAffectedRowCount
+    fun deleteByIds(@RequestParam  ids:List<Long>): Int {
+        val affectedRowCountMap = sql.deleteByIds(CLASS(), ids).totalAffectedRowCount
         return affectedRowCountMap
     }
 

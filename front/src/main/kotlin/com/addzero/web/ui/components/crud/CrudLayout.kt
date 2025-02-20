@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun <T> CrudLayout(
-    isLoading: Boolean,
-    error: String?,
     searchBar: @Composable () -> Unit = {},
     actionButtons: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
@@ -36,18 +34,18 @@ fun <T> CrudLayout(
         actionButtons()
 
         // 加载状态
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
+//        if (isLoading) {
+//            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+//        }
 
         // 错误提示
-        error?.let { errorMsg ->
-            Text(
-                text = errorMsg,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+//        error?.let { errorMsg ->
+//            Text(
+//                text = errorMsg,
+//                color = MaterialTheme.colorScheme.error,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
 
         // 主内容区插槽
         content()
@@ -55,4 +53,4 @@ fun <T> CrudLayout(
         // 分页控制插槽
         pagination()
     }
-} 
+}

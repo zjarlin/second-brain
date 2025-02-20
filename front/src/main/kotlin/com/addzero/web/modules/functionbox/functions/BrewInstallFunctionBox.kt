@@ -16,8 +16,8 @@ package com.addzero.web.modules.functionbox.functions
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.graphics.vector.ImageVector
     import androidx.compose.ui.unit.dp
-    import com.addzero.web.modules.common.dialog.CommonDialog
-    import com.addzero.web.modules.common.dialog.DefaultDialogButton
+    import com.addzero.web.ui.components.common.dialog.CommonDialog
+    import com.addzero.web.ui.components.common.dialog.DefaultDialogButton
     import com.addzero.web.modules.functionbox.model.FunctionBoxSpec
     import com.addzero.web.modules.functionbox.functions.`package`.PackageManagerFactory
     import com.addzero.web.modules.functionbox.functions.`package`.PackageStatus

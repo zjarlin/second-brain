@@ -40,7 +40,7 @@ public interface BizDotfiles : BaseEntity {
 //    @Column(name = "os_structure")
     @Key
     @get:Schema(description = "系统架构")
-    val osStructure: EnumOsStructure?
+    val osStructure: Enumplatforms?
 
     /**
      *  定义类型
