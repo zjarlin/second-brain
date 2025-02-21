@@ -4,10 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import org.babyfish.jimmer.sql.EnumItem
 
-fun main() {
-    val getenv = System.getenv("BAIDUTRANS_KEY")
-    println()
-}
 /**
  * /**
  *  定义类型

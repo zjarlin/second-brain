@@ -29,7 +29,7 @@ fun <T : Any> DataTable(
     startIndex: Int = 0,
     pageIndex: Int,
     totalPages: Int,
-    onPageChange: (Int) -> Unit
+    onPageSizeChange: (Int) -> Unit
 ) {
 
 
@@ -120,7 +120,7 @@ fun <T : Any> DataTable(
 
         // 添加分页控件
         Pagination(
-            currentPage = pageIndex, totalPages = totalPages, onPageChange = onPageChange
+            currentPage = pageIndex, totalPages = totalPages, onPageChange = onPageSizeChange
         )
     }
 }

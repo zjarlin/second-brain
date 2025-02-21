@@ -7,7 +7,6 @@ pluginManagement {
     repositories {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://repo.spring.io/milestone")
-        maven { url = uri("https://repo.spring.io/milestone") }
 
         google()
         gradlePluginPortal()

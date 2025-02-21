@@ -21,7 +21,6 @@ import java.time.LocalDateTime
 
 fun main() {
     val readMap = ExcelUtil.readMap("/Users/zjarlin/dot.xlsx")
-
 }
 
 class DotfilesPage : MetaSpec {
@@ -42,7 +41,7 @@ class DotfilesPage : MetaSpec {
         val scope = rememberCoroutineScope()
         val viewModel = remember { DotfilesViewModel() }
         // 搜索条件状态
-        var searchName by remember { mutableStateOf("请输入内容") }
+        var searchName by remember { mutableStateOf("请输入要搜索的内容") }
         var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
         var selectedOSTypes by remember { mutableStateOf(setOf<String>()) }
 
@@ -73,15 +72,13 @@ class DotfilesPage : MetaSpec {
                 val pageSize = pageResult.pageSize
                 val bizDotfilesSpec = BizDotfilesSpec()
                 bizDotfilesSpec.defType
-                DataTable(records = pageResult.content
-                , onEdit = {
-                /* 处理编辑 */
+                DataTable(records = pageResult.content, onEdit = {
+                    /* 处理编辑 */
 //                    弹出form
 
-                }
-                , onDelete = {
+                }, onDelete = {
                     viewModel.deleteByIds(listOf(it.id))
-                }, pageIndex = pageIndex, totalPages = pageResult.totalPages, onPageChange = { newPage ->
+                }, pageIndex = pageIndex, totalPages = pageResult.totalPages, onPageSizeChange = { newPage ->
                     viewModel.page(
                         spec = bizDotfilesSpec, pageNum = pageIndex, pageSize = newPage
                     )
@@ -93,7 +90,7 @@ class DotfilesPage : MetaSpec {
             })
     }
 
-    private fun mockData() = {
+    private fun mockData(): () -> MutableState<PageResult<BizDotfilesView>> = {
         val bizDotfiles = BizDotfiles {
             id = 1
             createBy = SysUser { id = 1 }
@@ -112,10 +109,13 @@ class DotfilesPage : MetaSpec {
         }
         val bizDotfilesView = BizDotfilesView(bizDotfiles)
 
-        val listOf = listOf(bizDotfilesView)
+        val result = generateSequence(0) { it + 1 }
+            .take(30)
+            .map { bizDotfilesView }
+            .toList()
 
         val pageResult = PageResult(
-            content = listOf,
+            content = result,
             totalElements = 0,
             totalPages = 0,
             pageIndex = 0,
