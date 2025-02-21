@@ -3,15 +3,23 @@ package com.addzero.web.modules.dotfiles
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import com.addzero.common.util.excel.ExcelUtil
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
-import com.addzero.web.modules.second_brain.dotfiles.BizDotfiles
+import com.addzero.web.modules.second_brain.dotfiles.*
 import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesView
 import com.addzero.web.ui.components.crud.CrudLayout
 import com.addzero.web.ui.components.crud.Pagination
 import com.addzero.web.ui.components.crud.SearchPanel
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.components.table.DataTable
+import org.apache.poi.ss.formula.functions.T
+
+fun main() {
+    val readMap = ExcelUtil.readMap("/Users/zjarlin/dot.xlsx")
+
+}
 
 class DotfilesPage : MetaSpec {
 
@@ -31,16 +39,40 @@ class DotfilesPage : MetaSpec {
         val scope = rememberCoroutineScope()
         val viewModel = remember { DotfilesViewModel() }
         // 搜索条件状态
-        var searchName by remember { mutableStateOf("我是搜索") }
+        var searchName by remember { mutableStateOf("请输入内容") }
         var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
         var selectedOSTypes by remember { mutableStateOf(setOf<String>()) }
 
-           var value by remember { mutableStateOf<PageResult<BizDotfiles>>(PageResult
-               .empty()) }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf("") }
+        val value by remember {
+            val bizDotfiles = BizDotfiles {
+                id = 1
+                //todo 在这个lambda里alt+回车,把属性都列出来,需要这个idea意图
+                osType = listOf(EnumOsType.LINUX, EnumOsType.MAC)
+                osStructure = Enumplatforms.ARM64
+                defType = EnumDefType.ALIAS
+                name = "vi"
+                value = "nvim $@"
+                describtion = "neovim别名"
+                status = EnumStatus.QIYONG
+            }
+            val bizDotfilesView = BizDotfilesView(bizDotfiles)
 
+            val listOf = listOf(bizDotfilesView)
 
+            val pageResult = PageResult(
+                content = listOf,
+                totalElements = 0,
+                totalPages = 0,
+                pageIndex = 0,
+                pageSize = 10,
+                isFirst = true,
+                isLast = true
+            )
+            mutableStateOf(pageResult)
+        }
+
+        var isLoading by remember { mutableStateOf(false) }
+        var error by remember { mutableStateOf("") }
 
         CrudLayout<BizDotfiles>(
             // 搜索区域插槽
@@ -53,43 +85,23 @@ class DotfilesPage : MetaSpec {
             actionButtons = {
 
             },
-
             // 主内容区插槽
             content = {
                 val pageIndex = value.pageIndex
                 val pageSize = value.pageSize
                 val bizDotfilesSpec = BizDotfilesSpec()
                 bizDotfilesSpec.defType
-                DataTable(
-                    records = value.content,
-                    onEdit = { /* 处理编辑 */ },
-                    onDelete = {
-                        viewModel.deleteByIds(listOf(it.id))
-                    },
-                    pageIndex = pageIndex,
-                    totalPages = value.totalPages,
-                    onPageChange = { newPage ->
-                        viewModel.page(
-                            spec = bizDotfilesSpec, pageNum = pageIndex, pageSize = newPage
-                        )
-                    })
+                DataTable(records = value.content, onEdit = { /* 处理编辑 */ }, onDelete = {
+                    viewModel.deleteByIds(listOf(it.id))
+                }, pageIndex = pageIndex, totalPages = value.totalPages, onPageChange = { newPage ->
+                    viewModel.page(
+                        spec = bizDotfilesSpec, pageNum = pageIndex, pageSize = newPage
+                    )
+                })
             },
             // 分页控制插槽
             pagination = {
-                Pagination(
-
-//                        pageResult: PageResult<T>,
-//                    onLast: () -> Unit,
-//                    onNext: () -> Unit,
-//                    onChangePageSize: (Int) -> Unit
-
-                    pageResult = value, onLast = {},
-
-                    onNext = {}, onChangePageSize = {})
-
-
-//                viewModel.pageResult?.let { result ->
-//                }
+                Pagination(pageResult = value, onLast = {}, onNext = {}, onChangePageSize = {})
             })
     }
 

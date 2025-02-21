@@ -50,6 +50,7 @@ public interface BizDotfiles : BaseEntity {
      * sh=sh
      * var=var
      */
+    @get:Schema(description = "定义类型 alias=alias export=export function=function sh=sh var=var")
     @Key
     val defType: EnumDefType
 
@@ -63,11 +64,13 @@ public interface BizDotfiles : BaseEntity {
     /**
      *  值
      */
+    @get:Schema(description = "值")
     val value: String
 
     /**
      *  注释
      */
+    @get:Schema(description = "注释")
     val describtion: String?
 
     /**
@@ -75,15 +78,18 @@ public interface BizDotfiles : BaseEntity {
      *  1= 启用
      *  0= 未启用
      */
+    @get:Schema(description = "状态 1= 启用 0= 未启用")
     @Key
     @Default("1")
     val status: EnumStatus
 
     /** 文件地址 */
+    @get:Schema(description = "文件地址")
     val fileUrl: String?
 
 
     /** 文件位置 */
+    @get:Schema(description = "文件位置")
     val location: String?
 
 }

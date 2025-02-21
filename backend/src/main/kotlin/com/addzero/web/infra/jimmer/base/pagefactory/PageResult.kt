@@ -17,7 +17,9 @@ data class PageResult<T>(
     val isLast: Boolean = true
 ) {
     companion object {
-      fun <T> empty(pageSize: Int = 20) = PageResult<T>(
+      fun <T> empty(pageSize: Int = 20) =
+
+      PageResult<T>(
             content = emptyList(),
             totalElements = 0,
             totalPages = 0,
