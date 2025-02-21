@@ -1,8 +1,14 @@
 package com.addzero.web.modules.second_brain.dotfiles
 
 import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
+import com.addzero.web.modules.second_brain.tag.BizTag
+import com.addzero.web.modules.sys.dict.SysDict
+import com.addzero.web.modules.sys.dict.SysDictItem
 import io.swagger.v3.oas.annotations.media.Schema
 import org.babyfish.jimmer.sql.*
+import org.babyfish.jimmer.sql.JoinTable.*
+import javax.swing.text.html.HTML.Tag
+
 //import org.babyfish.jimmer.sql.Key
 
 
@@ -26,10 +32,18 @@ public interface BizDotfiles : BaseEntity {
      * mac=mac
      *null=不限
      */
-    @Key
-    @Serialized
     @get:Schema(description = "操作系统")
-    val osType: List<EnumOsType>?
+    @ManyToMany
+    @JoinTable(
+        name = "biz_mapping",
+        joinColumnName = "from_id",
+        inverseJoinColumnName = "to_id",
+        filter = JoinTableFilter(
+            columnName = "mapping_type",
+            values = ["dotfiles_tag_mapping"]
+        )
+    )
+    val osType: List<BizTag>
 
     /**
      *  系统架构
@@ -37,7 +51,6 @@ public interface BizDotfiles : BaseEntity {
      *  x86=x86
      *  不限=不限
      */
-//    @Column(name = "os_structure")
     @Key
     @get:Schema(description = "系统架构")
     val osStructure: Enumplatforms?
@@ -50,7 +63,7 @@ public interface BizDotfiles : BaseEntity {
      * sh=sh
      * var=var
      */
-    @get:Schema(description = "定义类型 alias=alias export=export function=function sh=sh var=var")
+    @get:Schema(description = "定义类型")
     @Key
     val defType: EnumDefType
 
@@ -78,7 +91,7 @@ public interface BizDotfiles : BaseEntity {
      *  1= 启用
      *  0= 未启用
      */
-    @get:Schema(description = "状态 1= 启用 0= 未启用")
+    @get:Schema(description = "状态")
     @Key
     @Default("1")
     val status: EnumStatus

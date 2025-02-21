@@ -2,6 +2,8 @@ package com.addzero.web.modules.second_brain.note;
 
 import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
 import com.addzero.web.modules.second_brain.tag.BizTag
+import com.addzero.web.modules.sys.dict.SysDict
+import com.addzero.web.modules.sys.dict.SysDictItem
 import org.apache.poi.ss.formula.functions.T
 import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.sql.*
@@ -71,7 +73,13 @@ interface BizNote : BaseEntity {
      */
     @ManyToMany
     @JoinTable(
-        name = "biz_note_tag", joinColumnName = "note_id", inverseJoinColumnName = "tag_id"
+        name = "biz_mapping",
+        joinColumnName = "from_id",
+        inverseJoinColumnName = "to_id",
+        filter = JoinTable.JoinTableFilter(
+            columnName = "mapping_type",
+            values = ["note_tag_mapping"]
+        )
     )
     val tags: List<BizTag>
 

@@ -1,10 +1,13 @@
 package com.addzero.addzero_common
 
 import com.addzero.web.modules.second_brain.dotfiles.*
+import com.addzero.web.modules.second_brain.dotfiles.dto.BizDotfilesSpec
+import com.addzero.web.modules.second_brain.tag.BizTag
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
+import kotlin.test.todo
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -14,7 +17,7 @@ class 测试枚举插入(
     @Test
     fun 测试枚举插入(): Unit {
         val bizDotfiles = BizDotfiles {
-            osType = listOf(EnumOsType.LINUX, EnumOsType.MAC)
+           osType = listOf(BizTag { name = "mac" }, BizTag { name = "win" })
 
             osStructure = Enumplatforms.ARM64
             defType = EnumDefType.FUNCTION
@@ -25,6 +28,9 @@ class 测试枚举插入(
             fileUrl = null
             location = "/Applications/Visual Studio Code.app"
         }
+        val bizDotfilesSpec = BizDotfilesSpec(
+
+            )
         val save = sql.save(bizDotfiles)
         println()
     }

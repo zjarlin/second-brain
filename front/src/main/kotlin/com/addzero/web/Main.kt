@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.addzero.SpringBootApp
 import com.addzero.SpringBootApp.Companion.runSpringBootApp
 import com.addzero.web.ui.layout.MainLayout
 import com.addzero.web.ui.theme.AppTheme
@@ -27,7 +26,7 @@ fun App() {
 }
 
 @SpringBootApplication
-open class Application
+open class Compose4desktop
 
 
 fun main(args: Array<String>) {

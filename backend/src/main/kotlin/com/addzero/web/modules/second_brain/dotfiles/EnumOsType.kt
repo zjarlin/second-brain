@@ -17,7 +17,6 @@ import org.babyfish.jimmer.sql.EnumItem
  * @date 2025-02-11 10:14:36
  */
 enum class EnumOsType(
-
     val code: String?, val desc: String
 ) {
     /**

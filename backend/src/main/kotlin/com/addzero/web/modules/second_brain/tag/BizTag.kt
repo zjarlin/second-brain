@@ -1,7 +1,6 @@
 package com.addzero.web.modules.second_brain.tag
 
 import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
-import com.addzero.web.modules.second_brain.note.BizNote
 import org.babyfish.jimmer.sql.*
 
 /**
@@ -23,10 +22,4 @@ interface BizTag : BaseEntity {
      */
     val description: String?
 
-    /**
-     * 关联的笔记列表
-     * 通过中间表实现与笔记的多对多关系
-     */
-    @ManyToMany
-    val notes: List<BizNote>
 }

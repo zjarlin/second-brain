@@ -1,17 +1,15 @@
 package com.addzero.web.modules.second_brain.dotfiles;
 
-import cn.idev.excel.annotation.ExcelProperty
+import cn.idev.excel.annotation.ExcelProperty;
+import com.addzero.web.modules.second_brain.dotfiles.BizDotfiles
 
 fun BizDotfiles.toExcelDTO(): BizDotfilesExcelDTO {
     var entity = BizDotfilesExcelDTO()
 
-    entity.osType = this.osType.toString()
+    entity.osStructure = this.osStructure
 
 
-    entity.osStructure = this.osStructure.toString()
-
-
-    entity.defType = this.defType.toString()
+    entity.defType = this.defType
 
 
     entity.name = this.name
@@ -36,16 +34,12 @@ fun BizDotfiles.toExcelDTO(): BizDotfilesExcelDTO {
 
 public open class BizDotfilesExcelDTO {
 
-    @ExcelProperty("操作系统 1=win 2-linux 3 mac null.不限")
-    var osType: String? = null
-
-
-    @ExcelProperty("系统架构 arm64=arm64 x86=x86")
-    var osStructure: String? = null
+    @ExcelProperty("系统架构")
+    var osStructure: Enumplatforms? = null
 
 
     @ExcelProperty("定义类型 alias=alias export=export function=function sh=sh var=var")
-    var defType: String? = null
+    var defType: EnumDefType? = null
 
 
     @ExcelProperty("名称")
@@ -60,10 +54,7 @@ public open class BizDotfilesExcelDTO {
     var describtion: String? = null
 
 
-    @ExcelProperty(
-    "状态 1= 启用 0= 未启用"
-//    , converter = BaseEnumConverter::class
-    )
+    @ExcelProperty("状态 1= 启用 0= 未启用")
     var status: EnumStatus? = null
 
 
@@ -79,13 +70,10 @@ public open class BizDotfilesExcelDTO {
 
         return BizDotfiles {
 
-            osType = listOf(EnumOsType.MAC)
+            osStructure = that.osStructure
 
 
-            osStructure = Enumplatforms.X86
-
-
-            defType =EnumDefType.VAR
+            defType = that.defType!!
 
 
             name = that.name.toString()
@@ -97,7 +85,7 @@ public open class BizDotfilesExcelDTO {
             describtion = that.describtion
 
 
-            status =EnumStatus.WEI_QIYONG
+            status = that.status!!
 
 
             fileUrl = that.fileUrl

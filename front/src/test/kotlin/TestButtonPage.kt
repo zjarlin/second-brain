@@ -7,11 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 class TestButtonPage {
-    private var question by remember { mutableStateOf(1) }
-
     @Composable
     @Preview
     fun render() {
+        var question by remember { mutableStateOf(1) }
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "父组件计数: $question")
             Button(onClick = { question += 1 }) {
