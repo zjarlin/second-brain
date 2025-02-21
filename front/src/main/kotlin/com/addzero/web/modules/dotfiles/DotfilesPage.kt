@@ -3,7 +3,6 @@ package com.addzero.web.modules.dotfiles
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
-import cn.hutool.extra.spring.SpringUtil
 import com.addzero.common.util.excel.ExcelUtil
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
 import com.addzero.web.infra.jimmer.list
@@ -18,7 +17,6 @@ import com.addzero.web.ui.components.crud.SearchPanel
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.components.table.DataTable
-import org.apache.poi.ss.formula.functions.T
 import java.time.LocalDateTime
 
 fun main() {
@@ -52,39 +50,7 @@ class DotfilesPage : MetaSpec {
         val sql = viewModel.sql
         val list = sql.list(BizDotfiles::class)
 
-        val value by remember {
-            val bizDotfiles = BizDotfiles {
-                id = 1
-                createBy = SysUser { id = 1 }
-                updateBy = SysUser { id = 1 }
-                createTime = LocalDateTime.now()
-                updateTime = LocalDateTime.now()
-                osType = listOf(BizTag { name = "linux" }, BizTag { name = "mac" })
-                osStructure = Enumplatforms.ARM64
-                defType = EnumDefType.ALIAS
-                name = "vi"
-                value = "nvim $@"
-                describtion = "neovim别名"
-                status = EnumStatus.QIYONG
-                fileUrl = ""
-                location = ""
-            }
-            val bizDotfilesView = BizDotfilesView(bizDotfiles)
-
-            val listOf = listOf(bizDotfilesView)
-
-            val pageResult = PageResult(
-                content = listOf,
-                totalElements = 0,
-                totalPages = 0,
-                pageIndex = 0,
-                pageSize = 10,
-                isFirst = true,
-                isLast = true
-            )
-            mutableStateOf(pageResult)
-        }
-
+        val pageResult by remember(mockData())
         var isLoading by remember { mutableStateOf(false) }
         var error by remember { mutableStateOf("") }
 
@@ -103,11 +69,11 @@ class DotfilesPage : MetaSpec {
             },
             // 主内容区插槽
             content = {
-                val pageIndex = value.pageIndex
-                val pageSize = value.pageSize
+                val pageIndex = pageResult.pageIndex
+                val pageSize = pageResult.pageSize
                 val bizDotfilesSpec = BizDotfilesSpec()
                 bizDotfilesSpec.defType
-                DataTable(records = value.content
+                DataTable(records = pageResult.content
                 , onEdit = {
                 /* 处理编辑 */
 //                    弹出form
@@ -115,7 +81,7 @@ class DotfilesPage : MetaSpec {
                 }
                 , onDelete = {
                     viewModel.deleteByIds(listOf(it.id))
-                }, pageIndex = pageIndex, totalPages = value.totalPages, onPageChange = { newPage ->
+                }, pageIndex = pageIndex, totalPages = pageResult.totalPages, onPageChange = { newPage ->
                     viewModel.page(
                         spec = bizDotfilesSpec, pageNum = pageIndex, pageSize = newPage
                     )
@@ -123,8 +89,41 @@ class DotfilesPage : MetaSpec {
             },
             // 分页控制插槽
             pagination = {
-                Pagination(pageResult = value, onLast = {}, onNext = {}, onChangePageSize = {})
+                Pagination(pageResult = pageResult, onLast = {}, onNext = {}, onChangePageSize = {})
             })
+    }
+
+    private fun mockData() = {
+        val bizDotfiles = BizDotfiles {
+            id = 1
+            createBy = SysUser { id = 1 }
+            updateBy = SysUser { id = 1 }
+            createTime = LocalDateTime.now()
+            updateTime = LocalDateTime.now()
+            osType = listOf(BizTag { name = "linux" }, BizTag { name = "mac" })
+            osStructure = Enumplatforms.ARM64
+            defType = EnumDefType.ALIAS
+            name = "vi"
+            value = "nvim $@"
+            describtion = "neovim别名"
+            status = EnumStatus.QIYONG
+            fileUrl = ""
+            location = ""
+        }
+        val bizDotfilesView = BizDotfilesView(bizDotfiles)
+
+        val listOf = listOf(bizDotfilesView)
+
+        val pageResult = PageResult(
+            content = listOf,
+            totalElements = 0,
+            totalPages = 0,
+            pageIndex = 0,
+            pageSize = 10,
+            isFirst = true,
+            isLast = true
+        )
+        mutableStateOf(pageResult)
     }
 
 }
