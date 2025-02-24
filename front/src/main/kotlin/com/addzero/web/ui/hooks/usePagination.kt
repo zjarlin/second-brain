@@ -17,35 +17,32 @@ import androidx.compose.ui.unit.dp
  * @param onPageChange 页码变化时的回调函数
  * @return PaginationState 包含分页相关的状态和操作，以及分页组件的渲染函数
  */
-@Composable
-fun usePagination(
-    initialPageSize: Int = 10,
-    onPageChange: (pageIndex: Int, pageSize: Int) -> Unit
-): PaginationState {
-    var pageSize by remember { mutableStateOf(initialPageSize) }
-    var pageIndex by remember { mutableStateOf(0) }
-    var expanded by remember { mutableStateOf(false) }
-    val pageSizes = listOf(10, 20, 50, 100)
+class Pagination {
+    private var pageSize by mutableStateOf(10)
+    private var pageIndex by mutableStateOf(0)
+    private var expanded by mutableStateOf(false)
+    private val pageSizes = listOf(10, 20, 50, 100)
+    private var onPageChange: (Int, Int) -> Unit = { _, _ -> }
 
-    val onLast = {
+    private val onLast = {
         if (pageIndex > 0) {
             pageIndex--
             onPageChange(pageIndex, pageSize)
         }
     }
 
-    val onNext = {
+    private val onNext = {
         pageIndex++
         onPageChange(pageIndex, pageSize)
     }
 
-    val onChangePageSize = { newSize: Int ->
+    private val onChangePageSize = { newSize: Int ->
         pageSize = newSize
         pageIndex = 0
         onPageChange(pageIndex, pageSize)
     }
 
-    val renderPagination: @Composable (totalPages: Int, totalElements: Long) -> Unit = { totalPages, totalElements ->
+    private val renderPagination: @Composable (totalPages: Int, totalElements: Long) -> Unit = { totalPages, totalElements ->
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalArrangement = Arrangement.Center,
@@ -97,16 +94,29 @@ fun usePagination(
         }
     }
 
-    return remember(pageSize, pageIndex) {
-        PaginationState(
-            pageSize = pageSize,
-            pageIndex = pageIndex,
-            onLast = onLast,
-            onNext = onNext,
-            onChangePageSize = onChangePageSize,
-            renderPagination = renderPagination
-        )
+    fun initialize(initialPageSize: Int, onPageChange: (Int, Int) -> Unit) {
+        pageSize = initialPageSize
+        this.onPageChange = onPageChange
     }
+
+    fun getState(): PaginationState = PaginationState(
+        pageSize = pageSize,
+        pageIndex = pageIndex,
+        onLast = onLast,
+        onNext = onNext,
+        onChangePageSize = onChangePageSize,
+        renderPagination = renderPagination
+    )
+}
+
+@Composable
+fun usePagination(
+    initialPageSize: Int = 10,
+    onPageChange: (pageIndex: Int, pageSize: Int) -> Unit
+): PaginationState {
+    val pagination = remember { Pagination() }
+    pagination.initialize(initialPageSize, onPageChange)
+    return pagination.getState()
 }
 
 /**

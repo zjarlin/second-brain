@@ -16,42 +16,37 @@ import androidx.compose.ui.unit.dp
  * @param onDelete 删除操作回调函数
  * @return ActionState 包含操作相关的状态和操作
  */
-@Composable
-fun <T> useActions(
-    onAdd: () -> Unit = {},
-    onEdit: (T) -> Unit = {},
-    onDelete: (T) -> Unit = {}
-): ActionState<T> {
-    var showAddDialog by remember { mutableStateOf(false) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<T?>(null) }
+class Actions<T> {
+    private var showAddDialog by mutableStateOf(false)
+    private var showEditDialog by mutableStateOf(false)
+    private var showDeleteDialog by mutableStateOf(false)
+    private var selectedItem by mutableStateOf<T?>(null)
 
-    val onAddClick = {
+    private val onAddClick = {
         showAddDialog = true
         onAdd()
     }
 
-    val onEditClick = { item: T ->
+    private val onEditClick = { item: T ->
         selectedItem = item
         showEditDialog = true
         onEdit(item)
     }
 
-    val onDeleteClick = { item: T ->
+    private val onDeleteClick = { item: T ->
         selectedItem = item
         showDeleteDialog = true
         onDelete(item)
     }
 
-    val onDismissDialog = {
+    private val onDismissDialog = {
         showAddDialog = false
         showEditDialog = false
         showDeleteDialog = false
         selectedItem = null
     }
 
-    val renderActions: @Composable () -> Unit = {
+    private val renderActions: @Composable () -> Unit = {
         Button(
             onClick = onAddClick,
             modifier = Modifier.padding(horizontal = 8.dp)
@@ -65,19 +60,42 @@ fun <T> useActions(
         }
     }
 
-    return remember(showAddDialog, showEditDialog, showDeleteDialog, selectedItem) {
-        ActionState(
-            showAddDialog = showAddDialog,
-            showEditDialog = showEditDialog,
-            showDeleteDialog = showDeleteDialog,
-            selectedItem = selectedItem,
-            onAddClick = onAddClick,
-            onEditClick = onEditClick,
-            onDeleteClick = onDeleteClick,
-            onDismissDialog = onDismissDialog,
-            renderActions = renderActions
-        )
+    private var onAdd: () -> Unit = {}
+    private var onEdit: (T) -> Unit = {}
+    private var onDelete: (T) -> Unit = {}
+
+    fun setCallbacks(
+        onAdd: () -> Unit = {},
+        onEdit: (T) -> Unit = {},
+        onDelete: (T) -> Unit = {}
+    ) {
+        this.onAdd = onAdd
+        this.onEdit = onEdit
+        this.onDelete = onDelete
     }
+
+    fun getState(): ActionState<T> = ActionState(
+        showAddDialog = showAddDialog,
+        showEditDialog = showEditDialog,
+        showDeleteDialog = showDeleteDialog,
+        selectedItem = selectedItem,
+        onAddClick = onAddClick,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onDismissDialog = onDismissDialog,
+        renderActions = renderActions
+    )
+}
+
+@Composable
+fun <T> useActions(
+    onAdd: () -> Unit = {},
+    onEdit: (T) -> Unit = {},
+    onDelete: (T) -> Unit = {}
+): ActionState<T> {
+    val actions = remember { Actions<T>() }
+    actions.setCallbacks(onAdd, onEdit, onDelete)
+    return actions.getState()
 }
 
 /**

@@ -11,7 +11,11 @@ import javax.swing.text.html.HTML.Tag
 
 //import org.babyfish.jimmer.sql.Key
 
+fun main() {
+    BizDotfiles {
 
+    }
+}
 /**
  * <p>
  *  环境变量管理
