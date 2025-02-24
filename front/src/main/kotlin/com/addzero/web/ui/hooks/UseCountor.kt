@@ -1,3 +1,4 @@
+
 package com.addzero.web.ui.hooks
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
@@ -16,24 +17,23 @@ class UseCounter {
     @Composable
     fun render(): UseCounter {
         // 使用 remember 保留实例
-        val rememberedInstance = remember { this }
-
+        val state = remember { this }
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Button(onClick = {
-                rememberedInstance.count1 += 1
-                rememberedInstance.count2 += 2
-                rememberedInstance.count3 += 3
+                state.count1 += 1
+                state.count2 += 2
+                state.count3 += 3
             }) {
-                Text("增加计数1: ${rememberedInstance.count1}", fontSize = 18.sp)
-                Text("增加计数2: ${rememberedInstance.count2}", fontSize = 18.sp)
-                Text("增加计数3: ${rememberedInstance.count3}", fontSize = 18.sp)
+                Text("增加计数1: ${state.count1}", fontSize = 18.sp)
+                Text("增加计数2: ${state.count2}", fontSize = 18.sp)
+                Text("增加计数3: ${state.count3}", fontSize = 18.sp)
             }
         }
 
-        return rememberedInstance
+        return state
     }
 }
