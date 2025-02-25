@@ -1,7 +1,7 @@
 package com.addzero.addzero_common
 
 import cn.hutool.extra.spring.SpringUtil
-import com.addzero.web.modules.metadata.DatabaseMetadataService
+import com.addzero.web.jdbc.metadata.DatabaseMetadataService
 import com.addzero.web.modules.second_brain.note.BizNote
 import com.addzero.web.modules.sys.low.metadata.impl.PostgresMetadataService
 import org.babyfish.jimmer.sql.kt.KSqlClient

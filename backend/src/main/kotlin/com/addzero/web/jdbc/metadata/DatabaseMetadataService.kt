@@ -1,4 +1,4 @@
-package com.addzero.web.modules.metadata
+package com.addzero.web.jdbc.metadata
 
 import org.springframework.stereotype.Service
 import java.security.MessageDigest
@@ -143,7 +143,7 @@ class DatabaseMetadataService(private val dataSource: DataSource) {
                 AND table_name = '$tableName' 
                 AND column_name = '$columnName'
             """.trimIndent()
-            
+
             statement.executeQuery(query).use { rs ->
                 if (rs.next()) {
                     return rs.getInt(1)
