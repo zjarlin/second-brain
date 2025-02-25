@@ -5,7 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.modules.demo.Countdemo
+import com.addzero.web.modules.demo.ButtonDemo
+import com.addzero.web.modules.demo.CountDemo
 import com.addzero.web.ui.components.system.Breadcrumb
 import com.addzero.web.ui.components.system.MainContent
 import com.addzero.web.ui.components.system.SideMenu
@@ -13,7 +14,7 @@ import com.addzero.web.ui.components.system.TopBar
 
 @Composable
 fun MainLayout() {
-    var currentRoute by remember { mutableStateOf(Countdemo::class.qualifiedName!!) }
+    var currentRoute by remember { mutableStateOf(ButtonDemo::class .qualifiedName!!) }
 
     Scaffold(
         topBar = { TopBar() }

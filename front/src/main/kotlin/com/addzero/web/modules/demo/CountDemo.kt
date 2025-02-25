@@ -7,11 +7,13 @@ import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.hooks.UseCounter
 
-class Countdemo : MetaSpec {
+class CountDemo : MetaSpec {
 
     override val metadata: RouteMetadata
         get() = RouteMetadata(
-            title = "测试计数器",
+            parentName = "测试demo",
+            title = "测试计数",
+            visible = true,
         )
 
     @Composable

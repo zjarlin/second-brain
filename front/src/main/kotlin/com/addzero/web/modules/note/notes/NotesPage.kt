@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.components.common.dialog.UploadDialog
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
-import kotlinx.serialization.json.JsonNull.content
 
 class NotesPage : MetaSpec {
     private val focusRequester = FocusRequester()

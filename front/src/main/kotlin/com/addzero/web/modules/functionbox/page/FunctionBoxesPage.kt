@@ -95,7 +95,7 @@ class FunctionBoxesPage : MetaSpec {
     override val metadata: RouteMetadata
         get() = RouteMetadata(
             parentName = null,
-            title = "功能盒子",
+            title = "工具箱",
             icon = Icons.Filled.Apps,
             visible = true,
             permissions = listOf("function_box:view"),

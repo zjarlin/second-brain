@@ -9,6 +9,9 @@ import androidx.compose.ui.window.rememberWindowState
 import com.addzero.SpringBootApp.Companion.runSpringBootApp
 import com.addzero.web.ui.layout.MainLayout
 import com.addzero.web.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -30,10 +33,11 @@ open class Compose4desktop
 
 
 fun main(args: Array<String>) {
-
     application {
-        val runApp = runSpringBootApp(args)
-
+        // 在协程中启动后端服务
+        CoroutineScope(Dispatchers.IO).launch {
+            runSpringBootApp(args)
+        }
 
         val windowState = rememberWindowState(
             width = 1200.dp, height = 800.dp
