@@ -35,9 +35,11 @@ open class Compose4desktop
 fun main(args: Array<String>) {
     application {
         // 在协程中启动后端服务
-        CoroutineScope(Dispatchers.IO).launch {
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
             runSpringBootApp(args)
         }
+
 
         val windowState = rememberWindowState(
             width = 1200.dp, height = 800.dp

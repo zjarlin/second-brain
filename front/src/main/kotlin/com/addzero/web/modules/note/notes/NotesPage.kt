@@ -12,7 +12,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.addzero.web.ui.components.common.dialog.UploadDialog
+import com.addzero.web.ui.components.dialog.UploadDialog
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 

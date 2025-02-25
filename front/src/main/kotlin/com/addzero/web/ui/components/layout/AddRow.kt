@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks
+package com.addzero.web.ui.components.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

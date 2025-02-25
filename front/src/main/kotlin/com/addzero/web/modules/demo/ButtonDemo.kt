@@ -1,11 +1,9 @@
 package com.addzero.web.modules.demo
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
 import androidx.compose.runtime.Composable
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
-import com.addzero.web.ui.hooks.AddButtonDemo
+import com.addzero.web.ui.components.button.AddButtonDemo
 
 
 class ButtonDemo : MetaSpec {

@@ -32,74 +32,83 @@ class WingetPackageManager : PackageManager {
         }
     }
 
-    override suspend fun installPackage(packageStatus: PackageStatus, scope: CoroutineScope) {
-        withContext(Dispatchers.IO) {
-            try {
-                packageStatus.status = PackageStatus.Status.INSTALLING
-                val process = ProcessBuilder("winget", "install", packageStatus.name, "--accept-source-agreements", "--accept-package-agreements")
-                    .redirectErrorStream(true)
-                    .start()
+    override suspend fun installPackage(packageStatus: PackageStatus) {
+        try {
+            packageStatus.status = PackageStatus.Status.INSTALLING
+            packageStatus.progress = 0f
 
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                var line: String?
+            val process = ProcessBuilder(
+                "winget",
+                "install",
+                packageStatus.name,
+                "--accept-source-agreements",
+                "--accept-package-agreements"
+            )
+                .redirectErrorStream(true)
+                .start()
 
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            var line: String?
+            var progressStep = 0.1f
+
+            withContext(Dispatchers.IO) {
                 while (reader.readLine().also { line = it } != null) {
-                    scope.launch(Dispatchers.Main) {
-                        packageStatus.progress += 0.1f
-                        if (packageStatus.progress > 1f) packageStatus.progress = 1f
+                    withContext(Dispatchers.Main) {
+                        packageStatus.progress += progressStep
+                        if (packageStatus.progress >= 1f) {
+                            packageStatus.progress = 0.9f
+                            progressStep = 0.01f
+                        }
                     }
                 }
 
                 val exitCode = process.waitFor()
-                scope.launch(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     if (exitCode == 0) {
+                        packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.INSTALLED
                     } else {
                         packageStatus.status = PackageStatus.Status.ERROR
                         packageStatus.error = "安装失败"
                     }
                 }
-            } catch (e: Exception) {
-                scope.launch(Dispatchers.Main) {
-                    packageStatus.status = PackageStatus.Status.ERROR
-                    packageStatus.error = e.message ?: "未知错误"
-                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                packageStatus.status = PackageStatus.Status.ERROR
+                packageStatus.error = e.message ?: "未知错误"
             }
         }
     }
 
-    override fun isAvailable(): Boolean {
-        return try {
-            val process = ProcessBuilder("where", "winget")
-                .redirectErrorStream(true)
-                .start()
-            process.waitFor() == 0
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    override suspend fun uninstallPackage(packageStatus: PackageStatus, scope: CoroutineScope) {
+    override suspend fun uninstallPackage(packageStatus: PackageStatus) {
         withContext(Dispatchers.IO) {
             try {
                 packageStatus.status = PackageStatus.Status.UNINSTALLING
+                packageStatus.progress = 0f
+                
                 val process = ProcessBuilder("winget", "uninstall", packageStatus.name)
                     .redirectErrorStream(true)
                     .start()
 
                 val reader = BufferedReader(InputStreamReader(process.inputStream))
                 var line: String?
+                var progressStep = 0.1f
 
                 while (reader.readLine().also { line = it } != null) {
-                    scope.launch(Dispatchers.Main) {
-                        packageStatus.progress += 0.1f
-                        if (packageStatus.progress > 1f) packageStatus.progress = 1f
+                    withContext(Dispatchers.Main) {
+                        packageStatus.progress += progressStep
+                        if (packageStatus.progress >= 1f) {
+                            packageStatus.progress = 0.9f
+                            progressStep = 0.01f
+                        }
                     }
                 }
 
                 val exitCode = process.waitFor()
-                scope.launch(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     if (exitCode == 0) {
+                        packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.NOT_INSTALLED
                     } else {
                         packageStatus.status = PackageStatus.Status.ERROR
@@ -107,7 +116,7 @@ class WingetPackageManager : PackageManager {
                     }
                 }
             } catch (e: Exception) {
-                scope.launch(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     packageStatus.status = PackageStatus.Status.ERROR
                     packageStatus.error = e.message ?: "未知错误"
                 }
