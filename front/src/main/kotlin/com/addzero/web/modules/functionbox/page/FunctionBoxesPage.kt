@@ -98,7 +98,7 @@ class FunctionBoxesPage : MetaSpec {
             title = "工具箱",
             icon = Icons.Filled.Apps,
             visible = true,
-            permissions = listOf("function_box:view"),
+//            permissions = listOf("function_box:view"),
             order = 60.0
         )
 
