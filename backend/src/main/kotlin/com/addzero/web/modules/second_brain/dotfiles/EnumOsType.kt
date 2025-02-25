@@ -22,27 +22,26 @@ enum class EnumOsType(
     /**
      * win
      */
-    @EnumItem(name = "1")
-    WIN("code_1", "win"),
+    @EnumItem(ordinal = 1)
+    WIN("1", "win系统"),
 
     /**
      * linux
      */
-    @EnumItem(name = "2")
-    LINUX("code_2", "linux"),
+    @EnumItem(ordinal = 2)
+    LINUX("2", "linux系统"),
 
     /**
      * mac
      */
-    @EnumItem(name = "3")
-    MAC("code_3", "mac"),
+    @EnumItem(ordinal = 3)
+    MAC("3", "mac系统"),
 
     /**
      * 不限
      */
-    @EnumItem(name = "0")
-    BUXIAN("code_0", "不限");
-
+    @EnumItem(ordinal = 0)
+    BUXIAN("0", "不限");
 
 
     @JsonValue

@@ -8,16 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
-class UseCounter {
+class UseCounter : UseHook<UseCounter> {
     // 使用 State 封装状态
     var count1 by mutableStateOf(0)
     var count2 by mutableStateOf(0)
     var count3 by mutableStateOf(0)
 
     @Composable
-    fun render(): UseCounter {
-        // 使用 remember 保留实例
-        val state = remember { this }
+    override fun show(state:UseCounter) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -33,7 +31,5 @@ class UseCounter {
                 Text("增加计数3: ${state.count3}", fontSize = 18.sp)
             }
         }
-
-        return state
     }
 }

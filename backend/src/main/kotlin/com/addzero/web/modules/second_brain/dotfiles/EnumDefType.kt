@@ -1,5 +1,4 @@
 package com.addzero.web.modules.second_brain.dotfiles
-
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import org.babyfish.jimmer.sql.EnumItem
@@ -25,31 +24,31 @@ enum class EnumDefType(
      * alias
      */
     @EnumItem(name = "1")
-    ALIAS("code_alias", "alias"),
+    ALIAS("1", "alias"),
 
     /**
      * export
      */
     @EnumItem(name = "2")
-    EXPORT("code_export", "export"),
+    EXPORT("2", "export"),
 
     /**
      * function
      */
     @EnumItem(name = "3")
-    FUNCTION("code_function", "function"),
+    FUNCTION("3", "function"),
 
     /**
      * sh
      */
     @EnumItem(name = "4")
-    SH("code_sh", "sh"),
+    SH("4", "sh"),
 
     /**
      * var
      */
     @EnumItem(name = "5")
-    VAR("code_var", "var");
+    VAR("5", "var");
 
     @JsonValue
     fun getValue(): String {
