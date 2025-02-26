@@ -9,10 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-fun main() {
-    val aa: Boolean? = true
-    !(aa ?: true)
-}
 
 /**
  * 通用搜索面板组件
