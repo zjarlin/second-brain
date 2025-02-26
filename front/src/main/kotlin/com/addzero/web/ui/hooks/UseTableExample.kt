@@ -1,50 +1,86 @@
 package com.addzero.web.ui.hooks
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import com.addzero.web.infra.jackson.toJson
 
 data class User(
-    val id: Int, val name: String, val age: Int, val enabled: Boolean
+    val id: Int, val name: String, val age: Int, var enabled: Boolean
 )
 
 @Composable
 fun UseTableExample() {
     // 分页状态
-    val myPageNo =1
-    val mypageSize=10
-    // 模拟数据
-    val users = List(1000) { index ->
-        User(
-            id = index + 1, name = "用户${index + 1}", age = 20 + (index % 20), enabled = index % 2 == 0
-        )
+    var myPageNo by remember { mutableStateOf(1) }
+    var mypageSize by remember { mutableStateOf(10) }
+
+    // 模拟数据 - 使用remember和mutableStateListOf创建响应式列表
+    val users = remember {
+        mutableStateListOf<User>().apply {
+            addAll(List(1000) { index ->
+                User(
+                    id = index + 1,
+                    name = "用户${index + 1}",
+                    age = 20 + (index % 20),
+                    enabled = index % 2 == 0
+                )
+            })
+        }
     }
 
     // 计算当前页数据
     val startIndex = (myPageNo - 1) * mypageSize
     val endIndex = minOf(startIndex + mypageSize, users.size)
-    val currentPageData = users.subList(startIndex, endIndex)
-
-
+    val currentPageData = remember(myPageNo, mypageSize) {
+        users.subList(startIndex, endIndex)
+    }
 
     // 定义表格列
-    val columns = listOf(
-        AddColumn(title = "ID", key = "id") { Text(it.id.toString()) },
-        AddColumn(title = "姓名", key = "name") { user -> Text(user.name) },
-        AddColumn(title = "年龄", key = "age") { user -> Text(user.age.toString()) },
-        AddColumn<User>(title = "状态", key = "enabled") { user ->
+    val columnsData = listOf(
+        AddColumn(title = "ID", key = "id"),
+        AddColumn(title = "姓名", key = "name"),
+        AddColumn(title = "年龄", key = "age"),
+        AddColumn<User>(title = "状态", key = "enabled") { col, user ->
+            //是否启用这个字段采用自定义渲染
             Switch(
-                checked = user.enabled, onCheckedChange = null // 实际使用时这里可以添加状态更新逻辑
+                checked = user.enabled,
+                onCheckedChange = { newValue ->
+                    val index = users.indexOf(user)
+                    if (index != -1) {
+                        users[index] = user.copy(enabled = newValue)
+                    }
+                }
             )
-        })
+        }
+    )
 
     // 使用表格组件
-    val render = UseTable(
-        columns = columns,
-        dataList = currentPageData,
+    val useTable = UseTable<User>(
         totalPages = users.size,
-    ).render().apply {
-        pageNo=myPageNo
-        pageSize=mypageSize
+        onRefresh = {
+            // 模拟刷新数据
+            users.clear()
+            users.addAll(List(1000) { index ->
+                User(
+                    id = index + 1,
+                    name = "用户${index + 1}",
+                    age = 20 + (index % 20),
+                    enabled = index % 2 == 0
+                )
+            })
+        }
+    ).apply {
+        pageNo = myPageNo
+        pageSize = mypageSize
+        columns = columnsData
+        dataList = currentPageData
+    }
 
+    Column(modifier = Modifier) {
+        val render = useTable.render()
+        val toJson = render.toJson()
+        Text(toJson)
     }
 }

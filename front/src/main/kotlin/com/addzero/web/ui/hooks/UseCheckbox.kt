@@ -61,7 +61,7 @@ class UseCheckbox<T>(
                     modifier = Modifier.padding(4.dp)
                 ) {
                     val checked = state.selected.contains(item)
-                    println("当前选中的 item: ${getLabel(item)}, 是否选中: $checked")
+//                    println("当前选中的 item: ${getLabel(item)}, 是否选中: $checked")
                     Checkbox(
                         checked = checked,
                         onCheckedChange = { state.toggle(item) }
