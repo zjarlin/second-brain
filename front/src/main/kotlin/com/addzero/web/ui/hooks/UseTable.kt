@@ -15,17 +15,16 @@ import cn.hutool.core.convert.Convert
 import cn.hutool.core.util.NumberUtil
 import cn.hutool.core.util.ReflectUtil
 import com.addzero.common.kt_util.isNull
+import com.addzero.common.kt_util.toNotBlankStr
+import org.apache.poi.ss.formula.functions.T
 import org.babyfish.jimmer.client.ApiIgnore
 
+
 data class AddColumn<T>(
-    val title: String, val key: String, val customRender: (@Composable (AddColumn<T>, T) -> Unit) = { col, item ->
-        val fieldValue = ReflectUtil.getFieldValue(item, col.key)
-        if (fieldValue.isNull()) {
-            Text("")
-        } else {
-            val toStr = Convert.toStr(fieldValue)
-            Text(toStr)
-        }
+    val title: String
+    , val getColumnValue: (T) -> Any? = { }
+    , val customRender: @Composable (String) -> Unit = { value ->
+        Text(value)
     }
 )
 
@@ -34,7 +33,7 @@ class UseTable<T>(
 ) : UseHook<UseTable<T>>() {
     var columns by mutableStateOf<List<AddColumn<T>>>(listOf())
     var dataList by mutableStateOf<List<T>>(listOf())
-    var pageNo by mutableStateOf(1L)
+    var pageNo by mutableStateOf(0L)
     var pageSize by mutableStateOf(10L)
     var totalPages: Long = 0
     var searchText by mutableStateOf("")
@@ -55,7 +54,7 @@ class UseTable<T>(
                 singleLine = true
             )
             Button(
-                onClick = { onValueChange }, modifier = Modifier.height(56.dp)
+                onClick = { onValueChange(state) }, modifier = Modifier.height(56.dp)
             ) {
                 Text("搜索")
             }
@@ -112,7 +111,10 @@ class UseTable<T>(
         ) {
             state.columns.forEach { column: AddColumn<T> ->
                 Box(modifier = Modifier.weight(1f)) {
-                    column.customRender(column, item)
+                    column.getColumnValue(item).let {
+                        val toNotBlankStr = it.toNotBlankStr()
+                        column.customRender(toNotBlankStr)
+                    }
                 }
             }
         }
@@ -185,8 +187,8 @@ class UseTable<T>(
     @ApiIgnore
     override fun show(state: UseTable<T>) {
 
-        LaunchedEffect(state) {
-            onValueChange
+        LaunchedEffect(state.pageNo, state.pageSize,state.dataList) {
+            onValueChange(state)
         }
 
         Box(modifier = modifier.fillMaxSize()) {

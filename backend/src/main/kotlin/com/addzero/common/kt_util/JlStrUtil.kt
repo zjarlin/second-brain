@@ -1,7 +1,9 @@
 package com.addzero.common.kt_util
 
+import cn.hutool.core.convert.Convert
 import cn.hutool.core.io.FileUtil
 import cn.hutool.core.text.CharSequenceUtil
+import cn.hutool.core.util.ObjUtil
 import cn.hutool.core.util.StrUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -266,6 +268,13 @@ fun CharSequence.removeBlankOrQuotation(): String {
 fun CharSequence.toUnderlineCase(): String {
     val toUnderlineCase = StrUtil.toUnderlineCase(this)
     return toUnderlineCase
+}
+fun Any?.toNotBlankStr(): String {
+    val toStr1 = Convert.toStr(this)
+    if (toStr1.isBlank()) {
+        return ""
+    }
+    return toStr1
 }
 
 fun String.equalsIgnoreCase(string: String): Boolean {
