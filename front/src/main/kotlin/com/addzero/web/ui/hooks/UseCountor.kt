@@ -1,5 +1,5 @@
-
 package com.addzero.web.ui.hooks
+
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -8,14 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
-class UseCounter : UseHook<UseCounter> {
+class UseCounter : UseHook<UseCounter>() {
     // 使用 State 封装状态
     var count1 by mutableStateOf(0)
     var count2 by mutableStateOf(0)
     var count3 by mutableStateOf(0)
 
     @Composable
-    override fun show(state:UseCounter) {
+    override fun show(state: UseCounter) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

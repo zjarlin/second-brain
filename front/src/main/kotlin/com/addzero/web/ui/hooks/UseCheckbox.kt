@@ -15,7 +15,7 @@ class UseCheckbox<T>(
     private val isMultiSelect: Boolean = false,
     private val modifier: Modifier = Modifier,
     private val getLabel: (T) -> String = { it.toString() },
-) : UseHook<UseCheckbox<T>> {
+) : UseHook<UseCheckbox<T>>() {
     // 使用 State 封装状态
     var selected by mutableStateOf<Set<T>>(setOf())
     /**

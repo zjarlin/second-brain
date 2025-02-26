@@ -30,14 +30,42 @@ data class AddColumn<T>(
 )
 
 class UseTable<T>(
-     private val modifier: Modifier = Modifier
-) : UseHook<UseTable<T>> {
+    private val modifier: Modifier = Modifier, private val onValueChange: ((state: UseTable<T>) -> Unit)={}
+) : UseHook<UseTable<T>>() {
+
+
+
+
     var columns by mutableStateOf<List<AddColumn<T>>>(listOf())
     var dataList by mutableStateOf<List<T>>(listOf())
     var pageNo by mutableStateOf(1L)
     var pageSize by mutableStateOf(10L)
-     var totalPages: Long = 0
+    var totalPages: Long = 0
 
+    var searchText by mutableStateOf("")
+
+
+    @Composable
+    private fun renderSearchBar() {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                placeholder = { Text("请输入搜索关键词") },
+                singleLine = true
+            )
+            Button(
+                onClick = { onValueChange }, modifier = Modifier.height(56.dp)
+            ) {
+                Text("搜索")
+            }
+        }
+    }
 
     @Composable
     private fun renderPageNavigation() {
@@ -109,7 +137,7 @@ class UseTable<T>(
                 renderPageNavigation()
                 Spacer(modifier = Modifier.width(16.dp))
                 renderMultiSelectOutlinedButton()
-                renderCustomPageSize()
+                renderCustomPageSizeBar()
             }
         }
     }
@@ -134,7 +162,7 @@ class UseTable<T>(
     }
 
     @Composable
-    private fun renderCustomPageSize() {
+    private fun renderCustomPageSizeBar() {
         OutlinedTextField(
             value = pageSize.toString(),
             onValueChange = { newValue ->
@@ -159,8 +187,16 @@ class UseTable<T>(
     @Composable
     @ApiIgnore
     override fun show(state: UseTable<T>) {
+
+        LaunchedEffect(state) {
+            onValueChange
+        }
+
         Box(modifier = modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
+                // 搜索栏
+                renderSearchBar()
+
                 // 表格头部
                 renderHeader()
 

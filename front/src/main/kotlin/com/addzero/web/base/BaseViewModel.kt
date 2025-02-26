@@ -30,10 +30,4 @@ abstract class BaseViewModel<T : Any, Spec : KSpecification<T>, SaveInputDTO : I
     BaseCrudController<T, Spec, SaveInputDTO, UpdateInputDTO, V>, BaseFastExcelApi<T, Spec, ExcelDTO> {
 
 
-
-
-
-
-
-
 }

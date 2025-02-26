@@ -5,12 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.addzero.common.consts.SpringVars
-import com.addzero.web.infra.jackson.toJson
 import com.addzero.web.modules.sys.area.entity.SysArea
-
-data class User(
-    val id: Int, val name: String, val age: Int, var enabled: Boolean
-)
 
 @Composable
 fun UseTableExample() {
@@ -24,27 +19,21 @@ fun UseTableExample() {
 
     // 使用表格组件
     val useTable = UseTable<SysArea>(
-    ).apply {
+        onValueChange = { loadData(it) }).apply {
         columns = columnsData
     }
+
     val render = useTable.render()
 
-    render.apply {
-        val sql = SpringVars.sql
-        val fetchPage = sql.createQuery(SysArea::class) {
-            select(table)
-        }.fetchPage(pageNo.toInt(), pageSize = pageSize.toInt())
+}
 
-        val rows = fetchPage.rows
-
-        val totalRowCount = fetchPage.totalRowCount
-        val totalPageCount = fetchPage.totalPageCount
-
-        dataList = rows
-        totalPages = totalPageCount
+fun loadData(state: UseTable<SysArea>) {
+    val keyword = state.searchText
+    val sql = SpringVars.sql
+    val query = sql.createQuery(SysArea::class) {
+        select(table)
     }
-//    Column(modifier = Modifier) {
-//        val toJson = render.toJson()
-//        Text(toJson)
-//    }
+    val fetchPage = query.fetchPage(state.pageNo.toInt(), pageSize = state.pageSize.toInt())
+    state.dataList = fetchPage.rows
+    state.totalPages = fetchPage.totalPageCount
 }
