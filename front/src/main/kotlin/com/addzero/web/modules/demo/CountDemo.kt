@@ -18,12 +18,12 @@ class CountDemo : MetaSpec {
 
     @Composable
     override fun render() {
-        val counter = UseCounter().render()
+        val state = UseCounter().render()
 
         Column {
-            DisplayCount(count = counter.count1)
-            DisplayCount(count = counter.count2)
-            DisplayCount(count = counter.count3)
+            DisplayCount(count = state.count1)
+            DisplayCount(count = state.count2)
+            DisplayCount(count = state.count3)
         }
     }
 

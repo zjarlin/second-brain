@@ -15,10 +15,6 @@ interface UseHook<T : UseHook<T>> {
         show(state)
         return state
     }
-
-    /**
-     * 显示组件UI
-     */
     @Composable
     abstract fun show(state: T)
 

@@ -14,23 +14,29 @@ import androidx.compose.ui.unit.dp
 import cn.hutool.core.convert.Convert
 import cn.hutool.core.util.NumberUtil
 import cn.hutool.core.util.ReflectUtil
+import com.addzero.common.kt_util.isNull
 import org.babyfish.jimmer.client.ApiIgnore
 
 data class AddColumn<T>(
     val title: String, val key: String, val customRender: (@Composable (AddColumn<T>, T) -> Unit) = { col, item ->
         val fieldValue = ReflectUtil.getFieldValue(item, col.key)
-        val toStr = Convert.toStr(fieldValue)
-        Text(toStr)
+        if (fieldValue.isNull()) {
+            Text("")
+        } else {
+            val toStr = Convert.toStr(fieldValue)
+            Text(toStr)
+        }
     }
 )
 
 class UseTable<T>(
-    private val totalPages: Int, private val modifier: Modifier = Modifier
+     private val modifier: Modifier = Modifier
 ) : UseHook<UseTable<T>> {
     var columns by mutableStateOf<List<AddColumn<T>>>(listOf())
     var dataList by mutableStateOf<List<T>>(listOf())
-    var pageNo by mutableStateOf(1)
-    var pageSize by mutableStateOf(10)
+    var pageNo by mutableStateOf(1L)
+    var pageSize by mutableStateOf(10L)
+     var totalPages: Long = 0
 
 
     @Composable
@@ -117,7 +123,7 @@ class UseTable<T>(
             OutlinedButton(
                 onClick = {
                     pageNo = 1
-                    pageSize = size
+                    pageSize = size.toLong()
                 },
                 modifier = Modifier.padding(horizontal = 4.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
@@ -136,7 +142,7 @@ class UseTable<T>(
                     val newSize = newValue.toInt()
                     if (newSize > 0) {
                         pageNo = 1
-                        pageSize = newSize
+                        pageSize = newSize.toLong()
                     }
                 }
             },

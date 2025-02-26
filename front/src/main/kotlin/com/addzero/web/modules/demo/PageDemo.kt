@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.sp
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.hooks.UseCounter
+import com.addzero.web.ui.hooks.UseTableExample
 
 class PageDemo : MetaSpec {
 
@@ -19,7 +20,7 @@ class PageDemo : MetaSpec {
 
     @Composable
     override fun render() {
-//        UseTableExample()
+        UseTableExample()
     }
 
 }
