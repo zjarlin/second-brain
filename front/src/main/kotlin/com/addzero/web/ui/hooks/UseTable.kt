@@ -30,18 +30,13 @@ data class AddColumn<T>(
 )
 
 class UseTable<T>(
-    private val modifier: Modifier = Modifier, private val onValueChange: ((state: UseTable<T>) -> Unit)={}
+    private val modifier: Modifier = Modifier, private val onValueChange: ((state: UseTable<T>) -> Unit) = {}
 ) : UseHook<UseTable<T>>() {
-
-
-
-
     var columns by mutableStateOf<List<AddColumn<T>>>(listOf())
     var dataList by mutableStateOf<List<T>>(listOf())
     var pageNo by mutableStateOf(1L)
     var pageSize by mutableStateOf(10L)
     var totalPages: Long = 0
-
     var searchText by mutableStateOf("")
 
 
@@ -53,8 +48,8 @@ class UseTable<T>(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
+                value = state.searchText,
+                onValueChange = { state.searchText = it },
                 modifier = Modifier.weight(1f).padding(end = 8.dp),
                 placeholder = { Text("请输入搜索关键词") },
                 singleLine = true
@@ -74,11 +69,11 @@ class UseTable<T>(
         ) {
             OutlinedButton(
                 onClick = {
-                    if (pageNo > 1) {
-                        pageNo -= 1
+                    if (state.pageNo > 1) {
+                        state.pageNo -= 1
                     }
                 },
-                enabled = pageNo > 1,
+                enabled = state.pageNo > 1,
                 modifier = Modifier.height(36.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
@@ -86,18 +81,18 @@ class UseTable<T>(
             }
 
             Text(
-                "$pageNo/$totalPages",
+                "${state.pageNo}/${state.totalPages} ",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
 
             OutlinedButton(
                 onClick = {
-                    if (pageNo < totalPages) {
-                        pageNo += 1
+                    if (state.pageNo < state.totalPages) {
+                        state.pageNo += 1
                     }
                 },
-                enabled = pageNo < totalPages,
+                enabled = state.pageNo < state.totalPages,
                 modifier = Modifier.height(36.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
@@ -115,7 +110,7 @@ class UseTable<T>(
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            columns.forEach { column: AddColumn<T> ->
+            state.columns.forEach { column: AddColumn<T> ->
                 Box(modifier = Modifier.weight(1f)) {
                     column.customRender(column, item)
                 }
@@ -150,8 +145,8 @@ class UseTable<T>(
         listOf(10, 30, 50, 100).forEach { size ->
             OutlinedButton(
                 onClick = {
-                    pageNo = 1
-                    pageSize = size.toLong()
+                    state.pageNo = 1
+                    state.pageSize = size.toLong()
                 },
                 modifier = Modifier.padding(horizontal = 4.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
@@ -164,13 +159,13 @@ class UseTable<T>(
     @Composable
     private fun renderCustomPageSizeBar() {
         OutlinedTextField(
-            value = pageSize.toString(),
+            value = state.pageSize.toString(),
             onValueChange = { newValue ->
                 if (newValue.isNotBlank() && NumberUtil.isNumber(newValue)) {
                     val newSize = newValue.toInt()
                     if (newSize > 0) {
-                        pageNo = 1
-                        pageSize = newSize.toLong()
+                        state.pageNo = 1
+                        state.pageSize = newSize.toLong()
                     }
                 }
             },
@@ -179,7 +174,9 @@ class UseTable<T>(
             textStyle = MaterialTheme.typography.bodyMedium,
             placeholder = { Text("自定义", style = MaterialTheme.typography.bodyMedium) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions(onDone = {})
+            keyboardActions = KeyboardActions(onDone = {
+                onValueChange
+            })
         )
     }
 
@@ -210,7 +207,7 @@ class UseTable<T>(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().padding(end = 12.dp)
                     ) {
-                        items(dataList) { item ->
+                        items(state.dataList) { item ->
                             renderTableRow(item)
                         }
                     }
@@ -227,7 +224,7 @@ class UseTable<T>(
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            columns.forEach { column ->
+            state.columns.forEach { column ->
                 Text(
                     text = column.title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f)
                 )

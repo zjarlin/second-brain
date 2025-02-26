@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks
+package com.addzero.web.ui.hooks.demo
 
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import com.addzero.web.ui.hooks.UseHook
 
 class UseCounter : UseHook<UseCounter>() {
     // 使用 State 封装状态

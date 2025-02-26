@@ -18,7 +18,7 @@ fun UseTableExample() {
     )
 
     // 使用表格组件
-    val useTable = UseTable<SysArea>(
+    val useTable = UseTable(
         onValueChange = { loadData(it) }).apply {
         columns = columnsData
     }

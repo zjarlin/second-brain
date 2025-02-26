@@ -1,10 +1,9 @@
 package com.addzero.web.ui.hooks
 
 import androidx.compose.runtime.*
-import org.checkerframework.checker.units.qual.t
 
 abstract class UseHook<T : UseHook<T>> {
-    var state:T= this as T
+    protected var state:T= this as T
     /**
      * 渲染组件并返回状态
      */
