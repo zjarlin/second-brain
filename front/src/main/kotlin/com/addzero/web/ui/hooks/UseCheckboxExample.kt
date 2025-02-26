@@ -35,15 +35,12 @@ fun <E : Enum<E>> UseCheckboxExample() {
             val multiSelectFlag = it.value
 
             val useCheckbox = UseCheckbox(
-                title = title,
-                items = items,
-                isMultiSelect = multiSelectFlag
+                title = title, items = items, isMultiSelect = multiSelectFlag
             ) { item -> ReflectUtil.getFieldValue(item, "desc").toString() }
             val joinToString = useCheckbox.render().selected.joinToString()
 
             Text(
-                text = "已选中: $joinToString",
-                modifier = Modifier.padding(top = 8.dp)
+                text = "已选中: $joinToString", modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
