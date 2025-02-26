@@ -41,7 +41,7 @@ class UseTable<T>(
             OutlinedButton(
                 onClick = {
                     if (pageNo > 1) {
-                        pageNo - 1
+                        pageNo -= 1
                     }
                 },
                 enabled = pageNo > 1,
@@ -60,7 +60,7 @@ class UseTable<T>(
             OutlinedButton(
                 onClick = {
                     if (pageNo < totalPages) {
-                        pageNo + 1
+                        pageNo += 1
                     }
                 },
                 enabled = pageNo < totalPages,
@@ -131,10 +131,13 @@ class UseTable<T>(
     private fun renderCustomPageSize() {
         OutlinedTextField(
             value = pageSize.toString(),
-            onValueChange = {
-                if (it.isNotBlank() && NumberUtil.isNumber(it) && it.toInt() > 0) {
-                    pageNo = 1
-                    pageSize = it.toInt()
+            onValueChange = { newValue ->
+                if (newValue.isNotBlank() && NumberUtil.isNumber(newValue)) {
+                    val newSize = newValue.toInt()
+                    if (newSize > 0) {
+                        pageNo = 1
+                        pageSize = newSize
+                    }
                 }
             },
             modifier = Modifier.width(80.dp).padding(horizontal = 4.dp),

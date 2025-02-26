@@ -16,11 +16,8 @@ class UseCheckbox<T>(
     private val modifier: Modifier = Modifier,
     private val getLabel: (T) -> String = { it.toString() },
 ) : UseHook<UseCheckbox<T>> {
-
     // 使用 State 封装状态
-
     var selected by mutableStateOf<Set<T>>(setOf())
-
     /**
      * 切换选中状态
      * @param value 当前选项的值
@@ -40,7 +37,6 @@ class UseCheckbox<T>(
             }
         }
     }
-
     /**
      * 清空选中状态
      */
