@@ -11,20 +11,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import cn.hutool.core.convert.Convert
 import cn.hutool.core.util.NumberUtil
-import cn.hutool.core.util.ReflectUtil
-import com.addzero.common.kt_util.isNull
 import com.addzero.common.kt_util.toNotBlankStr
-import org.apache.poi.ss.formula.functions.T
 import org.babyfish.jimmer.client.ApiIgnore
 
 
 data class AddColumn<T>(
-    val title: String
-    , val getColumnValue: (T) -> Any? = { }
-    , val customRender: @Composable (String) -> Unit = { value ->
-        Text(value)
+    val title: String,
+    val getFun: (T) -> Any? = { },
+    val customRender: @Composable (Any) -> Unit = {
+        val toNotBlankStr = it.toNotBlankStr()
+        Text(toNotBlankStr)
     }
 )
 
@@ -54,7 +51,10 @@ class UseTable<T>(
                 singleLine = true
             )
             Button(
-                onClick = { onValueChange(state) }, modifier = Modifier.height(56.dp)
+                onClick = {
+                    state.pageNo = 0
+                    onValueChange(state)
+                }, modifier = Modifier.height(56.dp)
             ) {
                 Text("搜索")
             }
@@ -68,11 +68,11 @@ class UseTable<T>(
         ) {
             OutlinedButton(
                 onClick = {
-                    if (state.pageNo > 1) {
+                    if (state.pageNo > 0) {
                         state.pageNo -= 1
                     }
                 },
-                enabled = state.pageNo > 1,
+                enabled = state.pageNo > 0,
                 modifier = Modifier.height(36.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
@@ -111,7 +111,7 @@ class UseTable<T>(
         ) {
             state.columns.forEach { column: AddColumn<T> ->
                 Box(modifier = Modifier.weight(1f)) {
-                    column.getColumnValue(item).let {
+                    column.getFun(item).let {
                         val toNotBlankStr = it.toNotBlankStr()
                         column.customRender(toNotBlankStr)
                     }
@@ -187,7 +187,7 @@ class UseTable<T>(
     @ApiIgnore
     override fun show(state: UseTable<T>) {
 
-        LaunchedEffect(state.pageNo, state.pageSize,state.dataList) {
+        LaunchedEffect(state.pageNo, state.pageSize, state.dataList) {
             onValueChange(state)
         }
 

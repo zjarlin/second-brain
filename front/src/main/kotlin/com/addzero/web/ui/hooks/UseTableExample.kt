@@ -1,12 +1,12 @@
 package com.addzero.web.ui.hooks
 
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import com.addzero.common.consts.SpringVars
+import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.modules.sys.area.entity.SysArea
 import com.addzero.web.modules.sys.area.entity.city
-import com.addzero.web.modules.sys.area.entity.name
-import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
-import org.babyfish.jimmer.sql.kt.ast.expression.like
 import org.babyfish.jimmer.sql.kt.ast.expression.`like?`
 import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
@@ -14,9 +14,29 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 fun UseTableExample() {
     // 定义表格列
     val columnsData = listOf(
-        AddColumn<SysArea>(title = "主键", getColumnValue = { it.sid }),
-        AddColumn(title = "上级", getColumnValue = { it.parentsid }),
-        AddColumn(title = "城市", getColumnValue = { it.city }),
+        AddColumn<SysArea>(title = "主键", getFun = { it.sid }),
+        AddColumn(title = "上级", getFun = { it.parentsid }),
+        AddColumn(title = "城市", getFun = { it.city }),
+
+
+        AddColumn(title = "是否包含黑开关样式", getFun = { it.blackFlag }) {
+            val toNotBlankStr = it.toNotBlankStr()
+            val contains = toNotBlankStr.contains("true")
+            Switch(
+                checked = contains, onCheckedChange = { newVal -> newVal.not() })
+
+        },
+
+
+        AddColumn(title = "城市名字是否有黑", getFun = { it.blackFlag }) {
+            val toNotBlankStr = it.toNotBlankStr()
+            if (toNotBlankStr.contains("true")) {
+                Text("名字包含黑", color = androidx.compose.ui.graphics.Color.Black)
+            } else {
+                Text("名字不包含黑", color = androidx.compose.ui.graphics.Color.Red)
+            }
+
+        },
     )
 
     // 使用表格组件
@@ -32,7 +52,7 @@ fun loadData(state: UseTable<SysArea>) {
     val keyword = state.searchText
     val sql = SpringVars.sql
     val query = sql.createQuery(SysArea::class) {
-         where(table.city `like?` keyword)
+        where(table.city `like?` keyword)
         orderBy(table.makeOrders("sid asc"))
         select(table)
     }

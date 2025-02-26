@@ -1,6 +1,6 @@
 package com.addzero.web.modules.sys.area.entity
 
-import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
+import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.sql.*
 
 
@@ -16,7 +16,9 @@ import org.babyfish.jimmer.sql.*
 @Entity
 @Table(name = "sys_area")
 public interface SysArea  {
-
+    @Formula(dependencies = ["delflag"])
+    val blackFlag: Boolean?
+        get() = city?.contains("黑")
 /**
 *  主键
 */
