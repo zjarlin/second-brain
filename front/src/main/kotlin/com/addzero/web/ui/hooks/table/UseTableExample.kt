@@ -16,24 +16,26 @@ fun UseTableExample() {
     val useTable = UseTable(
         onValueChange = { loadData(it) }
     ).apply {
-        column(title = "主键", getFun = { it.sid })
-        column(title = "上级", getFun = { it.parentsid })
-        column(title = "城市", getFun = { it.city })
-        column(
-            title = "是否包含黑开关样式",
-            getFun = { it.blackFlag }
-        ) {
-            val contains = it.contains("true")
-            Switch(checked = contains, onCheckedChange = { newVal -> newVal.not() })
-        }
-        column(
-            title = "城市名字是否有黑",
-            getFun = { it.blackFlag }
-        ) { value ->
-            if (value.contains("true")) {
-                Text("名字包含黑", color = Color.Black)
-            } else {
-                Text("名字不包含黑", color = Color.Red)
+        columns {
+            column(title = "主键", getFun = { it.sid })
+            column(title = "上级", getFun = { it.parentsid })
+            column(title = "城市", getFun = { it.city })
+            column(
+                title = "是否包含黑开关样式",
+                getFun = { it.blackFlag }
+            ) {
+                val contains = it.contains("true")
+                Switch(checked = contains, onCheckedChange = { newVal -> newVal.not() })
+            }
+            column(
+                title = "城市名字是否有黑",
+                getFun = { it.blackFlag }
+            ) { value ->
+                if (value.contains("true")) {
+                    Text("名字包含黑", color = Color.Black)
+                } else {
+                    Text("名字不包含黑", color = Color.Red)
+                }
             }
         }
     }
