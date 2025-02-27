@@ -23,14 +23,15 @@ fun <E : Any> UseTable(
     clazz: KClass<E>,
     modifier: Modifier = Modifier,
     excludeFields: Set<String> = setOf(),
-    columns: List<AddColumn<E>> = listOf(),
+    columns: (List<AddColumn<E>>.() -> Unit)? = null,
     onValueChange: (TableState<E>) -> Unit = {}
 ) {
+    val columnList: List<AddColumn<E>> = listOf()
+
     val state = remember {
-        val mergedColumns = mergeColumns(clazz, columns, excludeFields)
+        columns?.let { columnList.it() }
         val tableState = TableState(
-            clazz = clazz,
-            initialColumns = mergedColumns
+            clazz = clazz, initialColumns = mergeColumns(clazz, columnList, excludeFields)
         )
         tableState
     }
@@ -42,14 +43,10 @@ fun <E : Any> UseTable(
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // 搜索栏
-            SearchBar(
-                searchText = state.searchText,
-                onSearchTextChange = { state.searchText = it },
-                onSearch = {
-                    state.search()
-                    onValueChange(state)
-                }
-            )
+            SearchBar(searchText = state.searchText, onSearchTextChange = { state.searchText = it }, onSearch = {
+                state.search()
+                onValueChange(state)
+            })
 
             // 表格头部
             TableHeader(state.columns)
@@ -69,8 +66,7 @@ fun <E : Any> UseTable(
 
             // 分页控件
             Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface
+                modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surface
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
@@ -81,17 +77,12 @@ fun <E : Any> UseTable(
                         currentPage = state.pageNo,
                         totalPages = state.totalPages,
                         onPreviousPage = { state.previousPage() },
-                        onNextPage = { state.nextPage() }
-                    )
+                        onNextPage = { state.nextPage() })
                     Spacer(modifier = Modifier.width(16.dp))
                     PageSizeSelector(
-                        currentPageSize = state.pageSize,
-                        onPageSizeChange = { state.updatePageSize(it) }
-                    )
+                        currentPageSize = state.pageSize, onPageSizeChange = { state.updatePageSize(it) })
                     CustomPageSizeInput(
-                        currentPageSize = state.pageSize,
-                        onPageSizeChange = { state.updatePageSize(it) }
-                    )
+                        currentPageSize = state.pageSize, onPageSizeChange = { state.updatePageSize(it) })
                 }
             }
         }
@@ -100,18 +91,14 @@ fun <E : Any> UseTable(
 
 @Composable
 private fun TableHeader(
-    columns: List<AddColumn<*>>,
-    modifier: Modifier = Modifier
+    columns: List<AddColumn<*>>, modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         columns.forEach { column ->
             Text(
-                text = column.title,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.weight(1f)
+                text = column.title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f)
             )
         }
     }
@@ -119,13 +106,10 @@ private fun TableHeader(
 
 @Composable
 private fun <E> TableRow(
-    item: E,
-    columns: List<AddColumn<E>>,
-    modifier: Modifier = Modifier
+    item: E, columns: List<AddColumn<E>>, modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         columns.forEach { column ->
             Box(modifier = Modifier.weight(1f)) {
@@ -139,22 +123,19 @@ private fun <E> TableRow(
 
 private fun <T : Any> defaultColumns(clazz: KClass<T>, excludeFields: Set<String> = setOf()): List<AddColumn<T>> {
     val metadata = clazz.getMetadata()
-    return metadata.fields
-        .filter { !excludeFields.contains(it.property.name) }
-        .map { field ->
-            val getter = field.property.getter
-            AddColumn<T>(
-                title = field.description.toNotBlankStr(),
-                getFun = { getter.call(it) }
-            )
-        }
-        .filter { it.title.isNotBlank() }
+    return metadata.fields.filter { !excludeFields.contains(it.property.name) }.map { field ->
+        val getter = field.property.getter
+        AddColumn<T>(
+            title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+    }.filter { it.title.isNotBlank() }
 }
 
-private fun <T : Any> mergeColumns(clazz: KClass<T>, customColumns: List<AddColumn<T>>, excludeFields: Set<String>): List<AddColumn<T>> {
+private fun <T : Any> mergeColumns(
+    clazz: KClass<T>, customColumns: List<AddColumn<T>>, excludeFields: Set<String>
+): List<AddColumn<T>> {
     val defaultCols = defaultColumns(clazz, excludeFields)
     val customColMap = customColumns.associateBy { it.title }
-    
+
     return defaultCols.map { defaultCol ->
         customColMap[defaultCol.title] ?: defaultCol
     } + customColumns.filter { custom ->
