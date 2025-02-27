@@ -33,6 +33,26 @@ class UseTable<T>(
     var totalPages: Long = 0
     var searchText by mutableStateOf("")
 
+    fun columns(init: ColumnBuilder<T>.() -> Unit) {
+        val builder = ColumnBuilder<T>()
+        builder.init()
+        columns = builder.build()
+    }
+
+    class ColumnBuilder<T> {
+        private val columns = mutableListOf<AddColumn<T>>()
+
+        fun column(
+            title: String,
+            getFun: (T) -> Any?,
+            customRender: @Composable (String) -> Unit = { Text(it) }
+        ) {
+            columns.add(AddColumn(title, getFun, customRender))
+        }
+
+        internal fun build(): List<AddColumn<T>> = columns.toList()
+    }
+
 
     @Composable
     private fun renderSearchBar() {
@@ -230,4 +250,26 @@ class UseTable<T>(
             }
         }
     }
+
+//    fun <T> defaultColumns(clazz: Class<T>, excludeFields: Set<String> = setOf()) {
+//        val fields = clazz.declaredFields.filter { !excludeFields.contains(it.name) }
+//        val columnList = mutableListOf<AddColumn<T>>()
+//
+//        val map = fields.map { field ->
+//            field.isAccessible = true
+//            val schema = field.getAnnotation(Schema::class.java)
+//            val title = schema?.description ?: field.name.replaceFirstChar { it.uppercase() }
+//
+//            val element = AddColumn<T>(
+//                title = title,
+//                getFun = {
+//                    field.get(it)
+//                }
+//            )
+//            element
+//        }.toList()
+//
+//
+//        columns = mutableStateOf(map)
+//    }
 }

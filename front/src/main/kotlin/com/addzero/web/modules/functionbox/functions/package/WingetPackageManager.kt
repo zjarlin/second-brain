@@ -53,7 +53,7 @@ class WingetPackageManager : PackageManager {
 
             withContext(Dispatchers.IO) {
                 while (reader.readLine().also { line = it } != null) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
                         packageStatus.progress += progressStep
                         if (packageStatus.progress >= 1f) {
                             packageStatus.progress = 0.9f
@@ -63,7 +63,7 @@ class WingetPackageManager : PackageManager {
                 }
 
                 val exitCode = process.waitFor()
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     if (exitCode == 0) {
                         packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.INSTALLED
@@ -74,7 +74,7 @@ class WingetPackageManager : PackageManager {
                 }
             }
         } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
+            withContext(Dispatchers.IO) {
                 packageStatus.status = PackageStatus.Status.ERROR
                 packageStatus.error = e.message ?: "未知错误"
             }
@@ -96,7 +96,7 @@ class WingetPackageManager : PackageManager {
                 var progressStep = 0.1f
 
                 while (reader.readLine().also { line = it } != null) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
                         packageStatus.progress += progressStep
                         if (packageStatus.progress >= 1f) {
                             packageStatus.progress = 0.9f
@@ -106,7 +106,7 @@ class WingetPackageManager : PackageManager {
                 }
 
                 val exitCode = process.waitFor()
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     if (exitCode == 0) {
                         packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.NOT_INSTALLED
@@ -116,7 +116,7 @@ class WingetPackageManager : PackageManager {
                     }
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     packageStatus.status = PackageStatus.Status.ERROR
                     packageStatus.error = e.message ?: "未知错误"
                 }

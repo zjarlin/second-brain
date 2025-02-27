@@ -25,9 +25,6 @@ class SpringBootAppTests(
     @Test
     fun testMeta() {
         val declaredMemberProperties = ColumnMetadata::class.declaredMemberProperties
-        declaredMemberProperties.map {
-           it.get()
-        }
 
     }
 

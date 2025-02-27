@@ -12,7 +12,7 @@ class BrewPackageManager : PackageManager {
             val status = PackageStatus(packageName)
             try {
                 val execute = CommandExecutor.execute("brew list | grep $packageName")
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     status.status = if (execute.isNotBlank()) {
                         PackageStatus.Status.INSTALLED
                     } else {
@@ -20,7 +20,7 @@ class BrewPackageManager : PackageManager {
                     }
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     status.status = PackageStatus.Status.ERROR
                     status.error = e.message ?: "检查失败"
                 }
@@ -44,7 +44,7 @@ class BrewPackageManager : PackageManager {
                 var progressStep = 0.1f
 
                 while (reader.readLine().also { line = it } != null) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
                         packageStatus.progress += progressStep
                         if (packageStatus.progress >= 1f) {
                             packageStatus.progress = 0.9f
@@ -54,7 +54,7 @@ class BrewPackageManager : PackageManager {
                 }
 
                 val exitCode = process.waitFor()
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     if (exitCode == 0) {
                         packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.INSTALLED
@@ -64,7 +64,7 @@ class BrewPackageManager : PackageManager {
                     }
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     packageStatus.status = PackageStatus.Status.ERROR
                     packageStatus.error = e.message ?: "未知错误"
                 }
@@ -87,7 +87,7 @@ class BrewPackageManager : PackageManager {
                 var progressStep = 0.1f
 
                 while (reader.readLine().also { line = it } != null) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
                         packageStatus.progress += progressStep
                         if (packageStatus.progress >= 1f) {
                             packageStatus.progress = 0.9f
@@ -97,7 +97,7 @@ class BrewPackageManager : PackageManager {
                 }
 
                 val exitCode = process.waitFor()
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     if (exitCode == 0) {
                         packageStatus.progress = 1f
                         packageStatus.status = PackageStatus.Status.NOT_INSTALLED
@@ -107,7 +107,7 @@ class BrewPackageManager : PackageManager {
                     }
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
                     packageStatus.status = PackageStatus.Status.ERROR
                     packageStatus.error = e.message ?: "未知错误"
                 }

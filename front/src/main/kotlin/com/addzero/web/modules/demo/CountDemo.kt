@@ -1,8 +1,8 @@
 package com.addzero.web.modules.demo
 
-import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
@@ -20,7 +20,7 @@ class CountDemo : MetaSpec {
     @Composable
     override fun render() {
         val state = UseCounter().render()
-        state.count1 += 1
+//        state.count1 += 1
 
         val state2 = UseCounter().render()
 
