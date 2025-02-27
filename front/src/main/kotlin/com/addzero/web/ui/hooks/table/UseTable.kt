@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import cn.hutool.core.util.NumberUtil
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
+import io.swagger.v3.oas.annotations.media.Schema
 import org.babyfish.jimmer.client.ApiIgnore
 
 
@@ -26,7 +27,16 @@ data class AddColumn<T>(
 class UseTable<T>(
     private val modifier: Modifier = Modifier, private val onValueChange: ((state: UseTable<T>) -> Unit) = {}
 ) : UseHook<UseTable<T>>() {
-    var columns by mutableStateOf<List<AddColumn<T>>>(listOf())
+    init{
+        val kClass = T::class.javaClass
+    }
+
+    val value = listOf<AddColumn<T>>()
+
+
+
+
+    var columns by mutableStateOf<List<AddColumn<T>>>(value)
     var dataList by mutableStateOf<List<T>>(listOf())
     var pageNo by mutableStateOf(0L)
     var pageSize by mutableStateOf(10L)
@@ -251,25 +261,24 @@ class UseTable<T>(
         }
     }
 
-//    fun <T> defaultColumns(clazz: Class<T>, excludeFields: Set<String> = setOf()) {
-//        val fields = clazz.declaredFields.filter { !excludeFields.contains(it.name) }
-//        val columnList = mutableListOf<AddColumn<T>>()
-//
-//        val map = fields.map { field ->
-//            field.isAccessible = true
-//            val schema = field.getAnnotation(Schema::class.java)
-//            val title = schema?.description ?: field.name.replaceFirstChar { it.uppercase() }
-//
-//            val element = AddColumn<T>(
-//                title = title,
-//                getFun = {
-//                    field.get(it)
-//                }
-//            )
-//            element
-//        }.toList()
-//
-//
-//        columns = mutableStateOf(map)
-//    }
+    fun <T> defaultColumns(clazz: Class<T>, excludeFields: Set<String> = setOf()): List<AddColumn<T>> {
+        val fields = clazz.declaredFields.filter { !excludeFields.contains(it.name) }
+        val columnList = mutableListOf<AddColumn<T>>()
+
+        val map = fields.map { field ->
+            field.isAccessible = true
+            val schema = field.getAnnotation(Schema::class.java)
+            val title = schema?.description ?: field.name.replaceFirstChar { it.uppercase() }
+
+            val element = AddColumn<T>(
+                title = title,
+                getFun = {
+                    field.get(it)
+                }
+            )
+            element
+        }.toList()
+        return map
+
+    }
 }

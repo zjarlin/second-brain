@@ -13,8 +13,23 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 @Composable
 fun UseTableExample() {
     // 使用表格组件
-    val useTable = UseTable(
-        onValueChange = { loadData(it) }
+    val useTable = UseTable<SysArea>(
+        onValueChange = {
+            val keyword = it.searchText
+            val sql = SpringVars.sql
+            val query = sql.createQuery(SysArea::class) {
+                where(table.city `like?` keyword)
+                orderBy(table.makeOrders("sid asc"))
+                select(table)
+            }
+            val pageIndex = it.pageNo.toInt()
+            val pageSize = it.pageSize.toInt()
+            val fetchPage = query.fetchPage(pageIndex, pageSize = pageSize)
+            val rows = fetchPage.rows
+            val totalPageCount = fetchPage.totalPageCount
+            it.dataList = rows
+            it.totalPages = totalPageCount
+        }
     ).apply {
         columns {
             column(title = "主键", getFun = { it.sid })
@@ -39,25 +54,8 @@ fun UseTableExample() {
             }
         }
     }
+
     useTable.render()
 
 }
 
-fun loadData(state: UseTable<SysArea>) {
-    val keyword = state.searchText
-    val sql = SpringVars.sql
-    val query = sql.createQuery(SysArea::class) {
-        where(table.city `like?` keyword)
-        orderBy(table.makeOrders("sid asc"))
-        select(table)
-    }
-    val pageIndex = state.pageNo.toInt()
-    val pageSize = state.pageSize.toInt()
-    val fetchPage = query.fetchPage(pageIndex, pageSize = pageSize)
-    val rows = fetchPage.rows
-    val totalPageCount = fetchPage.totalPageCount
-
-
-    state.dataList = rows
-    state.totalPages = totalPageCount
-}
