@@ -1,5 +1,4 @@
 package com.addzero.web.ui.hooks.table
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,27 +12,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
+import com.addzero.common.kt_util.ClassMetadata
+import com.addzero.common.kt_util.FieldMetadata
 import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.toNotBlankStr
-import kotlin.reflect.KClass
 
 
 @Composable
-fun <E : Any> UseTable(
-    clazz: KClass<E>,
+inline fun <reified E : Any> UseTable(
     modifier: Modifier = Modifier,
-    excludeFields: Set<String> = setOf(),
-    columns: (List<AddColumn<E>>.() -> Unit)? = null,
-    onValueChange: (TableState<E>) -> Unit = {}
+    excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
+    columns: List<AddColumn<E>> = listOf(),
+    noinline onValueChange: (TableState<E>) -> Unit = {}
 ) {
-    val columnList: List<AddColumn<E>> = listOf()
-
     val state = remember {
-        columns?.let { columnList.it() }
-        val tableState = TableState(
-            clazz = clazz, initialColumns = mergeColumns(clazz, columnList, excludeFields)
+        val clazz = E::class
+        val metadata = clazz.getMetadata()
+        val defaultColumns = addColumns<E>(metadata, excludeFields)
+        val mergedColumns = defaultColumns + columns
+        TableState(
+            initialColumns = mergedColumns
         )
-        tableState
     }
 
     LaunchedEffect(state.pageNo, state.pageSize) {
@@ -89,8 +89,21 @@ fun <E : Any> UseTable(
     }
 }
 
+inline fun <reified E : Any> addColumns(
+    metadata: ClassMetadata<E>,
+    excludeFields: Set<String>
+): List<AddColumn<E>> {
+    val defaultColumns = metadata.fields.filter<FieldMetadata<E>> { !excludeFields.contains(it.property.name) }
+        .map<FieldMetadata<E>, AddColumn<E>> { field ->
+            val getter = field.property.getter
+            AddColumn<E>(
+                title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+        }.filter<AddColumn<E>> { it.title.isNotBlank() }
+    return defaultColumns
+}
+
 @Composable
-private fun TableHeader(
+fun TableHeader(
     columns: List<AddColumn<*>>, modifier: Modifier = Modifier
 ) {
     Row(
@@ -105,7 +118,7 @@ private fun TableHeader(
 }
 
 @Composable
-private fun <E> TableRow(
+fun <E> TableRow(
     item: E, columns: List<AddColumn<E>>, modifier: Modifier = Modifier
 ) {
     Row(
@@ -121,24 +134,3 @@ private fun <E> TableRow(
     }
 }
 
-private fun <T : Any> defaultColumns(clazz: KClass<T>, excludeFields: Set<String> = setOf()): List<AddColumn<T>> {
-    val metadata = clazz.getMetadata()
-    return metadata.fields.filter { !excludeFields.contains(it.property.name) }.map { field ->
-        val getter = field.property.getter
-        AddColumn<T>(
-            title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
-    }.filter { it.title.isNotBlank() }
-}
-
-private fun <T : Any> mergeColumns(
-    clazz: KClass<T>, customColumns: List<AddColumn<T>>, excludeFields: Set<String>
-): List<AddColumn<T>> {
-    val defaultCols = defaultColumns(clazz, excludeFields)
-    val customColMap = customColumns.associateBy { it.title }
-
-    return defaultCols.map { defaultCol ->
-        customColMap[defaultCol.title] ?: defaultCol
-    } + customColumns.filter { custom ->
-        defaultCols.none { it.title == custom.title }
-    }
-}

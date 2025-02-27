@@ -5,13 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlin.reflect.KClass
 
 /**
  * 表格状态管理类
  */
 class TableState<E : Any>(
-    val clazz: KClass<E>,
     initialColumns: List<AddColumn<E>> = listOf(),
     initialPageSize: Long = 10,
 ) {

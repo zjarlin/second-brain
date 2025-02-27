@@ -11,14 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import io.swagger.v3.oas.annotations.media.Schema
 
 // 默认的排除字段
 
 
-val DEFAULT_EXCLUDE_FIELDS = setOf(
-    "createTime", "createdBy", "updateTime", "updatedBy", "id"
-)
 
 // 表格样式配置
 object DataTableStyle {
