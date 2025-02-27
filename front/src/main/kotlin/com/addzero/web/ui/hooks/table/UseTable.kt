@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cn.hutool.core.util.NumberUtil
+import com.addzero.common.kt_util.add
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import org.babyfish.jimmer.client.ApiIgnore
@@ -33,25 +34,15 @@ class UseTable<T>(
     var totalPages: Long = 0
     var searchText by mutableStateOf("")
 
-    fun columns(init: ColumnBuilder<T>.() -> Unit) {
-        val builder = ColumnBuilder<T>()
-        builder.init()
-        columns = builder.build()
+    fun column(
+        title: String,
+        getFun: (T) -> Any?,
+        customRender: @Composable (String) -> Unit = { Text(it) }
+    ) {
+        val currentNode = AddColumn(title, getFun, customRender)
+        columns.add(currentNode)
     }
 
-    class ColumnBuilder<T> {
-        private val columns = mutableListOf<AddColumn<T>>()
-
-        fun column(
-            title: String,
-            getFun: (T) -> Any?,
-            customRender: @Composable (String) -> Unit = { Text(it) }
-        ) {
-            columns.add(AddColumn(title, getFun, customRender))
-        }
-
-        internal fun build(): List<AddColumn<T>> = columns.toList()
-    }
 
 
     @Composable
