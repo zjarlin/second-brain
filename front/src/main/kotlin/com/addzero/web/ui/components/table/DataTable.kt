@@ -32,10 +32,13 @@ object DataTableStyle {
 }
 
 @Composable
-private fun <T : Any> TableHeader(
-    fields: List<java.lang.reflect.Field>,
+inline fun <reified T : Any> TableHeader(
+    excludeFields: Set<String>,
     modifier: Modifier = Modifier
 ) {
+    val java = T::class.java
+    val fields = java.declaredFields
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         tonalElevation = DataTableStyle.headerElevation,
@@ -56,16 +59,18 @@ private fun <T : Any> TableHeader(
             )
 
             // 字段列
-            fields.forEach { field ->
-                field.isAccessible = true
-                val annotation = field.getAnnotation(Schema::class.java)
-                val columnName = annotation?.description ?: field.name.replaceFirstChar { it.uppercase() }
-                Text(
-                    text = columnName,
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            fields
+                .filter { !excludeFields.contains(it.name) }
+                .forEach { field ->
+                    field.isAccessible = true
+                    val annotation = field.getAnnotation(Schema::class.java)
+                    val columnName = annotation?.description ?: field.name.replaceFirstChar { it.uppercase() }
+                    Text(
+                        text = columnName,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
             // 操作列
             Text(
@@ -78,15 +83,16 @@ private fun <T : Any> TableHeader(
 }
 
 @Composable
-private fun <T : Any> TableRow(
+inline fun <reified T : Any> TableRow(
     item: T,
     index: Int,
     startIndex: Int,
-    fields: List<java.lang.reflect.Field>,
-    onEdit: (T) -> Unit,
-    onDelete: (T) -> Unit,
+    crossinline onEdit: (T) -> Unit,
+    crossinline onDelete: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val fields = T::class.java.declaredFields
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = if (index % 2 == 0) {
@@ -108,12 +114,15 @@ private fun <T : Any> TableRow(
             )
 
             // 字段值
-            fields.forEach { field ->
-                Text(
-                    text = field.get(item)?.toString() ?: "",
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            fields
+//                .filter { excludeFields.con }
+                .forEach { field ->
+                    field.isAccessible=true
+                    Text(
+                        text = field.get(item)?.toString() ?: "",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
             // 操作按钮
             OperationButtons(
@@ -126,7 +135,7 @@ private fun <T : Any> TableRow(
 }
 
 @Composable
-private fun OperationButtons(
+fun OperationButtons(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -155,25 +164,19 @@ private fun OperationButtons(
 }
 
 @Composable
-fun <T : Any> DataTable(
+inline fun <reified T : Any> DataTable(
     records: List<T>,
-    onEdit: (T) -> Unit,
-    onDelete: (T) -> Unit,
+    crossinline onEdit: (T) -> Unit,
+    crossinline onDelete: (T) -> Unit,
     excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
     startIndex: Int = 0,
     pageIndex: Int,
     totalPages: Int,
-    onPageSizeChange: (Int) -> Unit
+    noinline onPageSizeChange: (Int) -> Unit
 ) {
-    val fields = records.firstOrNull()?.let { item ->
-        item::class.java.declaredFields
-            .filter { field ->
-                !java.lang.reflect.Modifier.isStatic(field.modifiers) && field.name !in excludeFields
-            }.toList()
-    } ?: emptyList()
 
     Column(modifier = Modifier.fillMaxSize()) {
-    TableHeader<T>(fields)  // 添加泛型类型参数
+        TableHeader<T>(excludeFields)  // 添加泛型类型参数
         HorizontalDivider()
 
         LazyColumn(
@@ -184,7 +187,6 @@ fun <T : Any> DataTable(
                     item = item,
                     index = index,
                     startIndex = startIndex,
-                    fields = fields,
                     onEdit = onEdit,
                     onDelete = onDelete
                 )

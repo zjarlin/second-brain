@@ -9,32 +9,6 @@ import javax.sql.DataSource
 @Service
 class DatabaseMetadataService(private val dataSource: DataSource) {
 
-    data class ColumnMetadata(
-        val id: String,          // MD5哈希生成的唯一ID
-        val tableName: String,   // 表名
-        val columnName: String,  // 列名
-        val columnType: String,  // 列类型
-        val columnLength: Int?,  // 列长度
-        val nullableFlag: String // 是否可空
-    )
-
-    data class PrimaryKeyMetadata(
-        val tableName: String,      // 表名
-        val columnName: String,     // 主键列名
-        val keySeq: Short,         // 主键序号
-        val pkName: String?        // 主键约束名称
-    )
-
-    data class ForeignKeyMetadata(
-        val pkTableName: String,    // 主键表名
-        val pkColumnName: String,   // 主键列名
-        val fkTableName: String,    // 外键表名
-        val fkColumnName: String,   // 外键列名
-        val keySeq: Short,         // 外键序号
-        val fkName: String?,       // 外键约束名称
-        val pkName: String?        // 主键约束名称
-    )
-
     fun getPrimaryKeysMetadata(schema: String = "public"): List<PrimaryKeyMetadata> {
         return dataSource.connection.use { connection ->
             val metadata = connection.metaData
@@ -104,7 +78,7 @@ class DatabaseMetadataService(private val dataSource: DataSource) {
 
                 result.add(
                     ColumnMetadata(
-                        id = id,
+                        md5 = id,
                         tableName = tableName,
                         columnName = columnName,
                         columnType = normalizedType,

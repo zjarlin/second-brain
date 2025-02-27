@@ -3,20 +3,20 @@ package com.addzero.web.modules.demo
 import androidx.compose.runtime.*
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
-import com.addzero.web.ui.hooks.table.UseTableExample
+import com.addzero.web.ui.components.table.TableExample
 
-class PageDemo : MetaSpec {
+class DataTableDemo : MetaSpec {
 
     override val metadata: RouteMetadata
         get() = RouteMetadata(
             parentName = "测试demo",
-            title = "测试表格",
+            title = "测试DataTable",
             visible = true,
         )
 
     @Composable
     override fun render() {
-        UseTableExample()
+        TableExample()
     }
 
 }

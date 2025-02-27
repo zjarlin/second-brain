@@ -1,22 +1,16 @@
 package com.addzero.web.infra.jimmer.dynamicdatasource
 
-import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.infra.spring.SprCtxUtil.applicationContext
-import com.addzero.web.modules.sys.low.metadata.DbEnum
+import com.addzero.web.jdbc.metadata.DbEnum
 import com.zaxxer.hikari.HikariDataSource
 import org.babyfish.jimmer.spring.SqlClients
 import org.babyfish.jimmer.spring.transaction.JimmerTransactionManager
 import org.babyfish.jimmer.sql.dialect.*
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
 import org.springframework.beans.factory.support.RootBeanDefinition
-import org.springframework.boot.web.servlet.RegistrationBean
-import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource
-import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
 @Configuration

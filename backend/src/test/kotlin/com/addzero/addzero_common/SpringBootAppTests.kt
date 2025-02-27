@@ -1,15 +1,16 @@
 package com.addzero.addzero_common
 
 import cn.hutool.extra.spring.SpringUtil
+import com.addzero.web.jdbc.metadata.ColumnMetadata
 import com.addzero.web.jdbc.metadata.DatabaseMetadataService
 import com.addzero.web.modules.second_brain.note.BizNote
-import com.addzero.web.modules.sys.low.metadata.impl.PostgresMetadataService
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.babyfish.jimmer.sql.runtime.Customizer
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
+import kotlin.reflect.full.declaredMemberProperties
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -19,12 +20,16 @@ class SpringBootAppTests(
     @Autowired
     private lateinit var databaseMetadataService: DatabaseMetadataService
 
-    @Autowired
-    private lateinit var postgresMetadataService: PostgresMetadataService
+    //    @Autowired
+//    private lateinit var postgresMetadataService: PostgresMetadataService
+    @Test
+    fun testMeta() {
+        val declaredMemberProperties = ColumnMetadata::class.declaredMemberProperties
+        declaredMemberProperties.map {
+           it.get()
+        }
 
-
-
-
+    }
 
 
     @Test
@@ -34,7 +39,6 @@ class SpringBootAppTests(
         val primaryKeysMetadata = databaseMetadataService.getPrimaryKeysMetadata()
         println()
     }
-
 
 
 //    @Test

@@ -3,14 +3,14 @@ package com.addzero.web.modules.functionbox.functions
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +43,8 @@ class SoftInstallFunctionBox : FunctionBoxSpec {
         packageStatus: PackageStatus, onInstall: () -> Unit, onUninstall: () -> Unit
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), elevation = 4.dp
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+//            , elevation = 4.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -82,11 +83,11 @@ class SoftInstallFunctionBox : FunctionBoxSpec {
 
                         PackageStatus.Status.ERROR -> {
                             Column {
-                                Text("安装失败", color = MaterialTheme.colors.error)
+                                Text("安装失败"
+//                                , color = MaterialTheme.colors.error
+                                )
                                 Text(
                                     text = packageStatus.error,
-                                    style = MaterialTheme.typography.caption,
-                                    color = MaterialTheme.colors.error
                                 )
                                 Button(
                                     onClick = onInstall, modifier = Modifier.padding(top = 8.dp)

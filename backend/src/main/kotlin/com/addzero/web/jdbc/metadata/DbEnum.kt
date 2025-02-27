@@ -1,4 +1,4 @@
-package com.addzero.web.modules.sys.low.metadata
+package com.addzero.web.jdbc.metadata
 
 enum class DbEnum(val key: String) {
     MYSQL("mysql"),

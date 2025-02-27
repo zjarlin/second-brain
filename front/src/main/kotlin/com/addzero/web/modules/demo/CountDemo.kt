@@ -1,4 +1,5 @@
 package com.addzero.web.modules.demo
+
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
@@ -19,11 +20,19 @@ class CountDemo : MetaSpec {
     @Composable
     override fun render() {
         val state = UseCounter().render()
+        state.count1 += 1
+
+        val state2 = UseCounter().render()
 
         Column {
             DisplayCount(count = state.count1)
             DisplayCount(count = state.count2)
             DisplayCount(count = state.count3)
+
+
+            DisplayCount(count = state2.count1)
+            DisplayCount(count = state2.count2)
+            DisplayCount(count = state2.count3)
         }
     }
 

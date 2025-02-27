@@ -2,8 +2,8 @@ package com.addzero.web.modules.demo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,7 +14,7 @@ import com.addzero.web.modules.second_brain.dotfiles.EnumStatus
 import com.addzero.web.modules.second_brain.dotfiles.Enumplatforms
 import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
-import com.addzero.web.ui.hooks.UseCheckbox
+import com.addzero.web.ui.hooks.checkbox.UseCheckbox
 
 
 class CheckboxDemo : MetaSpec {

@@ -1,6 +1,6 @@
 package com.addzero.web.infra.jimmer.dynamicdatasource
 
-import com.addzero.web.modules.sys.low.metadata.DbEnum
+import com.addzero.web.jdbc.metadata.DbEnum
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import javax.sql.DataSource
 

@@ -1,9 +1,9 @@
 //package com.addzero.web.modules.note.knowlagegraph
 //import androidx.compose.foundation.layout.*
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.AccountTree
-//import androidx.compose.material.icons.filled.Apps
-//import androidx.compose.material.icons.filled.Search
+//import androidx.compose.material3.icons.Icons
+//import androidx.compose.material3.icons.filled.AccountTree
+//import androidx.compose.material3.icons.filled.Apps
+//import androidx.compose.material3.icons.filled.Search
 //import androidx.compose.material3.*
 //import androidx.compose.runtime.*
 //import androidx.compose.ui.Alignment

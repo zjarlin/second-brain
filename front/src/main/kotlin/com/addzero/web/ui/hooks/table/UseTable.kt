@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks
+package com.addzero.web.ui.hooks.table
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,15 +13,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cn.hutool.core.util.NumberUtil
 import com.addzero.common.kt_util.toNotBlankStr
+import com.addzero.web.ui.hooks.UseHook
 import org.babyfish.jimmer.client.ApiIgnore
 
 
 data class AddColumn<T>(
-    val title: String,
-    val getFun: (T) -> Any? = { },
-    val customRender: @Composable (Any) -> Unit = {
-        val toNotBlankStr = it.toNotBlankStr()
-        Text(toNotBlankStr)
+    val title: String, val getFun: (T) -> Any? ,  val customRender: @Composable (String) -> Unit = {
+        Text(it)
     }
 )
 
@@ -111,10 +109,9 @@ class UseTable<T>(
         ) {
             state.columns.forEach { column: AddColumn<T> ->
                 Box(modifier = Modifier.weight(1f)) {
-                    column.getFun(item).let {
-                        val toNotBlankStr = it.toNotBlankStr()
+                    val any = column.getFun(item)
+                    val toNotBlankStr = any.toNotBlankStr()
                         column.customRender(toNotBlankStr)
-                    }
                 }
             }
         }

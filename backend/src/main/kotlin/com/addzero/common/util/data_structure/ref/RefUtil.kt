@@ -7,11 +7,14 @@ import cn.hutool.core.util.TypeUtil
 import com.addzero.common.util.BigDecimals
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
+import io.swagger.v3.oas.annotations.media.Schema
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.memberProperties
 
 /**
  * 反射工具类
@@ -21,6 +24,22 @@ import kotlin.reflect.KClass
  */
 @Suppress("unused")
 object RefUtil {
+
+       fun <T : Any> getClassMetadata(clazz: KClass<T>): List<Map<String, Any?>> {
+        return clazz.memberProperties.map { property ->
+            val apiModelProperty = property.findAnnotation<Schema>()
+            mapOf(
+                "name" to property.name,
+                "type" to property.returnType.toString(),
+                "nullable" to property.returnType.isMarkedNullable,
+                "swaggerDescription" to apiModelProperty?.description,
+                "required" to apiModelProperty?.required
+            )
+        }
+    }
+
+
+
 
     fun <T : Any> currentClass(): KClass<T> {
         val typeArgument = TypeUtil.getTypeArgument(this.javaClass, 0)
