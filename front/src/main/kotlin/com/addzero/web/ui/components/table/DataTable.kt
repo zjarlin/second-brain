@@ -10,24 +10,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import io.swagger.v3.oas.annotations.media.Schema
 
 // 默认的排除字段
 
-
-
-// 表格样式配置
-object DataTableStyle {
-    val headerElevation = 2.dp
-    val indexColumnWidth = 60.dp
-    val operationColumnWidth = 96.dp
-    val horizontalPadding = 16.dp
-    val verticalPadding = 12.dp
-    val operationSpacing = 8.dp
-    val alternateRowAlpha = 0.3f
-}
 
 @Composable
 inline fun <reified T : Any> TableHeader(
@@ -38,22 +28,25 @@ inline fun <reified T : Any> TableHeader(
     val fields = java.declaredFields
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
-        tonalElevation = DataTableStyle.headerElevation,
-        color = MaterialTheme.colorScheme.surfaceVariant
+        modifier = modifier.fillMaxWidth().height(56.dp),
+        tonalElevation = 2.dp,
+        color = Color(0xFF2196F3)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(
-                horizontal = DataTableStyle.horizontalPadding,
-                vertical = DataTableStyle.verticalPadding
+                horizontal = 16.dp,
+                vertical = 12.dp
             ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 序号列
             Text(
                 text = "序号",
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.width(DataTableStyle.indexColumnWidth)
+                style = Typography().titleMedium.copy(
+                    fontWeight = FontWeight.Bold  // 加粗文字
+                ),
+                modifier = Modifier.width(60.dp),
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
             // 字段列
@@ -65,16 +58,22 @@ inline fun <reified T : Any> TableHeader(
                     val columnName = annotation?.description ?: field.name.replaceFirstChar { it.uppercase() }
                     Text(
                         text = columnName,
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.weight(1f)
+                        style = Typography().titleMedium.copy(
+                            fontWeight = FontWeight.Bold  // 加粗文字
+                        ),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
             // 操作列
             Text(
                 text = "操作",
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.width(DataTableStyle.operationColumnWidth)
+                style = Typography().titleMedium.copy(
+                    fontWeight = FontWeight.Bold  // 加粗文字
+                ),
+                modifier = Modifier.width(120.dp),
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -92,23 +91,21 @@ inline fun <reified T : Any> TableRow(
 
     val fields = T::class.java.declaredFields
     Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = if (index % 2 == 0) {
-            MaterialTheme.colorScheme.surface
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = DataTableStyle.alternateRowAlpha)
-        }
+        modifier = modifier.fillMaxWidth().height(48.dp),
+        color = MaterialTheme.colorScheme.surface
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = DataTableStyle.verticalPadding),
+            modifier = Modifier.fillMaxWidth().padding(
+                horizontal = 16.dp,
+                vertical = 12.dp
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 序号列
             Text(
                 text = (startIndex + index + 1).toString(),
-                modifier = Modifier.width(DataTableStyle.indexColumnWidth)
+                modifier = Modifier.width(60.dp)
+//                .wrapContentWidth(Alignment.Horizontal.Center)
             )
 
             // 字段值
@@ -119,6 +116,7 @@ inline fun <reified T : Any> TableRow(
                     Text(
                         text = field.get(item)?.toString() ?: "",
                         modifier = Modifier.weight(1f)
+//                        .wrapContentWidth(Alignment.Horizontal.Center)
                     )
                 }
 
@@ -139,8 +137,8 @@ fun OperationButtons(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.width(DataTableStyle.operationColumnWidth),
-        horizontalArrangement = Arrangement.spacedBy(DataTableStyle.operationSpacing)
+        modifier = modifier.width(96.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         IconButton(
             onClick = onEdit,
@@ -178,7 +176,7 @@ inline fun <reified T : Any> DataTable(
         HorizontalDivider()
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(horizontal = DataTableStyle.horizontalPadding)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
             itemsIndexed(records) { index, item ->
                 TableRow(

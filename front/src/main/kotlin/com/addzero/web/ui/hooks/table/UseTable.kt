@@ -9,9 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,8 +30,13 @@ inline fun <reified E : Any> UseTable(
     noinline onDelete: (E) -> Unit = {},
     noinline onValueChange: (TableState<E>) -> Unit = {},
 ) {
+    val clazz = E::class
+
+    var showEditDialog by remember { mutableStateOf(false) }
+    var currentEditItem by remember { mutableStateOf<E?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var currentDeleteItem by remember { mutableStateOf<E?>(null) }
     val state = remember {
-        val clazz = E::class
         val mergedColumns = mergeColumns<E>(clazz, excludeFields, columns)
         TableState(
             initialColumns = mergedColumns
@@ -55,7 +58,10 @@ inline fun <reified E : Any> UseTable(
                     Box(modifier = Modifier.weight(1f)) {
                         Column(modifier = Modifier.fillMaxSize()) {
                             // 表格头部
-                            Surface {
+                            Surface(
+                                tonalElevation = 2.dp,
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f)
+                            ) {
                                 Row(modifier = Modifier.horizontalScroll(scrollState)) {
                                     // 序号列
                                     Text(
@@ -97,7 +103,7 @@ inline fun <reified E : Any> UseTable(
                                         }
                                     }
 //                                    if (index < state.dataList.size - 1) {
-                                        HorizontalDivider()
+                                    HorizontalDivider()
 //                                    }
                                 }
                             }
@@ -119,10 +125,16 @@ inline fun <reified E : Any> UseTable(
                             LazyColumn {
                                 itemsIndexed(state.dataList) { index, item ->
                                     Row(modifier = Modifier.fillMaxWidth()) {
-                                        IconButton(onClick = { onEdit(item) }) {
+                                        IconButton(onClick = {
+                                            currentEditItem = item
+                                            showEditDialog = true
+                                        }) {
                                             Icon(Icons.Default.Edit, "编辑")
                                         }
-                                        IconButton(onClick = { onDelete(item) }) {
+                                        IconButton(onClick = {
+                                            currentDeleteItem = item
+                                            showDeleteDialog = true
+                                        }) {
                                             Icon(Icons.Default.Delete, "删除")
                                         }
                                     }
@@ -156,6 +168,49 @@ inline fun <reified E : Any> UseTable(
                         currentPageSize = state.pageSize,
                         onPageSizeChange = { state.updatePageSize(it) })
                 }
+            }
+
+            // 编辑对话框
+            if (showEditDialog && currentEditItem != null) {
+                AlertDialog(
+                    onDismissRequest = { showEditDialog = false },
+                    title = { Text("编辑") },
+                    text = {
+                        DynamicForm(
+                            item = currentEditItem!!,
+                            onSave = { updatedItem ->
+                                onEdit(updatedItem)
+                                showEditDialog = false
+                            },
+                            onCancel = { showEditDialog = false }
+                        )
+                    },
+                    confirmButton = { },
+                    dismissButton = { }
+                )
+            }
+            // 删除确认对话框
+            if (showDeleteDialog && currentDeleteItem != null) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = { Text("确认删除") },
+                    text = { Text("确定要删除这条记录吗？") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                onDelete(currentDeleteItem!!)
+                                showDeleteDialog = false
+                            }
+                        ) {
+                            Text("确认")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteDialog = false }) {
+                            Text("取消")
+                        }
+                    }
+                )
             }
         }
     }
