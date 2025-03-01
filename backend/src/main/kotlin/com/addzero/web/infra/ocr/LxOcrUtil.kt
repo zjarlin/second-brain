@@ -1,34 +1,21 @@
 package com.addzero.web.infra.ocr
 
-import cn.hutool.core.io.FileUtil
 import cn.hutool.extra.spring.SpringUtil
 import cn.hutool.http.HttpRequest
-import com.addzero.web.infra.ocr.LxOcrUtil.ocr
 import com.alibaba.fastjson2.JSON
 import java.io.File
 
-//fun main() {
-//    val s = "192.168.0.110:8089"
-//    val filePath = "/Users/zjarlin/Desktop/Snipaste_2024-10-16_21-30-45.png"
-//    val file = FileUtil.file(filePath)
-//    val name = FileUtil.getName(filePath)
-//    val readBytes1 = FileUtil.readBytes(filePath)
-//    val ocr = ocr(s, readBytes1, name)
-//    println()
-//}
 
-fun doaisjdoi(): String {
+fun getip(): String {
     try {
         return SpringUtil.getProperty("ocr.ip")
     } catch (e: Exception) {
-        return "192.168.0.110:8089"
+        return "192.168.0.1:8089"
     }
 }
 
 
 object LxOcrUtil {
-
-    val property = doaisjdoi()
 
     /**
      * docker run -itd --rm -p 8089:8089 --name trwebocr mmmz/trwebocr:latest
@@ -38,7 +25,7 @@ object LxOcrUtil {
      * @return [Pair<String, List<String>>?]
      *///@Throws(Exception::class)
     fun ocr(
-        ip: String = property,
+        ip: String = getip(),
         requestCustomizer: (HttpRequest) -> Unit = {},  //
         // Consumer<HttpRequest> 参数
     ): String {
@@ -60,19 +47,19 @@ object LxOcrUtil {
         return collectJoined
     }
 
-    fun ocr(ip: String = property, bytes: ByteArray, fileName: String): String {
+    fun ocr(ip: String = getip(), bytes: ByteArray, fileName: String): String {
 //        val post = HttpRequest.post("$ip/api/tr-run/")
         val ocr = ocr { run { it.form("file", bytes, fileName) } }
         return ocr
     }
 
-    fun ocr(ip: String = property, file: File): String {
+    fun ocr(ip: String = getip(), file: File): String {
         val post = HttpRequest.post("$ip/api/tr-run/")
         val ocr = ocr { run { it.form("file", file) } }
         return ocr
     }
 
-    fun ocr(ip: String = property, resource: cn.hutool.core.io.resource.Resource):
+    fun ocr(ip: String = getip(), resource: cn.hutool.core.io.resource.Resource):
             String {
         val post = HttpRequest.post("$ip/api/tr-run/")
         val ocr = ocr { run { it.form("file", resource) } }

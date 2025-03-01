@@ -1,13 +1,11 @@
 package com.addzero.web.modules.sys.rbac
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountTree
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import com.addzero.web.ui.system.dynamicroute.MetaSpec
+import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 
 
 class DepartmentManagementSpec : MetaSpec {

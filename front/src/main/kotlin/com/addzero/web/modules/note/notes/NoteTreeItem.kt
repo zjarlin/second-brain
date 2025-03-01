@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.common.kt_util.isNotEmpty
 import com.addzero.web.modules.second_brain.note.BizNote
-import com.addzero.web.modules.second_brain.note.dto.BizNoteView
 
 @Composable
 fun NoteTreeItem(

@@ -1,5 +1,6 @@
 package com.addzero.web.modules.demo
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -7,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
+import com.addzero.web.ui.system.dynamicroute.MetaSpec
+import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.hooks.demo.UseCounter
 
 class CountDemo : MetaSpec {
@@ -21,10 +22,11 @@ class CountDemo : MetaSpec {
         )
 
     @Composable
+    @Preview
     override fun render() {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            val state = UseCounter().render()
-            val state2 = UseCounter().render()
+            val state = UseCounter().getState()
+            val state2 = UseCounter().getState()
 
             Spacer(modifier = Modifier.height(16.dp))
 

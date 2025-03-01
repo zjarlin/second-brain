@@ -18,7 +18,6 @@ dependencies {
     implementation(compose.material3)
 //    implementation(libs.compose.material3.desktop)
 //    implementation(libs.compose.icons.extended)
-    implementation(libs.kotlinx.coroutines.core)
     implementation(compose.materialIconsExtended)
 
 //    implementation(libs.ktor.client.core)

@@ -1,5 +1,21 @@
 package com.addzero.common.kt_util
 
+import cn.hutool.core.collection.CollUtil
+
+//JlCollutil
+
+
+fun <T, K> List<T>.addAllIfAbsentByKey(other: Collection<T>, keySelector: (T) -> K): Boolean? {
+    var modified = false
+    other.forEach { element ->
+        if (none { keySelector(it) == keySelector(element) }) {
+            CollUtil.addAll(this, element)
+            modified = true
+        }
+    }
+    return modified
+}
+
 fun <E> List<E>.removeAt(i: Int) {
     this.toMutableList().removeAt(i)
 }

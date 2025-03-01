@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.hutool.core.util.ClassUtil
 import com.addzero.web.modules.functionbox.model.FunctionBoxSpec
-import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
+import com.addzero.web.ui.system.dynamicroute.MetaSpec
+import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 
 @Composable
 fun <F : FunctionBoxSpec> FunctionBoxItem(

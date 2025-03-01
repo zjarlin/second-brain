@@ -47,6 +47,7 @@ dependencies {
     // Kotlin Dependencies
     // ----------------------------------------
 //    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.core)
 
     implementation("org.tomlj:tomlj:1.1.1")
     // 引入 Spring Boot 相关依赖

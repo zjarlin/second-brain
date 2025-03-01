@@ -7,8 +7,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.addzero.SpringBootApp.Companion.runSpringBootApp
-import com.addzero.web.ui.layout.MainLayout
-import com.addzero.web.ui.theme.AppTheme
+import com.addzero.web.ui.system.layout.MainLayout
+import com.addzero.web.ui.system.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

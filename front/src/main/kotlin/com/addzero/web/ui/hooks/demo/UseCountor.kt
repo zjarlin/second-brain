@@ -9,23 +9,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
 import com.addzero.web.ui.hooks.UseHook
 
-class UseCounter : UseHook<UseCounter>() {
-    // 使用 State 封装状态
+class UseCounter : UseHook<UseCounter> {
+
     var count1 by mutableStateOf(0)
     var count2 by mutableStateOf(0)
     var count3 by mutableStateOf(0)
-
-    @Composable
-    override fun show(state: UseCounter) {
-        Button(onClick = {
-            state.count1 += 1
-            state.count2 += 2
-            state.count3 += 3
-        }) {
-            Text("增加计数1: ${state.count1}", fontSize = 18.sp)
-            Text("增加计数2: ${state.count2}", fontSize = 18.sp)
-            Text("增加计数3: ${state.count3}", fontSize = 18.sp)
+    override val render: @Composable () -> Unit
+        get() = {
+            Button(onClick = {
+                count1 += 1
+                count2 += 2
+                count3 += 3
+            }) {
+                Text("增加计数1: ${count1}", fontSize = 18.sp)
+                Text("增加计数2: ${count2}", fontSize = 18.sp)
+                Text("增加计数3: ${count3}", fontSize = 18.sp)
+            }
         }
-    }
-
 }

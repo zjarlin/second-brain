@@ -18,6 +18,8 @@ enum class ComponentType {
     TREE_SELECT,
     /** 级联选择器 */
     CASCADE_SELECT,
+    NUMBER,
     /** 自动完成 */
-    AUTO_COMPLETE
+    AUTO_COMPLETE;
+
 }

@@ -9,8 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
+import com.addzero.web.ui.system.dynamicroute.MetaSpec
+import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 
 class SurfaceDemo : MetaSpec {
 

@@ -1,11 +1,9 @@
 package com.addzero.addzero_common
 
-import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.jdbc.metadata.ColumnMetadata
 import com.addzero.web.jdbc.metadata.DatabaseMetadataService
 import com.addzero.web.modules.second_brain.note.BizNote
 import org.babyfish.jimmer.sql.kt.KSqlClient
-import org.babyfish.jimmer.sql.runtime.Customizer
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -60,14 +58,6 @@ class SpringBootAppTests(
     }
 
 
-    @Test
-    fun contextLoads() {
-        val java = Customizer::class.java
-        val bean = SpringUtil.getBean(java)
-        println(bean)
-//        val dbMetaInfos = postgresMetadataService.getDbMetaInfos()
-//        println(dbMetaInfos)
-    }
 
 
 }

@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.ui.components.button.AddButton
-import com.addzero.web.ui.components.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.components.system.dynamicroute.RouteMetadata
+import com.addzero.web.ui.system.dynamicroute.MetaSpec
+import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.components.layout.AddRow
 
 
