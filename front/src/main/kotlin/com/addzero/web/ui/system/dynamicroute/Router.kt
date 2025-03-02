@@ -7,6 +7,8 @@ package com.addzero.web.ui.system.dynamicroute
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Router(
+
+    val routerPath: String = "/customRoutes/default ",
     val parentName: String = "",
     val title: String = "标题",
     val visible: Boolean = true,

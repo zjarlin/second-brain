@@ -17,7 +17,8 @@ interface MetaSpec {
             title = "标题",
             icon = Icons.Filled.Apps,
             visible = true,
-            permissions = emptyList()
+            permissions = emptyList(),
+            routerPath = refPath,
         )
 
     @Composable

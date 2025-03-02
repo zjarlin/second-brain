@@ -18,19 +18,13 @@ import com.addzero.web.ui.system.dynamicroute.RouteUtil
  */
 @Composable
 fun Breadcrumb(
-    currentRouteRefPath: String,
-    onPathClick: (String) -> Unit = {}
+    currentRouteRefPath: String, onPathClick: (String) -> Unit = {}
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        color = MaterialTheme.colorScheme.surface
+        modifier = Modifier.fillMaxWidth().height(48.dp), color = MaterialTheme.colorScheme.surface
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val breadcrumbPath = RouteUtil.getBreadcrumbPath(currentRouteRefPath)
@@ -55,8 +49,7 @@ fun Breadcrumb(
                         },
                         modifier = Modifier.clickable(enabled = index != breadcrumbPath.lastIndex) {
                             onPathClick(path)
-                        }
-                    )
+                        })
                 }
             }
         }

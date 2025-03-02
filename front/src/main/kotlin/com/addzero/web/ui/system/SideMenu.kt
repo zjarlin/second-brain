@@ -4,17 +4,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cn.hutool.core.util.StrUtil
-import com.addzero.web.ui.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 import com.addzero.web.ui.system.dynamicroute.RouteUtil
-import kotlin.reflect.KClass
-
 
 
 @Composable
@@ -23,36 +22,13 @@ fun SideMenu(
 ) {
     Column(modifier = Modifier.width(240.dp)) {
         // 获取所有路由组件的元数据
-        val routeMetadataMap = RouteUtil.getAllRouteComponents()
-
-        // 转换路由数据
-        val transform: (Map.Entry<KClass<*>, MetaSpec>) -> Pair<String?, MetaSpec> = { it.key.qualifiedName to it.value }
-
-        // 提取父级路由
-        val parentRoutes = routeMetadataMap
-            .filter { it.value.metadata.parentName != null }
-            .map { entry ->
-                val parentName = entry.value.metadata.parentName
-                val parentMetadata = RouteMetadata(
-                    parentName = null,
-                    title = parentName.toString(),
-                    icon = Icons.Default.Menu,
-                    visible = true,
-                    permissions = emptyList()
-                )
-                parentName to object : MetaSpec {
-                    override val refPath: String = ""
-                    override val metadata: RouteMetadata = parentMetadata
-                }
-            }.distinctBy { it.first }
-
-        // 转换实际路由
-        val childRoutes = routeMetadataMap.map(transform)
-
-        // 合并路由并按父级分组
-        val allRoutes = (parentRoutes + childRoutes)
-            .filter { it.second.metadata.visible }
-            .distinctBy { it.first ?: it.second.metadata.title }
+        val allRoutes = RouteUtil.scanMetas()
+            // 过滤可见的路由
+            .filter { it.visible }
+            // 如果需要，这里可以添加权限过滤
+            // .filter { route -> userPermissions.containsAll(route.permissions) }
+            // 按排序字段排序
+            .sortedBy { it.order }
 
         renderTreeSider(allRoutes, currentRoute, onRouteChange)
     }
@@ -60,29 +36,29 @@ fun SideMenu(
 
 @Composable
 private fun renderTreeSider(
-    allRoutes: List<Pair<String?, MetaSpec>>,
+    allRoutes: List<RouteMetadata>,
     currentRoute: String,
     onRouteChange: (String) -> Unit
 ) {
     // 按父级路由分组
-    val routeGroups = allRoutes.groupBy { it.second.metadata.parentName }
+    val routeGroups = allRoutes.groupBy { it.parentName }
 
     // 渲染根级菜单项
-    routeGroups[null]?.forEach { (qualifiedName, spec) ->
-        val contentDescription = spec.metadata.title
+    routeGroups[null]?.forEach { route ->
+        val contentDescription = route.title
         val isExpanded = remember { mutableStateOf(true) }
 
         Column {
             // 渲染当前菜单项
             NavigationDrawerItem(
                 icon = {
-                    val imageVector = spec.metadata.icon
+                    val imageVector = route.icon
                     imageVector?.let { Icon(it, contentDescription = contentDescription) }
                 },
                 label = { Text(contentDescription) },
                 badge = {
                     // 只有当存在子菜单时才显示箭头图标
-                    if (routeGroups[spec.metadata.title] != null) {
+                    if (routeGroups[route.title] != null) {
                         val arrowIcon =
                             if (isExpanded.value) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight
                         Icon(
@@ -92,11 +68,9 @@ private fun renderTreeSider(
                         )
                     }
                 },
-                selected = currentRoute == qualifiedName,
+                selected = currentRoute == route.routerPath,
                 onClick = {
-                    if (qualifiedName != null) {
-                        onRouteChange(qualifiedName)
-                    }
+                    onRouteChange(route.routerPath)
                     isExpanded.value = !isExpanded.value
                 },
                 modifier = Modifier.padding(vertical = 4.dp)
@@ -104,18 +78,18 @@ private fun renderTreeSider(
 
             // 如果存在子菜单项且展开状态，则渲染子菜单
             if (isExpanded.value) {
-                val childRoutes = routeGroups[spec.metadata.title]
-                childRoutes?.forEach { (childQualifiedName, childSpec) ->
-                    if (childSpec.metadata.visible) {
+                val childRoutes = routeGroups[route.title]
+                childRoutes?.forEach { childRoute ->
+                    if (childRoute.visible) {
                         Box(modifier = Modifier.padding(start = 16.dp)) {
                             NavigationDrawerItem(
                                 icon = {
-                                    val imageVector = childSpec.metadata.icon
-                                    imageVector?.let { Icon(it, contentDescription = childSpec.metadata.title) }
+                                    val imageVector = childRoute.icon
+                                    imageVector?.let { Icon(it, contentDescription = childRoute.title) }
                                 },
-                                label = { Text(childSpec.metadata.title) },
-                                selected = currentRoute == childQualifiedName,
-                                onClick = { childQualifiedName?.let { onRouteChange(it) } },
+                                label = { Text(childRoute.title) },
+                                selected = currentRoute == childRoute.routerPath,
+                                onClick = { onRouteChange(childRoute.routerPath) },
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
                         }
@@ -123,33 +97,5 @@ private fun renderTreeSider(
                 }
             }
         }
-    }
-}
-
-
-@Composable
-private fun renderFlatSider(
-    routeMetadataMap: Map<KClass<*>, MetaSpec>,
-    currentRoute: String,
-    onRouteChange: (String) -> Unit
-) {
-    routeMetadataMap.forEach {
-        val route = it.key
-        val spec = it.value
-        val contentDescription = spec.metadata.title
-
-        val qualifiedName = route.qualifiedName
-        NavigationDrawerItem(
-            icon = {
-                val imageVector = spec.metadata.icon
-                imageVector?.let { Icon(it, contentDescription = contentDescription) }
-            },
-            label = { Text(contentDescription) },
-            selected = currentRoute == qualifiedName,
-            onClick = { onRouteChange(qualifiedName!!) },
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
-
-
     }
 }
