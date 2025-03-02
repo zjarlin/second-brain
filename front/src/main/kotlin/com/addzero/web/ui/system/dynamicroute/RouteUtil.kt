@@ -8,8 +8,6 @@ import cn.hutool.core.util.StrUtil
 import com.addzero.common.kt_util.isNotBlank
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.common.util.data_structure.tree.List2TreeUtil
-import java.util.function.BiConsumer
-import java.util.function.Function
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
 
@@ -26,15 +24,14 @@ object RouteUtil {
     fun convertRoutesToTree(routes: List<RouteMetadata>): List<RouteMetadata> {
         return List2TreeUtil.list2Tree(
             source = routes,
-            idFun = Function { it.title },
-            pidFun = Function { it.parentName },
-            getChildFun = Function { it.children },
-            setChildFun = BiConsumer { route, children ->
+            idFun = { it.title },
+            pidFun = { it.parentName },
+            getChildFun = { it.children },
+            setChildFun = { route, children ->
                 // 由于RouteMetadata是不可变的，我们需要创建一个新的实例
                 val newRoute = route.copy(children = children)
                 // 在实际使用中，这里会返回新对象
-            }
-        )
+            })
     }
 
 
@@ -55,74 +52,75 @@ object RouteUtil {
 
 
         // 处理上级名称为空的路由,把父类当做虚拟路由添加到列表中
-        val virtualParentRoutes = allRoutes
-            .filter { it.visible }
-            .filter { it.parentName.isNotBlank() }
-            .distinctBy { it.parentName }
+        val virtualParentRoutes =
+            allRoutes.filter { it.visible }.filter { it.parentName.isNotBlank() }.distinctBy { it.parentName }
 
-            .map {
-                val parentName = it.parentName.toNotBlankStr()
-                RouteMetadata(
-                    routerPath = "$parentName/${it.routerPath}",
-                    title = parentName,
-                    parentName = null,
-                    icon = Icons.Default.KeyboardArrowDown,
-                    visible = true,
-                    permissions = emptyList(),
-                    order = 0.0,
-                    children = emptyList()
-                )
-            }
+                .map {
+                    val parentName = it.parentName.toNotBlankStr()
+                    RouteMetadata(
+                        routerPath = "$parentName/${it.routerPath}",
+                        title = parentName,
+                        parentName = null,
+                        icon = Icons.Default.KeyboardArrowDown,
+                        visible = true,
+                        permissions = emptyList(),
+                        order = 0.0,
+                        children = emptyList()
+                    )
+                }
 
         allRoutes.addAll(virtualParentRoutes)
 
         // 过滤和排序
-        return allRoutes
-            .filter { it.visible }
-            .sortedBy { it.title }
-            .sortedBy { it.order }
+        val sortedBy = allRoutes.filter { it.visible }.sortedBy { it.title }.sortedBy { it.order }
+        return sortedBy
     }
 
     private fun getFunctionsRouteMetaData(packageName: String): List<RouteMetadata> {
-        val toList1 = ClassUtil.scanPackage(packageName, {
+
+
+        // 获取所有带有 @Composable 注解的方法
+
+
+        val scanPackage = ClassUtil.scanPackage(packageName, {
             val functions = it.kotlin.functions
             val hasRouter = functions.any {
                 it.annotations.any {
                     val b = it.annotationClass == Router::class
-                    val b2 = it.annotationClass.simpleName == "Composable"
-                    b && b2
+                    b
                 }
             }
             hasRouter
-        }).flatMap {
+        })
+        val toList1 = scanPackage.flatMap {
             val kotlin = it.kotlin
             val qualifiedName = kotlin.qualifiedName
             val functions = kotlin.functions
-            functions.map {
-                //函数限定名作为路由路径
-                val refPath = "$qualifiedName#${it.name}"
+            functions
+                .mapNotNull {
+                    //函数限定名作为路由路径
+                    val refPath = "$qualifiedName#${it.name}"
 
-                val routorAnno = it.findAnnotation<Router>()!!
-                val routerPath = routorAnno.routerPath
-                val firstNonNullRouterPath = StrUtil.firstNonNull(
-                    routerPath,
-                    refPath
-                )
-                RouteMetadata(
-                    routerPath = firstNonNullRouterPath,
-                    title = routorAnno.title,
-                    parentName = routorAnno.parentName,
-                    icon = Icons.Default.Apps,
-                    visible = true,
-                    permissions = emptyList(),
-                    order = 0.0,
-                    children = emptyList()
-                )
+                    val routorAnno = it.findAnnotation<Router>() ?: return@mapNotNull null
+                    val routerPath = routorAnno.routerPath
+                    val firstNonNullRouterPath = StrUtil.firstNonBlank(routerPath, refPath)
+
+                    RouteMetadata(
+                        routerPath = firstNonNullRouterPath,
+                        title = routorAnno.title,
+                        parentName = routorAnno.parentName,
+                        icon = Icons.Default.Apps,
+                        visible = true,
+                        permissions = emptyList(),
+                        order = 0.0,
+                        children = emptyList(),
+                        func = { it.call() },
+                        clazz = kotlin
+                    )
 
 
-            }
-        }
-            .toList()
+                }
+        }.toList()
 
 
         return toList1
@@ -139,15 +137,12 @@ object RouteUtil {
             val metaSpec = instance as MetaSpec
             val refPath = kClass.qualifiedName!!
             val routeMetadata = metaSpec.metadata
-
             //采用类的全限定类名作为路由路径
-
-
             routeMetadata.routerPath = refPath
+            routeMetadata.clazz = kClass
             routeMetadata
 
-        }
-            .toList()
+        }.toList()
         return toList
     }
 
@@ -200,39 +195,10 @@ object RouteUtil {
      * @param path 路由路径
      * @return 路由组件类和实例
      */
-    fun getRouteComponentByPath(path: String): Pair<kotlin.reflect.KClass<*>, MetaSpec>? {
-        val scanPackageBySuper = ClassUtil.scanPackageBySuper(META_PKG, MetaSpec::class.java)
-
-        // 查找匹配的路由组件
-        val matchedClass = scanPackageBySuper.find {
-            val kClass = it.kotlin
-            val qualifiedName = kClass.qualifiedName
-            qualifiedName == path
-        }
-
-        if (matchedClass != null) {
-            val instance = matchedClass.getDeclaredConstructor().newInstance() as MetaSpec
-            return matchedClass.kotlin to instance
-        }
-
-        // 如果是函数路由，则需要查找包含该函数的类
-        if (path.contains("#")) {
-            val parts = path.split("#")
-            val className = parts[0]
-            val functionName = parts[1]
-
-            val classWithFunction = scanPackageBySuper.find {
-                val kClass = it.kotlin
-                val qualifiedName = kClass.qualifiedName
-                qualifiedName == className
-            }
-
-            if (classWithFunction != null) {
-                val instance = classWithFunction.getDeclaredConstructor().newInstance() as MetaSpec
-                return classWithFunction.kotlin to instance
-            }
-        }
-
-        return null
+    fun getRouteComponentByPath(path: String): RouteMetadata? {
+        val scanMetas = scanMetas()
+        val associate = scanMetas.associateBy { it.routerPath }
+        val routeMetadata = associate[path]
+        return routeMetadata
     }
 }

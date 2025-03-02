@@ -20,7 +20,6 @@ import com.addzero.web.ui.hooks.checkbox.CheckboxGroup
 import com.addzero.web.ui.hooks.checkbox.UseCheckbox
 import com.addzero.web.ui.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.system.dynamicroute.RouteMetadata
-import com.addzero.web.ui.system.dynamicroute.Router
 import kotlin.enums.EnumEntries
 
 
@@ -50,21 +49,6 @@ class CheckboxDemo : MetaSpec {
 //        extracted(mapOf)
     }
 
-
-    /**
-     *todo 测试动态路由
-     */
-    @Composable
-    @Router(parentName = "测试demo", title = "xxxxxxxxxxxxxx")
-     fun render222() {
-        val mapOf = mapOf(
-            "定义类型" to EnumDefType.entries to false,
-            "操作系统" to EnumOsType.entries to true,
-            "系统架构" to Enumplatforms.entries to false,
-            "定义类型" to EnumStatus.entries to false,
-        )
-        extracted(mapOf)
-    }
 
 
 
