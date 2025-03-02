@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil
 import com.addzero.common.kt_util.isNotBlank
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.common.util.data_structure.tree.List2TreeUtil
+import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
 
@@ -95,7 +96,7 @@ object RouteUtil {
         val toList1 = scanPackage.flatMap {
             val kotlin = it.kotlin
             val qualifiedName = kotlin.qualifiedName
-            val functions = kotlin.functions
+            val functions = kotlin.declaredFunctions
             functions
                 .mapNotNull {
                     //函数限定名作为路由路径

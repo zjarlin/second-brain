@@ -8,7 +8,10 @@ import kotlin.reflect.KClass
 /**
  * 路由元数据实现类
  */
+
 data class RouteMetadata(
+
+
     //会有默认实现 ,函数式则ref#functionName,类Spec则全限定类名
     var routerPath: String="",
     //id
@@ -22,4 +25,8 @@ data class RouteMetadata(
     val children: List<RouteMetadata> = emptyList(),
     var clazz: KClass<*>?=null,
     val func: (() -> Unit)? = null
-)
+){
+    @JvmConstructor
+   constructor()
+
+}
