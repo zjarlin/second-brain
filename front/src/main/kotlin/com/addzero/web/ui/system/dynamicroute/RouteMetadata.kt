@@ -26,7 +26,7 @@ data class RouteMetadata(
     var clazz: KClass<*>?=null,
     val func: (() -> Unit)? = null
 ){
-    @JvmConstructor
-   constructor()
+//    @JvmConstructor
+//   constructor()
 
 }

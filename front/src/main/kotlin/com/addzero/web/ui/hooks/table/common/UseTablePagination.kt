@@ -44,73 +44,73 @@ class UseTablePagination(private val initPageNo: Int = 1) : UseHook<UseTablePagi
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        // 分页导航
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier
+                    // 分页导航
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                    ) {
+                        OutlinedButton(
+                            onClick = { pageNo -= 1 },
+                            enabled = pageNo > (initPageNo - 1),
+                            modifier = Modifier.height(36.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp)
                         ) {
-                            OutlinedButton(
-                                onClick = { pageNo -= 1 },
-                                enabled = pageNo > (initPageNo - 1),
-                                modifier = Modifier.height(36.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp)
-                            ) {
-                                Text("上一页", style = MaterialTheme.typography.bodyMedium)
-                            }
+                            Text("上一页", style = MaterialTheme.typography.bodyMedium)
+                        }
 
-                            Text(
-                                "$pageNo/$totalPages",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
+                        Text(
+                            "$pageNo/$totalPages",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
 
+                        OutlinedButton(
+                            onClick = { pageNo += 1 },
+                            enabled = pageNo < totalPages,
+                            modifier = Modifier.height(36.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp)
+                        ) {
+                            Text("下一页", style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+//                      间隔符
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // 页面大小选择器
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Text(
+                            "每页显示: ", style = MaterialTheme.typography.bodyMedium
+                        )
+                        listOf(10L, 30L, 50L, 100L).forEach { size ->
                             OutlinedButton(
-                                onClick = { pageNo += 1 },
-                                enabled = pageNo < totalPages,
-                                modifier = Modifier.height(36.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp)
+                                onClick = { pageNo = size.toInt() },
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                             ) {
-                                Text("下一页", style = MaterialTheme.typography.bodyMedium)
+                                Text("$size")
                             }
                         }
 
-                        // 页面大小选择器
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)
-                        ) {
-                            Text(
-                                "每页显示: ", style = MaterialTheme.typography.bodyMedium
-                            )
-                            listOf(10L, 30L, 50L, 100L).forEach { size ->
-                                OutlinedButton(
-                                    onClick = { pageNo = size.toInt() },
-                                    modifier = Modifier.padding(horizontal = 4.dp),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                                ) {
-                                    Text("$size")
+                        // 自定义页面大小输入
+                        OutlinedTextField(
+                            value = pageSize.toString(),
+                            onValueChange = {
+                                val b = NumberUtil.isNumber(it) && it.isNotBlank()
+                                if (b) {
+                                    pageNo = initPageNo
+
+                                    pageSize = it.toInt()
                                 }
-                            }
-
-                            // 自定义页面大小输入
-                            OutlinedTextField(
-                                value = pageSize.toString(),
-                                onValueChange = {
-                                    val b = NumberUtil.isNumber(it) && it.isNotBlank()
-                                    if (b) {
-                                        pageNo = initPageNo
-
-                                        pageSize = it.toInt()
-                                    }
-                                },
-                                modifier = Modifier.width(80.dp).padding(horizontal = 4.dp),
-                                singleLine = true,
-                                textStyle = MaterialTheme.typography.bodyMedium,
-                                placeholder = { Text("自定义", style = MaterialTheme.typography.bodyMedium) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
-                        }
+                            },
+                            modifier = Modifier.width(80.dp).padding(horizontal = 4.dp),
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodyMedium,
+                            placeholder = { Text("自定义", style = MaterialTheme.typography.bodyMedium) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
                     }
                 }
             }

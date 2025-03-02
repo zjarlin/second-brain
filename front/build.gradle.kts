@@ -13,7 +13,7 @@ plugins {
 
 dependencies {
 //    implementation("org.reflections:reflections:0.10.2")
-    implementation(libs.kotlin.reflect)
+//    implementation(libs.kotlin.reflect)
 //    kotlin-reflect
 
     api(project(":backend"))

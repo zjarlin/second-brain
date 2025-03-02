@@ -6,16 +6,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.modules.demo.ButtonDemo
-import com.addzero.web.ui.system.Breadcrumb
-import com.addzero.web.ui.system.ErrorHandler
-import com.addzero.web.ui.system.MainContent
-import com.addzero.web.ui.system.SideMenu
-import com.addzero.web.ui.system.TopBar
+import com.addzero.web.modules.demo.TableDemo
+import com.addzero.web.ui.system.*
 
 @Composable
 fun MainLayout() {
-    var currentRoute by remember { mutableStateOf(ButtonDemo::class .qualifiedName!!) }
+    //首页设置
+    var currentRoute by remember { mutableStateOf(TableDemo::class .qualifiedName!!) }
 
     // 使用ErrorHandler包装整个应用内容
     ErrorHandler {
