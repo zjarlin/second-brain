@@ -3,6 +3,8 @@ package com.addzero.web.ui.hooks.table.common
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -33,10 +35,15 @@ class UseTableLayout<E : Any> : UseHook<UseTableLayout<E>> {
 
     override val render: @Composable () -> Unit
         get() = {
-            Column(modifier = modifier) {
+            val horizontalScrollState = rememberScrollState()
+            
+            Column(modifier = Modifier) {
                 // 表头
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(horizontalScrollState)
+                        .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     columns.forEach { column ->
@@ -58,7 +65,10 @@ class UseTableLayout<E : Any> : UseHook<UseTableLayout<E>> {
                 LazyColumn {
                     items(dataList, key = { getIdFun(it) }) { item ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(horizontalScrollState)
+                                .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {

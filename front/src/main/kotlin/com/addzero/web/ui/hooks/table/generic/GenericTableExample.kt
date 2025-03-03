@@ -3,11 +3,16 @@ package com.addzero.web.ui.hooks.table.generic
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.common.consts.sql
+import com.addzero.web.modules.sys.area.SysArea
+import com.addzero.web.modules.sys.area.name
 import com.addzero.web.ui.hooks.table.entity.AddColumn
-import com.addzero.web.ui.hooks.table.entity.RenderType
+import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
+import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
 // 示例数据实体
 data class User(
@@ -20,49 +25,48 @@ data class User(
 
 @Composable
 fun GenericTableExample() {
-    // 模拟数据
-    var users by remember { mutableStateOf(listOf(
-        User(1, "张三", 25, "zhangsan@example.com", true),
-        User(2, "李四", 30, "lisi@example.com", false),
-        User(3, "王五", 28, "wangwu@example.com", true)
-    )) }
-
     // 自定义列配置
-    val columns = listOf(
-        AddColumn<User>(
-            key = "name",
-            title = "姓名",
-            getFun = { it.name }
-        ),
-        AddColumn<User>(
-            key = "age",
-            title = "年龄",
-            getFun = { it.age.toString() }
-        ),
-        AddColumn<User>(
-            key = "email",
-            title = "邮箱",
-            getFun = { it.email }
-        ),
-        AddColumn<User>(
-            key = "active",
-            title = "状态",
-            getRenderType = { RenderType.TAG },
-            getFun = { if (it.active) "激活" else "禁用" }
-        )
+    val addColumn = AddColumn<SysArea>(
+//        key = TODO(),
+        title = "名字是否有黑",
+//        placeholder = TODO(),
+//        defaultValue = TODO(),
+//        getRenderType = TODO(),
+//        required = TODO(),
+//        validator = TODO(),
+//        errorMessage = TODO(),
+//        dependsOn = TODO(),
+//        order = TODO(),
+        getFun = { it.blackFlag },
+        customRender = {
+            val blackFlag = it.blackFlag!!
+            if (blackFlag) {
+
+                Text("名字包含黑")
+            } else {
+                Text("名字不包含黑")
+
+            }
+
+        }
     )
 
     Surface(modifier = Modifier.padding(16.dp)) {
         Column {
-            GenericTable(
-                columns = columns,
+            GenericTable<SysArea>(
+                columns = listOf(addColumn),
                 onSearch = { viewModel ->
                     // 模拟搜索功能
                     val keyword = viewModel.searchText.lowercase()
-                    viewModel.dataList = users.filter { user ->
-                        user.name.lowercase().contains(keyword) ||
-                        user.email.lowercase().contains(keyword)
-                    }
+
+                    val createQuery = sql.createQuery(SysArea::class) {
+                        where(table.name `ilike?` keyword)
+                        orderBy(table.makeOrders("sid asc"))
+                        select(table)
+                    }.fetchPage(viewModel.pageNo, viewModel.pageSize)
+                    viewModel.dataList = createQuery.rows
+                    viewModel.totalPages = createQuery.totalPageCount.toInt()
+
                 },
                 onEdit = { user ->
                     // 处理编辑操作
@@ -70,9 +74,9 @@ fun GenericTableExample() {
                 },
                 onDelete = { user ->
                     // 处理删除操作
-                    users = users.filter { it.id != user.id }
+
                 },
-                getIdFun = { it.id }
+                getIdFun = { it.sid }
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.addzero.web.modules.sys.area.entity
+package com.addzero.web.modules.sys.area
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.babyfish.jimmer.Formula

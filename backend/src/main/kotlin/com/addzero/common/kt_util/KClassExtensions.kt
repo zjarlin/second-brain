@@ -38,9 +38,26 @@ data class FieldMetadata<T>(
 )
 
 
+/**
+ * 根据指定的顺序对集合进行排序（不区分大小写）。
+ *
+ * @param order 指定的顺序列表。
+ * @param selector 用于获取排序字段的函数。
+ * @return 排序后的列表。
+ */
+fun <T> Collection<T>.sortedByCustomOrderIgnoreCase(
+    order: List<String>, selector: (T) -> String
+): List<T> {
+    // 创建一个映射，用于快速查找指定顺序的索引（忽略大小写）
+    val orderMap = order.withIndex().associate { it.value.lowercase() to it.index }
 
-
-
+    return this.sortedBy { item ->
+        // 获取当前元素的排序字段值（忽略大小写）
+        val fieldValue = selector(item).lowercase()
+        // 返回字段值在指定顺序中的索引，如果不存在则返回最大值（排在最后）
+        orderMap[fieldValue] ?: Int.MAX_VALUE
+    }
+}
 
 
 /**
@@ -54,33 +71,35 @@ fun <T : Any> KClass<T>.getMetadata(): ClassMetadata<T> {
     val classSchema = this.findAnnotation<Schema>()
     val classDescription = classSchema?.description
 
-    // 获取所有字段的元数据，包括接口中声明的属性
-    val fields = this
-        .memberProperties
-//        .filterIsInstance<kotlin.reflect.KProperty<*>>()
-        .map { property ->
-            // 获取属性的getter
-            val getter = property.getter
-            val schema = getter.annotations.find { it is Schema } as? Schema
-
-            // 优先查找getter上的@Schema注解
-            val findAnnotation = getter.findAnnotation<Schema>()
-            val propertySchema = findAnnotation ?: property.findAnnotation<Schema>()
-
-            val description = propertySchema?.description
-            FieldMetadata(
-                property = property,
-                name = property.name,
-                type = property.returnType.toString(),
-                description = description,
-                example = propertySchema?.example,
-                nullable = property.returnType.isMarkedNullable
-            )
+    // 使用Java反射API获取方法，并转换为属性名
+    val declaredFields =
+        this.java.declaredMethods.filter { it.name.startsWith("get") && it.name.length > 3 }.map { method ->
+            // 移除get前缀并将首字母小写
+            val propertyName = method.name.removePrefix("get").let {
+                it.first().lowercase() + it.substring(1)
+            }
+            propertyName
         }
+    // 获取对应的Kotlin属性
+    val property = this.memberProperties.map {
+        val getter = it.getter
+        val propertySchema = getter.findAnnotation<Schema>() ?: it.findAnnotation<Schema>()
+        FieldMetadata(
+            property = it!!,
+            name = it.name,
+            type = it.returnType.toString(),
+            description = propertySchema?.description,
+            example = propertySchema?.example,
+            nullable = false
+        )
+
+    }.sortedByCustomOrderIgnoreCase(
+        declaredFields, { it.name }
+    )
 
     return ClassMetadata(
-        className = className,
-        description = classDescription,
-        fields = fields
+        className = className, description = classDescription, fields = property
     )
+
 }
+

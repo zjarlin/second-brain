@@ -4,6 +4,14 @@ import cn.hutool.core.collection.CollUtil
 
 //JlCollutil
 
+// infix fun<T> MutableCollection<T>.`+?`(defaultExcludeFields:
+//                                        MutableCollection<T>):
+//         List<T> {
+//    defaultExcludeFields.forEach {
+//        CollUtil.addIfAbsent(this,it)
+//    }
+//    return this.filter { it.isNotNull() }
+//}
 
 fun <T, K> List<T>.addAllIfAbsentByKey(other: Collection<T>, keySelector: (T) -> K): Boolean? {
     var modified = false

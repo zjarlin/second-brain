@@ -1,6 +1,6 @@
 package com.addzero.addzero_common
 
-import com.addzero.web.modules.sys.area.entity.SysArea
+import com.addzero.web.modules.sys.area.SysArea
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

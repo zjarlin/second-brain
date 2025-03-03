@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.addAllIfAbsentByKey
 import com.addzero.web.ui.hooks.table.common.UseSearch
 import com.addzero.web.ui.hooks.table.common.UseTableLayout
@@ -19,24 +18,47 @@ import com.addzero.web.ui.hooks.table.entity.AddColumn
  */
 @Composable
 inline fun <reified E : Any> GenericTable(
-    excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
+    excludeFields: MutableSet<String> = mutableSetOf() ,
     columns: List<AddColumn<E>> = emptyList(),
-    crossinline onSearch: (GenericTableViewModelSpec<E>) -> Unit = {},
+    crossinline onSearch: (GenericTableViewModel<E>) -> Unit = {},
     noinline onEdit: (E) -> Unit = {},
     noinline onDelete: (E) -> Unit = {},
     noinline getIdFun: (E) -> Any = { it.hashCode() }
 ) {
-    val viewModel = remember { GenericTableViewModelSpec<E>() }
-    val useSearch = remember { UseSearch { onSearch(viewModel) } }
-    val useTableLayout = remember { UseTableLayout<E>() }
-    val useTablePagination = remember { UseTablePagination() }
+    val viewModel = remember { GenericTableViewModel<E>() }
 
-    val clazz = E::class
-    LaunchedEffect(clazz) {
-        val defaultColumns = viewModel.getDefaultColumns(clazz, excludeFields)
-        viewModel.columns = columns.toMutableList().apply {
-            addAllIfAbsentByKey(defaultColumns) { it.title }
+    val useSearch = UseSearch(onSearch = {
+    onSearch(viewModel)
+    }).getState().apply {
+       viewModel.searchText = searchText
+    }
+
+    val useTableLayout = UseTableLayout<E>() .apply {
+       viewModel.dataList = dataList
+    }
+
+    val useTablePagination = UseTablePagination() .apply {
+       viewModel.pageNo=pageNo
+        viewModel.pageSize=pageSize
+        viewModel.totalPages=totalPages
+    }
+
+
+
+    LaunchedEffect(E::class) {
+        val defaultColumns = viewModel.getDefaultColumns(E::class, excludeFields)
+        val toMutableList = columns.toMutableList()
+         defaultColumns.addAllIfAbsentByKey(
+            toMutableList
+        ) {
+            it.title
         }
+        viewModel.columns = defaultColumns
+    }
+
+    // 初始化数据加载
+    LaunchedEffect(Unit) {
+        onSearch(viewModel)
     }
 
     Box {
