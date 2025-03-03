@@ -65,6 +65,7 @@ inline fun <reified E : Any> GenericTable(
                 onSearchTextChange = { searchText = it },
                 onSearch = {
                     viewModel.searchText = searchText
+                    viewModel.pageNo = 1  // 重置页码为1
                     onSearch(viewModel)
                 }
             )

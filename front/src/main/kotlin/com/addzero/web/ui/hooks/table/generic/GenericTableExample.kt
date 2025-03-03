@@ -29,9 +29,10 @@ fun GenericTableExample() {
     }
     val toList = (1..100)
         .map {
+            val title = it.toString()
             val addColumn1 = AddColumn<SysArea>(
-                title = it.toString(),
-                getFun = { it.toString() },
+                title = title,
+                getFun = {title},
             )
             addColumn1
         }.toList()
