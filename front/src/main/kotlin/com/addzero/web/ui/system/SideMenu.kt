@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,7 +71,11 @@ private fun renderTreeSider(
                     onRouteChange(route.routerPath)
                     isExpanded.value = !isExpanded.value
                 },
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 4.dp),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    unselectedContainerColor = MaterialTheme.colorScheme.surface
+                )
             )
 
             // 如果存在子菜单项且展开状态，则渲染子菜单
@@ -90,7 +92,11 @@ private fun renderTreeSider(
                                 label = { Text(childRoute.title) },
                                 selected = currentRoute == childRoute.routerPath,
                                 onClick = { onRouteChange(childRoute.routerPath) },
-                                modifier = Modifier.padding(vertical = 4.dp)
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    unselectedContainerColor = MaterialTheme.colorScheme.surface
+                                )
                             )
                         }
                     }

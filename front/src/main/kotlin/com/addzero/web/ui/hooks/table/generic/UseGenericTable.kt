@@ -1,10 +1,14 @@
 package com.addzero.web.ui.hooks.table.generic
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -14,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cn.hutool.core.util.ReflectUtil
@@ -288,10 +293,12 @@ fun SearchBar(
             value = searchText,
             onValueChange = onSearchTextChange,
             modifier = Modifier.weight(1f).padding(end = 8.dp),
-            placeholder = { Text("请输入搜索关键词") },
-            singleLine = true
+            placeholder = { Text("请输入搜索关键词... 键入Enter可执行搜索") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearch() })
         )
-        Button(
+        OutlinedButton(
             onClick = onSearch,
             modifier = Modifier.height(56.dp)
         ) {
@@ -314,14 +321,28 @@ fun <E : Any> TableContent(
 ) {
     val horizontalScrollState = rememberScrollState()
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(8.dp)
+            )
+    ) {
         // 表头区域
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             // 选择框表头
             if (isEditMode) {
                 Box(
-                    modifier = Modifier.width(48.dp).padding(8.dp),
-                    contentAlignment = Alignment.CenterStart
+                    modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Checkbox(
                         checked = selectedItems.size == dataList.size,
@@ -338,13 +359,13 @@ fun <E : Any> TableContent(
             
             // 序号表头
             Box(
-                modifier = Modifier.width(60.dp).padding(8.dp),
-                contentAlignment = Alignment.CenterStart
+                modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "序号",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             
@@ -355,16 +376,18 @@ fun <E : Any> TableContent(
                     .horizontalScroll(horizontalScrollState)
             ) {
                 Row(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .width(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.Start
+                    modifier = Modifier.width(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     columns.forEach { column ->
                         Text(
                             text = column.title,
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.width(150.dp).padding(horizontal = 4.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .width(150.dp)
+                                .padding(horizontal = 8.dp)
                         )
                     }
                 }
@@ -372,13 +395,13 @@ fun <E : Any> TableContent(
             
             // 操作列表头
             Box(
-                modifier = Modifier.width(120.dp).padding(8.dp),
-                contentAlignment = Alignment.CenterStart
+                modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "操作",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -386,12 +409,24 @@ fun <E : Any> TableContent(
         // 使用单个LazyColumn渲染所有数据行
         LazyColumn {
             items(dataList, key = getIdFun) { item ->
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(
+                            color = if (selectedItems.contains(item))
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f)
+                            else
+                                MaterialTheme.colorScheme.surface
+                        )
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     // 选择框列
                     if (isEditMode) {
                         Box(
-                            modifier = Modifier.width(48.dp).padding(8.dp),
-                            contentAlignment = Alignment.CenterStart
+                            modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
+                            contentAlignment = Alignment.Center
                         ) {
                             Checkbox(
                                 checked = selectedItems.contains(item),
@@ -409,13 +444,13 @@ fun <E : Any> TableContent(
                     
                     // 序号列
                     Box(
-                        modifier = Modifier.width(60.dp).padding(8.dp),
-                        contentAlignment = Alignment.CenterStart
+                        modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = (dataList.indexOf(item) + 1).toString(),
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(horizontal = 4.dp)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -426,9 +461,7 @@ fun <E : Any> TableContent(
                             .horizontalScroll(horizontalScrollState)
                     ) {
                         Row(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .width(IntrinsicSize.Max),
+                            modifier = Modifier.width(IntrinsicSize.Max),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -436,8 +469,9 @@ fun <E : Any> TableContent(
                                 Box(
                                     modifier = Modifier
                                         .width(150.dp)
-                                        .padding(horizontal = 4.dp)
-                                        .height(IntrinsicSize.Min)
+                                        .padding(horizontal = 8.dp)
+                                        .height(IntrinsicSize.Min),
+                                    contentAlignment = Alignment.CenterStart
                                 ) {
                                     val content = column.getFun(item).toNotBlankStr()
                                     val displayText = if (content.length > 30) {
@@ -459,7 +493,8 @@ fun <E : Any> TableContent(
                                             Text(
                                                 text = displayText,
                                                 maxLines = 2,
-                                                style = MaterialTheme.typography.bodyMedium
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
                                         }
                                     }
@@ -470,22 +505,50 @@ fun <E : Any> TableContent(
                     
                     // 操作列
                     Box(
-                        modifier = Modifier.width(120.dp).padding(8.dp)
+                        modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(onClick = { onEdit(item) }) {
-                                Icon(Icons.Default.Edit, contentDescription = "编辑")
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                tooltip = {
+                                    PlainTooltip { Text("编辑") }
+                                },
+                                state = rememberTooltipState()
+                            ) {
+                                IconButton(onClick = { onEdit(item) }) {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = "编辑",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
-                            IconButton(onClick = { onDelete(item) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "删除")
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                tooltip = {
+                                    PlainTooltip { Text("删除") }
+                                },
+                                state = rememberTooltipState()
+                            ) {
+                                IconButton(onClick = { onDelete(item) }) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = "删除",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
                     }
                 }
-                HorizontalDivider()
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                )
             }
         }
     }
