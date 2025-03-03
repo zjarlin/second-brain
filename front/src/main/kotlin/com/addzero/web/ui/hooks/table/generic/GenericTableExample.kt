@@ -12,6 +12,7 @@ import com.addzero.common.kt_util.add
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
 import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
@@ -46,11 +47,9 @@ fun GenericTableExample() {
                 onSearch = { viewModel ->
                     // 模拟搜索功能
                     val keyword = viewModel.searchText.lowercase()
-                    val createQuery = sql.createQuery(SysArea::class) {
-                        where(table.city `ilike?` keyword)
-                        orderBy(table.makeOrders("sid asc"))
-                        select(table)
-                    }.fetchPage(viewModel.pageNo - 1, viewModel.pageSize)
+
+
+                    val createQuery = selectArea(keyword, viewModel)
                     viewModel.dataList = createQuery.rows
                     viewModel.totalPages = createQuery.totalPageCount.toInt()
 
@@ -67,3 +66,16 @@ fun GenericTableExample() {
         }
     }
 }
+
+private fun selectArea(
+    keyword: String,
+    viewModel: GenericTableViewModel<SysArea>
+): Page<SysArea> {
+    val createQuery = sql.createQuery(SysArea::class) {
+        where(table.city `ilike?` keyword)
+        orderBy(table.makeOrders("sid asc"))
+        select(table)
+    }.fetchPage(viewModel.pageNo - 1, viewModel.pageSize)
+    return createQuery
+}
+

@@ -93,4 +93,6 @@ data class AddColumn<E>(
 
 
     }
-)
+) {
+    lateinit var fieldName: String
+}

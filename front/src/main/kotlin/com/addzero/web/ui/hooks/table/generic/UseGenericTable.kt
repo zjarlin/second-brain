@@ -16,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cn.hutool.core.util.ReflectUtil
 import com.addzero.common.kt_util.addAllIfAbsentByKey
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.form.DynamicFormComponent
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.ButtonConfig
 
 /**
  * 通用表格组件
@@ -28,6 +30,7 @@ import com.addzero.web.ui.hooks.table.entity.AddColumn
 inline fun <reified E : Any> GenericTable(
     excludeFields: MutableSet<String> = mutableSetOf(),
     columns: List<AddColumn<E>> = emptyList(),
+    buttons: List<ButtonConfig<E>> = ButtonConfig.defaultButtons(),
     crossinline onSearch: (GenericTableViewModel<E>) -> Unit = {},
     noinline onEdit: (E) -> Unit = {},
     noinline onDelete: (E) -> Unit = {},
@@ -39,6 +42,8 @@ inline fun <reified E : Any> GenericTable(
     var showEditDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<E?>(null) }
+    var isEditMode by remember { mutableStateOf(false) }
+    var selectedItems by remember { mutableStateOf<List<E>>(emptyList()) }
 
     // 初始化数据加载
 //    LaunchedEffect(Unit) {
@@ -59,16 +64,95 @@ inline fun <reified E : Any> GenericTable(
 
     Box {
         Column {
-            // 搜索栏
-            SearchBar(
-                searchText = searchText,
-                onSearchTextChange = { searchText = it },
-                onSearch = {
-                    viewModel.searchText = searchText
-                    viewModel.pageNo = 1  // 重置页码为1
-                    onSearch(viewModel)
+            // 搜索栏和按钮区
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 搜索栏
+                SearchBar(
+                    searchText = searchText,
+                    onSearchTextChange = { searchText = it },
+                    onSearch = {
+                        viewModel.searchText = searchText
+                        viewModel.pageNo = 1  // 重置页码为1
+                        onSearch(viewModel)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                
+                // 按钮区
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    buttons.filter { button ->
+                        when (button.text) {
+                            "批量删除" -> isEditMode
+                            else -> true
+                        }
+                    }.forEach { button ->
+                        var showConfirmDialog by remember { mutableStateOf(false) }
+                        
+                        OutlinedButton(
+                            onClick = { 
+                                if (button.needConfirm) {
+                                    showConfirmDialog = true
+                                } else {
+                                    when (button.text) {
+                                        "编辑模式" -> {
+                                            if (isEditMode) {
+                                                selectedItems = emptyList()
+                                                isEditMode = false
+                                            } else {
+                                                isEditMode = true
+                                            }
+                                        }
+                                        else -> button.onClick(selectedItems)
+                                    }
+                                }
+                            },
+                            enabled = when (button.text) {
+                                "批量删除" -> selectedItems.isNotEmpty()
+                                else -> true
+                            }
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(button.icon, contentDescription = button.text)
+                                Text(if (button.text == "编辑模式" && isEditMode) "退出编辑" else button.text)
+                            }
+                        }
+                        
+                        if (showConfirmDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showConfirmDialog = false },
+                                title = { Text(button.confirmTitle) },
+                                text = { Text(button.confirmContent) },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            button.onClick(selectedItems)
+                                            showConfirmDialog = false
+                                        }
+                                    ) {
+                                        Text("确定")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showConfirmDialog = false }) {
+                                        Text("取消")
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
-            )
+            }
 
             // 表格主体区域
             Surface(modifier = Modifier.weight(1f)) {
@@ -83,7 +167,10 @@ inline fun <reified E : Any> GenericTable(
                         selectedItem = item
                         showDeleteDialog = true
                     },
-                    getIdFun = getIdFun
+                    getIdFun = getIdFun,
+                    isEditMode = isEditMode,
+                    selectedItems = selectedItems,
+                    onSelectionChange = { newSelection -> selectedItems = newSelection }
                 )
             }
 
@@ -108,7 +195,11 @@ inline fun <reified E : Any> GenericTable(
                             // 直接使用AddColumn，不需要转换
                             column.copy(
                                 setFun = { item, value ->
+                                    val fieldName = column.fieldName
+                                    val s = "__${fieldName}Value"
+                                    ReflectUtil.setFieldValue(item, s, value)
                                     item
+//                                    function
                                     // 使用Jimmer的Draft机制修改不可变实体
                                     // 1. 获取属性名（尝试多种匹配方式）
 
@@ -187,10 +278,11 @@ inline fun <reified E : Any> GenericTable(
 fun SearchBar(
     searchText: String,
     onSearchTextChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -217,13 +309,35 @@ fun <E : Any> TableContent(
     dataList: List<E>,
     onEdit: (E) -> Unit,
     onDelete: (E) -> Unit,
-    getIdFun: (E) -> Any
+    getIdFun: (E) -> Any,
+    isEditMode: Boolean = false,
+    selectedItems: List<E> = emptyList(),
+    onSelectionChange: (List<E>) -> Unit = {}
 ) {
     val horizontalScrollState = rememberScrollState()
 
     Column(modifier = Modifier.fillMaxWidth()) {
         // 表头区域
         Row(modifier = Modifier.fillMaxWidth()) {
+            // 选择框表头
+            if (isEditMode) {
+                Box(
+                    modifier = Modifier.width(48.dp).padding(8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Checkbox(
+                        checked = selectedItems.size == dataList.size,
+                        onCheckedChange = { checked ->
+                            if (checked) {
+                                onSelectionChange(dataList)
+                            } else {
+                                onSelectionChange(emptyList())
+                            }
+                        }
+                    )
+                }
+            }
+            
             // 序号表头
             Box(
                 modifier = Modifier.width(60.dp).padding(8.dp),
@@ -275,6 +389,26 @@ fun <E : Any> TableContent(
         LazyColumn {
             items(dataList, key = getIdFun) { item ->
                 Row(modifier = Modifier.fillMaxWidth()) {
+                    // 选择框列
+                    if (isEditMode) {
+                        Box(
+                            modifier = Modifier.width(48.dp).padding(8.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Checkbox(
+                                checked = selectedItems.contains(item),
+                                onCheckedChange = { checked ->
+                                    val newSelection = if (checked) {
+                                        selectedItems + item
+                                    } else {
+                                        selectedItems - item
+                                    }
+                                    onSelectionChange(newSelection)
+                                }
+                            )
+                        }
+                    }
+                    
                     // 序号列
                     Box(
                         modifier = Modifier.width(60.dp).padding(8.dp),
