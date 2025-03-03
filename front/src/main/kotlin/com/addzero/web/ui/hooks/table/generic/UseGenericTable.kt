@@ -125,12 +125,25 @@ fun <E : Any> TableContent(
 ) {
     val horizontalScrollState = rememberScrollState()
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Column {
-            // 表头
-            Surface(
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // 表头区域
+        Row(modifier = Modifier.fillMaxWidth()) {
+            // 序号表头
+            Box(
+                modifier = Modifier.width(60.dp).padding(8.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "序号",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+            }
+            
+            // 数据列表头
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .horizontalScroll(horizontalScrollState)
             ) {
                 Row(
@@ -146,61 +159,93 @@ fun <E : Any> TableContent(
                             modifier = Modifier.width(150.dp).padding(horizontal = 4.dp)
                         )
                     }
-                    Text(
-                        text = "操作",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.width(120.dp).padding(horizontal = 4.dp)
-                    )
                 }
             }
-
-            // 数据行
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(horizontalScrollState)
+            
+            // 操作列表头
+            Box(
+                modifier = Modifier.width(120.dp).padding(8.dp),
+                contentAlignment = Alignment.CenterStart
             ) {
-                items(dataList, key = getIdFun) { item ->
-                    Row(
-                        modifier = Modifier
-                            .width(IntrinsicSize.Max)
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
+                Text(
+                    text = "操作",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+            }
+        }
+        
+        // 使用单个LazyColumn渲染所有数据行
+        LazyColumn {
+            items(dataList, key = getIdFun) { item ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    // 序号列
+                    Box(
+                        modifier = Modifier.width(60.dp).padding(8.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
-                        columns.forEach { column ->
-                            Box(
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .padding(horizontal = 4.dp)
-                                    .height(IntrinsicSize.Min)
-                            ) {
-                                val content = column.getFun(item).toString()
-                                val displayText = if (content.length > 30) {
-                                    content.take(30) + "..."
-                                } else {
-                                    content
-                                }
-                                
-                                TooltipBox(
-                                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                    tooltip = {
-                                        PlainTooltip {
-                                            Text(content)
-                                        }
-                                    },
-                                    state = rememberTooltipState()
+                        Text(
+                            text = (dataList.indexOf(item) + 1).toString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
+                    
+                    // 数据列
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .horizontalScroll(horizontalScrollState)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .width(IntrinsicSize.Max),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            columns.forEach { column ->
+                                Box(
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .padding(horizontal = 4.dp)
+                                        .height(IntrinsicSize.Min)
                                 ) {
-                                    SelectionContainer {
-                                        Text(
-                                            text = displayText,
-                                            maxLines = 2,
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
+                                    val content = column.getFun(item).toString()
+                                    val displayText = if (content.length > 30) {
+                                        content.take(30) + "..."
+                                    } else {
+                                        content
+                                    }
+                                    
+                                    TooltipBox(
+                                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                        tooltip = {
+                                            PlainTooltip {
+                                                Text(content)
+                                            }
+                                        },
+                                        state = rememberTooltipState()
+                                    ) {
+                                        SelectionContainer {
+                                            Text(
+                                                text = displayText,
+                                                maxLines = 2,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    
+                    // 操作列
+                    Box(
+                        modifier = Modifier.width(120.dp).padding(8.dp)
+                    ) {
                         Row(
-                            modifier = Modifier.width(120.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             IconButton(onClick = { onEdit(item) }) {
@@ -211,8 +256,8 @@ fun <E : Any> TableContent(
                             }
                         }
                     }
-                    HorizontalDivider()
                 }
+                HorizontalDivider()
             }
         }
     }
