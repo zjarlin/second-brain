@@ -26,33 +26,50 @@ data class AddColumn<E>(
 
     /** 获取列数据的函数 */
     val getFun: (E) -> Any?,
+    
+    /** 设置值的函数，用于表单编辑 */
+    val setFun: (E, Any?) -> E = { e, _ -> e },
+    
+    /** 是否必填 */
+    val required: Boolean = false,
+    
+    /** 占位文本 */
+    val placeholder: String = "",
+    
+    /** 指定渲染类型，如果为null则自动推导 */
+    val renderTypeOverride: RenderType? = null,
+    
+    /** 选项列表，用于下拉选择等 */
+    val options: List<Pair<Any, String>> = emptyList(),
 
     /** 自定义渲染函数 */
     val customRender: @Composable (E) -> Unit = {
         val renderType = getRenderType(it)
+        val fieldValue = getFun(it)
+        val text = fieldValue.toNotBlankStr()
         when (renderType) {
             TEXT -> {
-                Text(text = getFun(it).toNotBlankStr())
+                Text(text = text)
             }
 
             IMAGE -> {
-                Text(getFun(it).toNotBlankStr())
+                Text(text)
             }
 
             CUSTOM -> {
-                Text(getFun(it).toNotBlankStr())
+                Text(text)
             }
 
             TEXTAREA -> {
-                Text(getFun(it).toNotBlankStr())
+                Text(text)
             }
 
             SWITCH -> {
-                Text(getFun(it).toNotBlankStr())
+                Text(text)
             }
 
             TAG -> {
-                Text(getFun(it).toNotBlankStr())
+                Text(text)
             }
 
             NUMBER -> TODO()
@@ -71,6 +88,7 @@ data class AddColumn<E>(
             BAR -> TODO()
             TREE -> TODO()
             COMPUTED -> TODO()
+            AUTO_COMPLETE -> TODO()
         }
 
 

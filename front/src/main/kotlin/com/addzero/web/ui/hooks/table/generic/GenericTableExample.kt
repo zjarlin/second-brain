@@ -20,6 +20,7 @@ fun GenericTableExample() {
     // 自定义列配置
     val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }) {
         val blackFlag = it.blackFlag
+
         if (blackFlag == true) {
             Text("名字包含黑")
         } else {
@@ -53,11 +54,11 @@ fun GenericTableExample() {
                     viewModel.totalPages = createQuery.totalPageCount.toInt()
 
                 },
-                onEdit = { user ->
+                onEdit = {
                     // 处理编辑操作
-                    println("编辑用户: $user")
+                    println("编辑用户: $it")
                 },
-                onDelete = { user ->
+                onDelete = {
                     // 处理删除操作
 
                 },

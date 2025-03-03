@@ -25,9 +25,11 @@ enum class RenderType {
     BAR,
     TREE,
     COMPUTED,
+    AUTO_COMPLETE,
     CUSTOM;
 
     companion object {
+
         fun fromJdbcType(jdbcType: JDBCType): RenderType {
             return when (jdbcType) {
                 JDBCType.VARCHAR, JDBCType.CHAR -> TEXT

@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.addzero.common.kt_util.addAllIfAbsentByKey
+import com.addzero.common.kt_util.toNotBlankStr
+import com.addzero.web.ui.hooks.form.DynamicFormComponent
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 
 /**
@@ -34,6 +36,9 @@ inline fun <reified E : Any> GenericTable(
 ) {
     val viewModel = remember { GenericTableViewModel<E>() }
     var searchText by remember { mutableStateOf("") }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<E?>(null) }
 
     // 初始化数据加载
 //    LaunchedEffect(Unit) {
@@ -69,8 +74,14 @@ inline fun <reified E : Any> GenericTable(
                 TableContent(
                     columns = viewModel.columns,
                     dataList = viewModel.dataList,
-                    onEdit = onEdit,
-                    onDelete = onDelete,
+                    onEdit = { item ->
+                        selectedItem = item
+                        showEditDialog = true
+                    },
+                    onDelete = { item ->
+                        selectedItem = item
+                        showDeleteDialog = true
+                    },
                     getIdFun = getIdFun
                 )
             }
@@ -82,6 +93,90 @@ inline fun <reified E : Any> GenericTable(
                 totalPages = viewModel.totalPages,
                 onPageChange = { viewModel.pageNo = it },
                 onPageSizeChange = { viewModel.pageSize = it }
+            )
+        }
+
+        // 编辑对话框
+        if (showEditDialog && selectedItem != null) {
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                title = { Text("编辑") },
+                text = {
+                    DynamicFormComponent(
+                        columns = viewModel.columns.map { column ->
+                            // 直接使用AddColumn，不需要转换
+                            column.copy(
+                                setFun = { item, value ->
+                                    item
+                                    // 使用Jimmer的Draft机制修改不可变实体
+                                    // 1. 获取属性名（尝试多种匹配方式）
+
+//                                    val getFun = column.getFun
+//
+////                                        咋把item变成draft呀
+//                                        val draftObj = item.toDraft()
+//
+//                                        val toTypedProp = getFun.toTypedProp()
+//
+//                                        DraftObjects.set(draftObj, toTypedProp, value)
+//
+//                                        //再把draft换成jimmer对象
+//                                        val updatedItem = draftObj.toEntity()
+//                                        // 5. 返回新的不可变实体
+//                                        return@copy updatedItem
+//                                        println("使用Jimmer Draft修改实体失败: ${e.message}")
+//                                        // 如果Draft修改失败，返回原始对象
+//                                        return@copy item
+                                }
+                            )
+                        },
+                        data = selectedItem as E,
+                        onDataChange = { updatedItem ->
+                            selectedItem = updatedItem
+                            // 触发数据更新
+                            onSearch(viewModel)
+                        }
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            selectedItem?.let { onEdit(it) }
+                            showEditDialog = false
+                        }
+                    ) {
+                        Text("确定")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEditDialog = false }) {
+                        Text("取消")
+                    }
+                }
+            )
+        }
+
+        // 删除确认对话框
+        if (showDeleteDialog && selectedItem != null) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("确认删除") },
+                text = { Text("确定要删除这条记录吗？") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            selectedItem?.let { onDelete(it) }
+                            showDeleteDialog = false
+                        }
+                    ) {
+                        Text("确定")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("取消")
+                    }
+                }
             )
         }
     }
@@ -211,7 +306,7 @@ fun <E : Any> TableContent(
                                         .padding(horizontal = 4.dp)
                                         .height(IntrinsicSize.Min)
                                 ) {
-                                    val content = column.getFun(item).toString()
+                                    val content = column.getFun(item).toNotBlankStr()
                                     val displayText = if (content.length > 30) {
                                         content.take(30) + "..."
                                     } else {

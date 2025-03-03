@@ -3,13 +3,8 @@ package com.addzero.common.kt_util
 import cn.hutool.core.convert.Convert
 import cn.hutool.core.io.FileUtil
 import cn.hutool.core.text.CharSequenceUtil
-import cn.hutool.core.util.ObjUtil
 import cn.hutool.core.util.StrUtil
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-
 
 
 /**
@@ -270,10 +265,10 @@ fun CharSequence.toUnderlineCase(): String {
     return toUnderlineCase
 }
 fun Any?.toNotBlankStr(): String {
-    val toStr1 = Convert.toStr(this)
-    if (toStr1.isBlank()) {
+    if (this==null) {
         return ""
     }
+    val toStr1 = Convert.toStr(this)
     return toStr1
 }
 
