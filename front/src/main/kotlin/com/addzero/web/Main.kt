@@ -38,6 +38,8 @@ fun main(args: Array<String>) {
     scope.launch {
         runSpringBootApp(args)
     }
+    //怕springboot没完全跑起来影响前台
+    Thread.sleep(2)
     application {
         val windowState = rememberWindowState(
             width = 1200.dp, height = 800.dp

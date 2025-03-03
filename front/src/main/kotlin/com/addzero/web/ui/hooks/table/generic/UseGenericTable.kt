@@ -607,7 +607,7 @@ fun PaginationBar(
                     "每页显示: ",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                listOf(10, 30, 50, 100).forEach { size ->
+                listOf(15, 30, 45, 60,75, 90).forEach { size ->
                     OutlinedButton(
                         onClick = { onPageSizeChange(size) },
                         modifier = Modifier.padding(horizontal = 4.dp),
