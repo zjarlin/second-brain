@@ -14,6 +14,7 @@ data class AddColumn<E>(
 
     /** 字段标题 */
     val title: String,
+    var fieldName: String="",
 
     /** 获取列渲染类型的函数，默认为文本类型 */
     val getRenderType: (E) -> RenderType = { TEXT },
@@ -28,7 +29,12 @@ data class AddColumn<E>(
     val getFun: (E) -> Any?,
     
     /** 设置值的函数，用于表单编辑 */
-    val setFun: (E, Any?) -> E = { e, _ -> e },
+    val setFun: (E, Any?) -> E = { e, value -> 
+        // 默认实现不再忽略value参数，但由于无法直接修改泛型对象E的属性
+        // 实际使用时应该提供具体的实现来处理value
+        // 这里返回原对象，但在实际使用时应该被覆盖
+        e
+    },
     
     /** 是否必填 */
     val required: Boolean = false,
@@ -94,5 +100,4 @@ data class AddColumn<E>(
 
     }
 ) {
-    lateinit var fieldName: String
 }

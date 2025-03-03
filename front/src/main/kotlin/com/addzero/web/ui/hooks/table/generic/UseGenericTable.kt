@@ -414,10 +414,14 @@ fun <E : Any> TableContent(
                         .fillMaxWidth()
                         .height(56.dp)
                         .background(
-                            color = if (selectedItems.contains(item))
-                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f)
-                            else
-                                MaterialTheme.colorScheme.surface
+                            color = when {
+                                selectedItems.contains(item) ->
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f)
+                                dataList.indexOf(item) % 2 == 1 ->
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
+                                else ->
+                                    MaterialTheme.colorScheme.surface
+                            }
                         )
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -607,7 +611,7 @@ fun PaginationBar(
                     "每页显示: ",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                listOf(15, 30, 45, 60,75, 90).forEach { size ->
+                listOf(10, 20, 30, 40,50, 60,70,80,90,100).forEach { size ->
                     OutlinedButton(
                         onClick = { onPageSizeChange(size) },
                         modifier = Modifier.padding(horizontal = 4.dp),

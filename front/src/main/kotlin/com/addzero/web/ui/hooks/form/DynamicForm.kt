@@ -79,6 +79,8 @@ fun <E : Any> DynamicFormComponent(
         data = formData,
         onDataChange = { newData ->
             formData = newData
+            // 当表单数据变更时，自动验证
+            validate()
         },
         validationErrors = validationErrors,
         columnCount = columnCount,
