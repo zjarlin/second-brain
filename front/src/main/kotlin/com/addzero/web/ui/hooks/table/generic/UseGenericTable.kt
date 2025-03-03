@@ -38,7 +38,6 @@ inline fun <reified E : Any> GenericTable(
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     val viewModel = remember { GenericTableViewModel<E>() }
-    var searchText by remember { mutableStateOf("") }
     var showEditDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<E?>(null) }
@@ -72,10 +71,9 @@ inline fun <reified E : Any> GenericTable(
             ) {
                 // 搜索栏
                 SearchBar(
-                    searchText = searchText,
-                    onSearchTextChange = { searchText = it },
+                    searchText =viewModel. searchText,
+                    onSearchTextChange = {viewModel. searchText = it },
                     onSearch = {
-                        viewModel.searchText = searchText
                         viewModel.pageNo = 1  // 重置页码为1
                         onSearch(viewModel)
                     },
