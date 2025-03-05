@@ -1,9 +1,9 @@
 package com.addzero.addzero_common
 
-import cn.hutool.core.util.ReflectUtil
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
-import org.babyfish.jimmer.ImmutableObjects
+import com.addzero.web.modules.sys.area.copy
+import org.babyfish.jimmer.Draft
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.babyfish.jimmer.sql.kt.ast.expression.KExpression
@@ -30,11 +30,17 @@ class 测试jimmer实体修改值(
             orderBy(table.makeOrders("sid asc"))
             select(table)
         }.fetchPage(pageNo - 1, pageSize)
+        createQuery.rows.map {
+
+            it.copy {
+
+            }
+        }
         return createQuery
     }
 
 
-    private inline fun <reified E : Any>selectGeneric(
+    private inline fun <reified E : Any> selectGeneric(
         keyword: String,
         getXxx: KExpression<String>?,
         pageNo: Int,
@@ -49,13 +55,16 @@ class 测试jimmer实体修改值(
         val rows = createQuery.rows
 
         val toList = rows.map {
-            val get = ImmutableObjects.get(it, "sid")
-            val fieldsValue = ReflectUtil.getFieldValue(it, "__sidValue")
-            val fieldsValue11 = ReflectUtil.setFieldValue(it, "__sidValue",
-                "111")
-//            DraftObjects.set(it,"__sidValue","111")
-//            val fieldValue = ReflectUtil.getFieldValue(it, "sid")
-//            val fieldValue1 = ReflectUtil.getFieldValue(it, "_sid")
+
+            val draft = it as Draft
+
+
+            it.apply {
+                val e = this
+                println()
+            }
+
+
 
             it
         }.toList()
@@ -63,7 +72,6 @@ class 测试jimmer实体修改值(
 
         return toList
     }
-
 
 
     @Test

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.ignoreCaseNotIn
+import com.addzero.common.kt_util.isBlank
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 import kotlin.reflect.KClass
@@ -31,6 +32,7 @@ class GenericTableViewModel<E : Any> {
         }
         val metadata = clazz.getMetadata()
 
+
         val filter = metadata.fields
 
             .filter {
@@ -40,10 +42,12 @@ class GenericTableViewModel<E : Any> {
             .map { field ->
                 val getter = field.property.getter
                 val addColumn = AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
-                addColumn.fieldName=field.name
+                addColumn.fieldName = field.name
+                if (addColumn.title.isBlank()) {
+                    addColumn.title = field.name
+                }
                 addColumn
             }
-            .filter { it.title.isNotBlank() }
 
         return filter
     }

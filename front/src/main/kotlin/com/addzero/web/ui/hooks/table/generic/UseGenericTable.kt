@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import cn.hutool.core.util.ReflectUtil
 import com.addzero.common.kt_util.addAllIfAbsentByKey
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.form.DynamicFormComponent
@@ -194,37 +193,7 @@ inline fun <reified E : Any> GenericTable(
                 title = { Text("编辑") },
                 text = {
                     DynamicFormComponent(
-                        columns = viewModel.columns.map { column ->
-                            // 直接使用AddColumn，不需要转换
-                            column.copy(
-                                setFun = { item, value ->
-                                    val fieldName = column.fieldName
-                                    val s = "__${fieldName}Value"
-                                    ReflectUtil.setFieldValue(item, s, value)
-                                    item
-//                                    function
-                                    // 使用Jimmer的Draft机制修改不可变实体
-                                    // 1. 获取属性名（尝试多种匹配方式）
-
-//                                    val getFun = column.getFun
-//
-////                                        咋把item变成draft呀
-//                                        val draftObj = item.toDraft()
-//
-//                                        val toTypedProp = getFun.toTypedProp()
-//
-//                                        DraftObjects.set(draftObj, toTypedProp, value)
-//
-//                                        //再把draft换成jimmer对象
-//                                        val updatedItem = draftObj.toEntity()
-//                                        // 5. 返回新的不可变实体
-//                                        return@copy updatedItem
-//                                        println("使用Jimmer Draft修改实体失败: ${e.message}")
-//                                        // 如果Draft修改失败，返回原始对象
-//                                        return@copy item
-                                }
-                            )
-                        },
+                        columns = viewModel.columns,
                         data = selectedItem as E,
                         onDataChange = { updatedItem ->
                             selectedItem = updatedItem

@@ -12,9 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.hutool.extra.spring.SpringUtil
 import com.addzero.web.ui.components.button.AddButton
+import com.addzero.web.ui.components.layout.AddRow
 import com.addzero.web.ui.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.system.dynamicroute.RouteMetadata
-import com.addzero.web.ui.components.layout.AddRow
 
 
 class ButtonDemo : MetaSpec {
@@ -160,6 +160,7 @@ class ButtonDemo : MetaSpec {
             // 垂直渐变按钮组
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 AddButton(
+
                     displayName = "日落渐变",
                     icon = Icons.Default.Add,
                     onClick = { println("点击日落渐变按钮") },

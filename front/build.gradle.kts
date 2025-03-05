@@ -15,6 +15,12 @@ dependencies {
 //    implementation("org.reflections:reflections:0.10.2")
 //    implementation(libs.kotlin.reflect)
 //    kotlin-reflect
+    implementation("com.mikepenz:multiplatform-markdown-renderer-m3:+")
+
+    implementation("com.mikepenz:multiplatform-markdown-renderer-code:+")
+
+    // material3 contains opinionated components to streamline development
+//    implementation("io.github.boswelja.markdown:material3:+")
 
     api(project(":backend"))
     implementation(compose.desktop.currentOs)

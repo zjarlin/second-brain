@@ -13,6 +13,23 @@ private val LightColorScheme = lightColorScheme(
     background = Color(AppConfig.Theme.backgroundGradient[0])
 )
 
+
+
+// 自定义颜色主题
+//val customColors = lightColorScheme(
+//    primary = Color(0xFF6200EE), // 自定义主色调（紫色）
+////    primaryVariant = Color(0xFF3700B3), // 主色调变体
+//    secondary = Color(0xFF03DAC6), // 次要色调（青色）
+//    background = Color(0xFF5F5F5F), // 背景色（浅灰）
+//    surface = Color.White, // 表面颜色
+//    error = Color(0xFF80C020), // 错误颜色
+//    onPrimary = Color.White, // 主色调上的文字颜色
+//    onSecondary = Color.Black, // 次要色调上的文字颜色
+//    onBackground = Color.Black, // 背景上的文字颜色
+//    onSurface = Color.Black, // 表面上的文字颜色
+//    onError = Color.White // 错误颜色上的文字颜色
+//)
+
 @Composable
 fun AppTheme(
     content: @Composable () -> Unit

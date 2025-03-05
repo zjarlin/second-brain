@@ -81,6 +81,7 @@ fun <E : Any> DynamicFormComponent(
             formData = newData
             // 当表单数据变更时，自动验证
             validate()
+            onDataChange(newData)  // 使用newData而不是formData
         },
         validationErrors = validationErrors,
         columnCount = columnCount,
@@ -208,7 +209,7 @@ fun <E : Any> DynamicForm(
                             column = column,
                             data = data,
                             onValueChange = { newValue ->
-                                val updatedData = column.setFun(data, newValue)
+                                val updatedData = column.setFun(data, column.fieldName, newValue)
                                 onDataChange(updatedData)
                             },
                             error = validationErrors[column.title],
