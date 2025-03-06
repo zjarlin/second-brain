@@ -1,6 +1,7 @@
 package com.addzero.web.ui.hooks.table.generic
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.ignoreCaseNotIn
@@ -53,13 +54,18 @@ class UseTable<E : Any>(
     val onDelete: (Any) -> Unit,
 ) : UseHook<UseTable<E>> {
 
-
     val useSearch = UseSearch(
         onSearch = {
-            val pageResult = onLoadData(this)!!
-            useTableContent.dataList = pageResult.rows
-            useTablePagination.totalPages = pageResult.totalPageCount.toInt()
+            useTablePagination.pageNo=1
+            refreshData()
         })
+
+
+    private fun refreshData() {
+        val pageResult = onLoadData(this)!!
+        useTableContent.dataList = pageResult.rows
+        useTablePagination.totalPages = pageResult.totalPageCount.toInt()
+    }
 
     private val useTableContent = UseTableContent<E>().apply {
         this.columns += columns
@@ -98,7 +104,12 @@ class UseTable<E : Any>(
             DeleteDialog(useTableContent, onDelete = onDelete)
 
 
+            LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize, useTablePagination.totalPages) {
+                refreshData()
+            }
+
             useTablePagination.render()
+
         }
 }
 

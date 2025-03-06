@@ -49,7 +49,6 @@ fun GenericTableExample() {
                     val searchText = it.useSearch.searchText
                     val createQuery = selectArea(searchText, it)
                     createQuery
-
                 },
                 onSave = {
                     // 处理编辑操作
