@@ -9,7 +9,7 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
  */
 @Composable
 fun <E : Any> DeleteDialog(
-    useTableContent: UseTableContent<E>, onDeleted: (Any) -> Unit
+    useTableContent: UseTableContent<E>, onDelete: (Any) -> Unit
 ) {
 //    val useTableContent = UseTableContent<E>().getState()
     val idFun = useTableContent.getIdFun
@@ -19,7 +19,7 @@ fun <E : Any> DeleteDialog(
         show = useTableContent.showDeleteFlag,
         title = "确认删除",
         onDismiss = { useTableContent.showDeleteFlag = false },
-        onConfirm = { onDeleted((idFun(currentSelectItem))) },
+        onConfirm = { onDelete((idFun(currentSelectItem))) },
         content = {
             Text("确定要删除这条记录吗？")
         })

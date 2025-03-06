@@ -26,7 +26,7 @@ fun <E : Any> FormDialog(
             DynamicFormComponent(
                 columns = useTableContent.columns,
                 data = item,
-                onDataChange = TODO(),
+                onDataChange = {},
             )
         }
     )

@@ -25,31 +25,35 @@ class GenericTableViewModel<E : Any> {
     var totalPages by mutableStateOf(0)
 
 
-    fun getDefaultColumns(clazz: KClass<E>, excludeFields: MutableSet<String>): List<AddColumn<E>> {
+    companion object {
+        fun <E : Any> getDefaultColumns(
+            clazz: KClass<E>, excludeFields: MutableSet<String>
+        ): List<AddColumn<E>> {
 
-        DEFAULT_EXCLUDE_FIELDS.forEach {
-            excludeFields.add(it)
-        }
-        val metadata = clazz.getMetadata()
-
-
-        val filter = metadata.fields
-
-            .filter {
-                val ignoreCaseNotIn = it.name ignoreCaseNotIn excludeFields
-                ignoreCaseNotIn
+            DEFAULT_EXCLUDE_FIELDS.forEach {
+                excludeFields.add(it)
             }
-            .map { field ->
-                val getter = field.property.getter
-                val addColumn = AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
-                addColumn.fieldName = field.name
-                if (addColumn.title.isBlank()) {
-                    addColumn.title = field.name
+            val metadata = clazz.getMetadata()
+
+
+            val filter = metadata.fields
+
+                .filter {
+                    val ignoreCaseNotIn = it.name ignoreCaseNotIn excludeFields
+                    ignoreCaseNotIn
+                }.map { field ->
+                    val getter = field.property.getter
+                    val addColumn =
+                        AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+                    addColumn.fieldName = field.name
+                    if (addColumn.title.isBlank()) {
+                        addColumn.title = field.name
+                    }
+                    addColumn
                 }
-                addColumn
-            }
 
-        return filter
+            return filter
+        }
     }
 }
 

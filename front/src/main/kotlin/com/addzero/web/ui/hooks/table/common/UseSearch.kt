@@ -22,7 +22,8 @@ import com.addzero.web.ui.hooks.UseHook
 class UseSearch(val onSearch: () -> Unit) : UseHook<UseSearch> {
     var searchText by mutableStateOf("")
 
-    override val render: () -> Unit
+    override val render: @Composable
+        () -> Unit
         get() = {
             Row(
                 modifier = modifier,

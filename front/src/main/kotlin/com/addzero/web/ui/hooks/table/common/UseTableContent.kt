@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,41 +25,40 @@ import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 
 class UseTableContent<E>(
-    val onSelectionChange: (List<E>) -> Unit = {},
-    val getIdFun: (E) -> Any={it.hashCode()}
+//    val onSelectionChange: (List<E>) -> Unit = {},
+    val getIdFun: (E) -> Any = { it.hashCode() }
 ) : UseHook<UseTableContent<E>> {
 
     var columns: List<AddColumn<E>> by mutableStateOf(listOf())
-    val dataList: List<E> by mutableStateOf(listOf())
-    val selectedItems: List<E> by mutableStateOf(listOf())
+    var dataList: List<E> by mutableStateOf(listOf())
+    var selectedItems: List<E> by mutableStateOf(listOf())
     val isEditMode by mutableStateOf(false)
     var currentSelectItem: E? by mutableStateOf(null)
 
     var showFormFlag: Boolean by mutableStateOf(false)
     var showDeleteFlag: Boolean by mutableStateOf(false)
 
-    val horizontalScrollState = rememberScrollState()
-
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override val render: () -> Unit
+    override val render: @Composable
+        () -> Unit
         get() = {
+
+            //todo 滚动位置在这记对不对?
+            val horizontalScrollState = rememberScrollState()
+
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                modifier = Modifier.fillMaxWidth().border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(8.dp)
+                )
             ) {
+
                 // 表头区域
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                        .padding(vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                        .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 选择框表头
                     if (isEditMode) {
@@ -67,15 +67,13 @@ class UseTableContent<E>(
                             contentAlignment = Alignment.Center
                         ) {
                             Checkbox(
-                                checked = selectedItems.size == dataList.size,
-                                onCheckedChange = { checked ->
-                                    if (checked) {
-                                        onSelectionChange(dataList)
+                                checked = selectedItems.size == dataList.size, onCheckedChange = {
+                                    if (it) {
+                                        selectedItems = dataList
                                     } else {
-                                        onSelectionChange(emptyList())
+                                        selectedItems = emptyList()
                                     }
-                                }
-                            )
+                                })
                         }
                     }
 
@@ -93,9 +91,7 @@ class UseTableContent<E>(
 
                     // 数据列表头
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .horizontalScroll(horizontalScrollState)
+                        modifier = Modifier.weight(1f).horizontalScroll(horizontalScrollState)
                     ) {
                         Row(
                             modifier = Modifier.width(IntrinsicSize.Max),
@@ -107,9 +103,7 @@ class UseTableContent<E>(
                                     text = column.title,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = androidx.compose.ui.Modifier
-                                        .width(150.dp)
-                                        .padding(horizontal = 8.dp)
+                                    modifier = androidx.compose.ui.Modifier.width(150.dp).padding(horizontal = 8.dp)
                                 )
                             }
                         }
@@ -132,23 +126,17 @@ class UseTableContent<E>(
                 LazyColumn {
                     items(dataList, key = getIdFun) { item ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .background(
-                                    color = when {
-                                        selectedItems.contains(item) ->
-                                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f)
+                            modifier = Modifier.fillMaxWidth().height(56.dp).background(
+                                color = when {
+                                    selectedItems.contains(item) -> MaterialTheme.colorScheme.primaryContainer.copy(
+                                        alpha = 0.12f
+                                    )
 
-                                        dataList.indexOf(item) % 2 == 1 ->
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
+                                    dataList.indexOf(item) % 2 == 1 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
 
-                                        else ->
-                                            MaterialTheme.colorScheme.surface
-                                    }
-                                )
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                    else -> MaterialTheme.colorScheme.surface
+                                }
+                            ).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically
                         ) {
                             // 选择框列
                             if (isEditMode) {
@@ -157,16 +145,14 @@ class UseTableContent<E>(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Checkbox(
-                                        checked = selectedItems.contains(item),
-                                        onCheckedChange = { checked ->
-                                            val newSelection = if (checked) {
+                                        checked = selectedItems.contains(item), onCheckedChange = { checked ->
+                                            selectedItems = if (checked) {
                                                 selectedItems + item
                                             } else {
                                                 selectedItems - item
                                             }
-                                            onSelectionChange(newSelection)
-                                        }
-                                    )
+
+                                        })
                                 }
                             }
 
@@ -184,9 +170,7 @@ class UseTableContent<E>(
 
                             // 数据列
                             Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .horizontalScroll(horizontalScrollState)
+                                modifier = Modifier.weight(1f).horizontalScroll(horizontalScrollState)
                             ) {
                                 Row(
                                     modifier = Modifier.width(IntrinsicSize.Max),
@@ -195,10 +179,8 @@ class UseTableContent<E>(
                                 ) {
                                     columns.forEach { column ->
                                         Box(
-                                            modifier = androidx.compose.ui.Modifier
-                                                .width(150.dp)
-                                                .padding(horizontal = 8.dp)
-                                                .height(IntrinsicSize.Min),
+                                            modifier = androidx.compose.ui.Modifier.width(150.dp)
+                                                .padding(horizontal = 8.dp).height(IntrinsicSize.Min),
                                             contentAlignment = Alignment.CenterStart
                                         ) {
                                             val content = column.getFun(item).toNotBlankStr()
