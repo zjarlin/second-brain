@@ -3,6 +3,7 @@ package com.addzero.common.kt_util
 import cn.hutool.core.convert.Convert
 import cn.hutool.core.io.FileUtil
 import cn.hutool.core.text.CharSequenceUtil
+import cn.hutool.core.util.NumberUtil
 import cn.hutool.core.util.StrUtil
 import java.util.regex.Pattern
 
@@ -264,6 +265,14 @@ fun CharSequence.toUnderlineCase(): String {
     val toUnderlineCase = StrUtil.toUnderlineCase(this)
     return toUnderlineCase
 }
+
+
+
+
+fun CharSequence.isNumber(): Boolean {
+    return NumberUtil.isNumber(this)
+}
+
 fun Any?.toNotBlankStr(): String {
     if (this==null) {
         return ""

@@ -1,608 +1,147 @@
 package com.addzero.web.ui.hooks.table.generic
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import cn.hutool.db.meta.Table
+import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
+import com.addzero.common.kt_util.FieldMetadata
 import com.addzero.common.kt_util.addAllIfAbsentByKey
+import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.toNotBlankStr
-import com.addzero.web.ui.hooks.form.DynamicFormComponent
+import com.addzero.web.ui.hooks.UseHook
+import com.addzero.web.ui.hooks.table.common.*
 import com.addzero.web.ui.hooks.table.entity.AddColumn
-import com.addzero.web.ui.hooks.table.entity.ButtonConfig
+import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
+import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
 
-/**
- * 通用表格组件
- */
-@Composable
-inline fun <reified E : Any> GenericTable(
-    excludeFields: MutableSet<String> = mutableSetOf(),
+
+
+
+inline fun<reified E> Table(
+    excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
     columns: List<AddColumn<E>> = emptyList(),
-    buttons: List<ButtonConfig<E>> = ButtonConfig.defaultButtons(),
-    crossinline onSearch: (GenericTableViewModel<E>) -> Unit = {},
-    noinline onEdit: (E) -> Unit = {},
-    noinline onDelete: (E) -> Unit = {},
-    noinline getIdFun: (E) -> Any = { it.hashCode() },
-    modifier: Modifier = Modifier.fillMaxSize()
+    onValueChange: (UseGenericTable<E>) -> Unit = {},
+
 ) {
-    val viewModel = remember { GenericTableViewModel<E>() }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<E?>(null) }
-    var isEditMode by remember { mutableStateOf(false) }
-    var selectedItems by remember { mutableStateOf<List<E>>(emptyList()) }
+    val clazz = E::class
+    LaunchedEffect(clazz){
+        val metadata = clazz.getMetadata()
+        val defaultColumns = metadata.fields.filter { !excludeFields.contains(it.property.name) }
+            .map<FieldMetadata<E>, AddColumn<E>> { field ->
+                val getter = field.property.getter
+                AddColumn(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+            }.filter { it.title.isNotBlank() }
+        columns.addAllIfAbsentByKey(defaultColumns, { it.title })
 
-    // 初始化数据加载
-//    LaunchedEffect(Unit) {
-//        onSearch(viewModel)
-//    }
-
-    // 监听分页变化
-    LaunchedEffect(viewModel.pageNo, viewModel.pageSize) {
-        onSearch(viewModel)
     }
 
-    LaunchedEffect(E::class) {
-        val defaultColumns = viewModel.getDefaultColumns(E::class, excludeFields)
-        val toMutableList = columns.toMutableList()
-        defaultColumns.addAllIfAbsentByKey(toMutableList) { it.title }
-        viewModel.columns = defaultColumns
+
+}
+
+
+
+
+class UseGenericTable<E : Any>(
+    excludeFields: Set<String> = DEFAULT_EXCLUDE_FIELDS,
+    columns: List<AddColumn<E>> = emptyList(),
+    onValueChange: (UseGenericTable<E>) -> Unit = {},
+) : UseHook<UseGenericTable<E>> {
+
+    init {
+        //设置默认值
     }
 
-    Box {
-        Column {
-            // 搜索栏和按钮区
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 搜索栏
-                SearchBar(
-                    searchText =viewModel. searchText,
-                    onSearchTextChange = {viewModel. searchText = it },
-                    onSearch = {
-                        viewModel.pageNo = 1  // 重置页码为1
-                        onSearch(viewModel)
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-                
-                // 按钮区
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    buttons.filter { button ->
-                        when (button.text) {
-                            "批量删除" -> isEditMode
-                            else -> true
-                        }
-                    }.forEach { button ->
-                        var showConfirmDialog by remember { mutableStateOf(false) }
-                        
-                        OutlinedButton(
-                            onClick = { 
-                                if (button.needConfirm) {
-                                    showConfirmDialog = true
-                                } else {
-                                    when (button.text) {
-                                        "编辑模式" -> {
-                                            if (isEditMode) {
-                                                selectedItems = emptyList()
-                                                isEditMode = false
-                                            } else {
-                                                isEditMode = true
-                                            }
-                                        }
-                                        else -> button.onClick(selectedItems)
-                                    }
-                                }
-                            },
-                            enabled = when (button.text) {
-                                "批量删除" -> selectedItems.isNotEmpty()
-                                else -> true
-                            }
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(button.icon, contentDescription = button.text)
-                                Text(if (button.text == "编辑模式" && isEditMode) "退出编辑" else button.text)
-                            }
-                        }
-                        
-                        if (showConfirmDialog) {
-                            AlertDialog(
-                                onDismissRequest = { showConfirmDialog = false },
-                                title = { Text(button.confirmTitle) },
-                                text = { Text(button.confirmContent) },
-                                confirmButton = {
-                                    TextButton(
-                                        onClick = {
-                                            button.onClick(selectedItems)
-                                            showConfirmDialog = false
-                                        }
-                                    ) {
-                                        Text("确定")
-                                    }
-                                },
-                                dismissButton = {
-                                    TextButton(onClick = { showConfirmDialog = false }) {
-                                        Text("取消")
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
 
-            // 表格主体区域
-            Surface(modifier = Modifier.weight(1f)) {
-                TableContent(
-                    columns = viewModel.columns,
-                    dataList = viewModel.dataList,
-                    onEdit = { item ->
-                        selectedItem = item
-                        showEditDialog = true
-                    },
-                    onDelete = { item ->
-                        selectedItem = item
-                        showDeleteDialog = true
-                    },
-                    getIdFun = getIdFun,
-                    isEditMode = isEditMode,
-                    selectedItems = selectedItems,
-                    onSelectionChange = { newSelection -> selectedItems = newSelection }
-                )
-            }
+    companion object {
+        // 搜索Hook
+        private val useSearch = UseSearch().getState()
 
-            // 分页控件
-            PaginationBar(
-                pageNo = viewModel.pageNo,
-                pageSize = viewModel.pageSize,
-                totalPages = viewModel.totalPages,
-                onPageChange = { viewModel.pageNo = it },
-                onPageSizeChange = { viewModel.pageSize = it }
-            )
-        }
+        // 表格头部Hook
+        // 分页控件Hook
+        private val useTablePagination = UseTablePagination().getState()
+    }
 
-        // 编辑对话框
-        if (showEditDialog && selectedItem != null) {
-            AlertDialog(
-                onDismissRequest = { showEditDialog = false },
-                title = { Text("编辑") },
-                text = {
-                    DynamicFormComponent(
+    // 表格内容Hook
+    private val useTableContent = UseTableContent<E>().getState()
+
+    private val useTableHeader = UseTableHeader<E>().getState()
+
+    // 表格操作区Hook
+    private val useTableOperations = UseTableOperations<E>().getState()
+
+
+
+    override val render: @Composable () -> Unit
+        get() = {
+            // 搜索栏
+            val searchText = useSearch.searchText
+            //表头滚动状态
+            val scrollState = useTableHeader.scrollState
+
+            //表头
+            val columns = useTableHeader.columns
+
+            // 表格内容的列,设置为表头的列
+            useTableContent.columns = columns
+
+            //表格内容数据
+            val dataList = useTableContent.dataList
+
+            // 表格内容滚动状态 设置为表头滚动状态
+            useTableContent.scrollState = scrollState
+
+
+
+//            todo 观察 公共包下的hook实现,完成表格的渲染,注意数据区与表头的同步滚动
+            Box {
+                useSearch.render()
+
+                // 表格头部和内容区域
+                val scrollState = rememberScrollState()
+
+                // 表格头部
+
+                HorizontalDivider()
+
+                // 表格内容
+
+                // 右侧操作区域
+
+                // 分页控件
+
+                // 编辑对话框
+                if (showEditDialog && selectedItem != null) {
+                    FormDialog(
+                        item = selectedItem as E,
                         columns = viewModel.columns,
-                        data = selectedItem as E,
-                        onDataChange = { updatedItem ->
-                            selectedItem = updatedItem
-                            // 触发数据更新
-                            onSearch(viewModel)
-                        }
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            selectedItem?.let { onEdit(it) }
+                        onConfirm = { item ->
+                            onEdit(item)
                             showEditDialog = false
-                        }
-                    ) {
-                        Text("确定")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showEditDialog = false }) {
-                        Text("取消")
-                    }
+                        },
+                        onDismiss = { showEditDialog = false }
+                    )
                 }
-            )
-        }
 
-        // 删除确认对话框
-        if (showDeleteDialog && selectedItem != null) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text("确认删除") },
-                text = { Text("确定要删除这条记录吗？") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
+                // 删除确认对话框
+
+                DeleteDialog(
+                    show = showFlag,
+                    item = currentItem,
+                    onDeleted = TODO()
+                )
+                if (showDeleteDialog && selectedItem != null) {
+                    DeleteDialog(
+                        onDeleted = {
                             selectedItem?.let { onDelete(it) }
                             showDeleteDialog = false
-                        }
-                    ) {
-                        Text("确定")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("取消")
-                    }
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun SearchBar(
-    searchText: String,
-    onSearchTextChange: (String) -> Unit,
-    onSearch: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = onSearchTextChange,
-            modifier = Modifier.weight(1f).padding(end = 8.dp),
-            placeholder = { Text("请输入搜索关键词... 键入Enter可执行搜索") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearch() })
-        )
-        OutlinedButton(
-            onClick = onSearch,
-            modifier = Modifier.height(56.dp)
-        ) {
-            Text("搜索")
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun <E : Any> TableContent(
-    columns: List<AddColumn<E>>,
-    dataList: List<E>,
-    onEdit: (E) -> Unit,
-    onDelete: (E) -> Unit,
-    getIdFun: (E) -> Any,
-    isEditMode: Boolean = false,
-    selectedItems: List<E> = emptyList(),
-    onSelectionChange: (List<E>) -> Unit = {}
-) {
-    val horizontalScrollState = rememberScrollState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
-                shape = RoundedCornerShape(8.dp)
-            )
-    ) {
-        // 表头区域
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                .padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 选择框表头
-            if (isEditMode) {
-                Box(
-                    modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Checkbox(
-                        checked = selectedItems.size == dataList.size,
-                        onCheckedChange = { checked ->
-                            if (checked) {
-                                onSelectionChange(dataList)
-                            } else {
-                                onSelectionChange(emptyList())
-                            }
-                        }
+                        },
+                        onDismiss = { showDeleteDialog = false }
                     )
                 }
             }
-            
-            // 序号表头
-            Box(
-                modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "序号",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            // 数据列表头
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .horizontalScroll(horizontalScrollState)
-            ) {
-                Row(
-                    modifier = Modifier.width(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    columns.forEach { column ->
-                        Text(
-                            text = column.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .width(150.dp)
-                                .padding(horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
-            
-            // 操作列表头
-            Box(
-                modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "操作",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
-        
-        // 使用单个LazyColumn渲染所有数据行
-        LazyColumn {
-            items(dataList, key = getIdFun) { item ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .background(
-                            color = when {
-                                selectedItems.contains(item) ->
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f)
-                                dataList.indexOf(item) % 2 == 1 ->
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
-                                else ->
-                                    MaterialTheme.colorScheme.surface
-                            }
-                        )
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 选择框列
-                    if (isEditMode) {
-                        Box(
-                            modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Checkbox(
-                                checked = selectedItems.contains(item),
-                                onCheckedChange = { checked ->
-                                    val newSelection = if (checked) {
-                                        selectedItems + item
-                                    } else {
-                                        selectedItems - item
-                                    }
-                                    onSelectionChange(newSelection)
-                                }
-                            )
-                        }
-                    }
-                    
-                    // 序号列
-                    Box(
-                        modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = (dataList.indexOf(item) + 1).toString(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    
-                    // 数据列
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .horizontalScroll(horizontalScrollState)
-                    ) {
-                        Row(
-                            modifier = Modifier.width(IntrinsicSize.Max),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            columns.forEach { column ->
-                                Box(
-                                    modifier = Modifier
-                                        .width(150.dp)
-                                        .padding(horizontal = 8.dp)
-                                        .height(IntrinsicSize.Min),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    val content = column.getFun(item).toNotBlankStr()
-                                    val displayText = if (content.length > 30) {
-                                        content.take(30) + "..."
-                                    } else {
-                                        content
-                                    }
-                                    
-                                    TooltipBox(
-                                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                        tooltip = {
-                                            PlainTooltip {
-                                                Text(content)
-                                            }
-                                        },
-                                        state = rememberTooltipState()
-                                    ) {
-                                        SelectionContainer {
-                                            Text(
-                                                text = displayText,
-                                                maxLines = 2,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    // 操作列
-                    Box(
-                        modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            TooltipBox(
-                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                tooltip = {
-                                    PlainTooltip { Text("编辑") }
-                                },
-                                state = rememberTooltipState()
-                            ) {
-                                IconButton(onClick = { onEdit(item) }) {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = "编辑",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
-                            TooltipBox(
-                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                tooltip = {
-                                    PlainTooltip { Text("删除") }
-                                },
-                                state = rememberTooltipState()
-                            ) {
-                                IconButton(onClick = { onDelete(item) }) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = "删除",
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun PaginationBar(
-    pageNo: Int,
-    pageSize: Int,
-    totalPages: Int,
-    onPageChange: (Int) -> Unit,
-    onPageSizeChange: (Int) -> Unit
-) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { onPageChange(pageNo - 1) },
-                    enabled = pageNo > 1,
-                    modifier = Modifier.height(36.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp)
-                ) {
-                    Text("上一页", style = MaterialTheme.typography.bodyMedium)
-                }
-
-                Text(
-                    "$pageNo/$totalPages",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-
-                OutlinedButton(
-                    onClick = { onPageChange(pageNo + 1) },
-                    enabled = pageNo < totalPages,
-                    modifier = Modifier.height(36.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp)
-                ) {
-                    Text("下一页", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Text(
-                    "每页显示: ",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                listOf(10, 20, 30, 40,50, 60,70,80,90,100).forEach { size ->
-                    OutlinedButton(
-                        onClick = { onPageSizeChange(size) },
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Text("$size")
-                    }
-                }
-
-                OutlinedTextField(
-                    value = pageSize.toString(),
-                    onValueChange = { newValue ->
-                        newValue.toIntOrNull()?.let { onPageSizeChange(it) }
-                    },
-                    modifier = Modifier.width(80.dp).padding(horizontal = 4.dp),
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    placeholder = { Text("自定义", style = MaterialTheme.typography.bodyMedium) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-        }
-    }
 }
 
