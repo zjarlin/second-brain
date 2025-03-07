@@ -1,8 +1,11 @@
 package com.addzero.web.ui.hooks.table.generic
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.ignoreCaseNotIn
@@ -95,25 +98,23 @@ class UseTable<E : Any>(
             val useTableContent = useTableContent.getState()
             val useTablePagination = useTablePagination.getState()
 
-
-
-            Column {
+            Column(modifier = Modifier.fillMaxSize()) {
                 useSearch.render()
-                useTableContent.render()
+                
+                Box(modifier = Modifier.weight(1f)) {
+                    Column {
+                        useTableContent.render()
+                        FormDialog(useTableContent, onFormSubmit = onSave)
+                        DeleteDialog(useTableContent, onDelete = onDelete)
+                    }
+                }
 
-                FormDialog(useTableContent, onFormSubmit = onSave)
+                LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize, useTablePagination.totalPages) {
+                    refreshData()
+                }
 
-                DeleteDialog(useTableContent, onDelete = onDelete)
+                useTablePagination.render()
             }
-
-
-
-            LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize, useTablePagination.totalPages) {
-                refreshData()
-            }
-
-            useTablePagination.render()
-
         }
 }
 
