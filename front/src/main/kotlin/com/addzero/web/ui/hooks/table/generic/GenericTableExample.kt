@@ -11,9 +11,11 @@ import com.addzero.common.consts.sql
 import com.addzero.common.kt_util.add
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
+import com.addzero.web.modules.sys.area.name
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
+import org.babyfish.jimmer.sql.kt.ast.expression.or
 import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
 @Composable
@@ -33,7 +35,7 @@ fun GenericTableExample() {
             val title = it.toString()
             val addColumn1 = AddColumn<SysArea>(
                 title = title,
-                getFun = {title},
+                getFun = { title },
             )
             addColumn1
         }.toList()
@@ -43,7 +45,7 @@ fun GenericTableExample() {
     Surface(modifier = Modifier.padding(16.dp)) {
         Column {
             GenericTable<SysArea>(
-                columns =toList,
+                columns = toList,
                 onLoadData = {
                     // 模拟搜索功能
                     val searchText = it.useSearch.searchText
@@ -67,7 +69,13 @@ private fun selectArea(
     useTable: UseTable<SysArea>
 ): Page<SysArea> {
     val createQuery = sql.createQuery(SysArea::class) {
-        where(table.city `ilike?` keyword)
+        where(
+            or(
+                table.city `ilike?` keyword,
+                table.name `ilike?` keyword
+            )
+
+        )
         orderBy(table.makeOrders("sid asc"))
         select(table)
     }.fetchPage(useTable.useTablePagination.pageNo - 1, useTable.useTablePagination.pageSize)
