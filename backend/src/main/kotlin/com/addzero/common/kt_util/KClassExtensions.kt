@@ -24,9 +24,7 @@ data class ClassMetadata<T>(
 data class FieldMetadata<T>(
     /** 字段名 */
     val name: String,
-
     val property: KProperty1<T, *>,
-
     /** 字段类型 */
     val type: String,
     /** 字段描述（来自@Schema注解） */
@@ -90,7 +88,7 @@ fun <T : Any> KClass<T>.getMetadata(): ClassMetadata<T> {
             type = it.returnType.toString(),
             description = propertySchema?.description,
             example = propertySchema?.example,
-            nullable = false
+            nullable = false,
         )
 
     }.sortedByCustomOrderIgnoreCase(

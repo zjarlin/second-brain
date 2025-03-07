@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,16 +21,22 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 @Composable
 fun GenericTableExample() {
     // 自定义列配置
-    val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }) {
-        val blackFlag = it.blackFlag
-        Switch(
-            checked = blackFlag == true,
-            onCheckedChange = {
-                TODO()
-//                sql.update(SysArea::class,it)
+    val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
+        customRender = {
 //                更新数据
-            }
-        )
+            val blackFlag = it.blackFlag
+            //                sql.update(SysArea::class,it)
+            //                更新数据
+            Switch(
+                checked = blackFlag == true,
+                onCheckedChange = {
+                    TODO()
+                    //                sql.update(SysArea::class,it)
+                    //                更新数据
+                }
+            )
+
+        }
     }
     val toList = (1..100)
         .map {

@@ -1,7 +1,7 @@
 package com.addzero.web.ui.hooks.table.generic.dialog
 
 import androidx.compose.runtime.Composable
-import com.addzero.web.ui.hooks.form.DynamicFormComponent
+import com.addzero.web.ui.hooks.form.UseDynamicForm
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 
 /**
@@ -9,7 +9,7 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
  */
 @Composable
 fun <E : Any> FormDialog(
-    useTableContent: UseTableContent<E>, onFormSubmit: (E) -> Unit
+    useTableContent: UseTableContent<E>, onFormSubmit: (E) -> Unit, columnCount: Int = 2
 ) {
     val item = useTableContent.currentSelectItem
     val show = useTableContent.showFormFlag
@@ -17,19 +17,20 @@ fun <E : Any> FormDialog(
     if (item == null) {
         return
     }
+
+    val useDynamicForm = UseDynamicForm(useTableContent, columnCount).getState()
+
     GenericDialog(
-        show = show,
+        showFlag = show,
         title = "编辑",
         onDismiss = { useTableContent.showFormFlag = false },
-        onConfirm = { onFormSubmit(item) },
+        onConfirm = {
+            //验证表单
+            val validate = useDynamicForm.validate()
+            onFormSubmit(item)
+        },
         content = {
-            DynamicFormComponent(
-                columns = useTableContent.columns,
-                onDataChange = {
-                    useTableContent.currentSelectItem = it
-                },
-                data = useTableContent.currentSelectItem!!,
-            )
+            useDynamicForm.render()
         }
     )
 }

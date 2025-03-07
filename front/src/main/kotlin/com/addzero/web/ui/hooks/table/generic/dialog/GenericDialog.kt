@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun GenericDialog(
-    show: Boolean,
+    showFlag: Boolean,
     title: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    if (show) {
+    if (showFlag) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(title) },

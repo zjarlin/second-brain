@@ -26,7 +26,8 @@ enum class RenderType {
     TREE,
     COMPUTED,
     AUTO_COMPLETE,
-    CUSTOM;
+    CUSTOM,
+    FILE;
 
     companion object {
 

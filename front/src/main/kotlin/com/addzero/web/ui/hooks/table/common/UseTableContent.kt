@@ -31,6 +31,7 @@ class UseTableContent<E : Any>(
     var dataList: List<E> by mutableStateOf(listOf())
     var selectedItems: List<E> by mutableStateOf(listOf())
     val isEditMode by mutableStateOf(false)
+
     var currentSelectItem: E? by mutableStateOf(null)
 
     var showFormFlag: Boolean by mutableStateOf(false)

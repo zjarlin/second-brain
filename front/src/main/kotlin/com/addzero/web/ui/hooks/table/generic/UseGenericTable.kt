@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.getMetadata
 import com.addzero.common.kt_util.ignoreCaseNotIn
+import com.addzero.common.kt_util.isNotEmpty
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseSearch
@@ -42,6 +43,7 @@ fun <E : Any> getDefaultColumns(
             if (addColumn.title.isBlank()) {
                 addColumn.title = field.name
             }
+            addColumn.currentField=field
             addColumn
         }
 
@@ -72,7 +74,9 @@ class UseTable<E : Any>(
     }
 
     private val useTableContent = UseTableContent<E>().apply {
-        this.columns += columns
+        if (columns.isNotEmpty()) {
+            this.columns += columns
+        }
     }
 
     val useTablePagination = UseTablePagination()

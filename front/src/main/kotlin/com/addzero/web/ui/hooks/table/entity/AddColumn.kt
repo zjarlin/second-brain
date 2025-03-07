@@ -1,23 +1,16 @@
 package com.addzero.web.ui.hooks.table.entity
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import cn.hutool.core.util.ReflectUtil
-import com.addzero.common.kt_util.toNotBlankStr
-import com.addzero.web.infra.jackson.parseObject
+import cn.hutool.core.util.ObjUtil
+import com.addzero.common.kt_util.*
 import com.addzero.web.infra.jackson.toJson
-import com.addzero.web.modules.sys.area.SysArea
+import com.addzero.web.ui.hooks.form.FormItem
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import com.alibaba.fastjson2.JSON
-import com.alibaba.fastjson2.parseObject
-import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
-import org.babyfish.jimmer.runtime.DraftSpi
 import org.babyfish.jimmer.runtime.Internal
-import org.babyfish.jimmer.runtime.Internal.currentDraftContext
 import kotlin.reflect.KClass
-
 
 
 /**
@@ -25,110 +18,101 @@ import kotlin.reflect.KClass
  * @param E 数据实体类型
  */
 data class AddColumn<E : Any>(
-
     /** 字段标题 */
     var title: String,
-    var fieldName: String="",
+    var fieldName: String = "",
 
-    /** 获取列渲染类型的函数，默认为文本类型 */
-    val getRenderType: (E) -> RenderType = { TEXT },
-
-    /** 自定义验证函数 */
-    val validator: (E) -> Boolean = { true },
-
-    /** 验证错误提示信息 */
-    val errorMessage: String? = null,
-    var clazz: KClass<E>?=null,
+    var clazz: KClass<E>? = null,
 
     /** 获取列数据的函数 */
     val getFun: (E) -> Any?,
 
     /** 设置值的函数，用于表单编辑 */
-    val setFun: (E,String, Any?) -> E = { e,fieldName, value ->
-        setImmutableObj(e, fieldName, value)
+    val setFun: (E?, AddColumn<E>, Any?) -> E? = { e, c, value ->
+        setImmutableObj(e, c, value)
     },
 
     /** 是否必填 */
     val required: Boolean = false,
 
-    /** 占位文本 */
-    val placeholder: String = "",
-
-    /** 指定渲染类型，如果为null则自动推导 */
-    val renderTypeOverride: RenderType? = null,
-
     /** 选项列表，用于下拉选择等 */
     val options: List<Pair<Any, String>> = emptyList(),
 
+    ) {
+
+    lateinit var currentField: FieldMetadata<E>
+
+    /** 占位文本 */
+    val placeholder: String
+        get() = "请输入${this.title}"
 
 
+    /** 验证错误提示信息 */
+    val errorMessage: String
+        get() = "${this.title}的值非法"
 
-    /** 自定义渲染函数 */
-    val customRender: @Composable (E) -> Unit = {
-        val renderType = getRenderType(it)
-        val fieldValue = getFun(it)
-        val text = fieldValue.toNotBlankStr()
-        when (renderType) {
-            TEXT -> {
-                Text(text = text)
+
+    /** 推测列渲染类型的函数，默认为文本类型 */
+    val renderType: RenderType
+        get() {
+//            // 如果明确指定了渲染类型，则使用指定的类型
+//            if (renderType.isNotNull()) {
+//                return CUSTOM
+//            }
+            val fieldName = this.fieldName
+
+            val property = currentField.property
+            val returnType = property.returnType
+
+            val renderType = when {
+                fieldName.containsAnyIgnoreCase("url,file") -> RenderType.FILE
+                fieldName.containsAnyIgnoreCase("image") -> IMAGE
+                fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> DATE
+                fieldName.containsAnyIgnoreCase("time", "datetime") -> DATETIME
+                fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
+                returnType.classifier == String::class -> TEXT
+                returnType.classifier == Boolean::class -> SWITCH
+
+                else -> {
+                    CUSTOM
+                }
             }
-
-            IMAGE -> {
-                Text(text)
-            }
-
-            CUSTOM -> {
-                Text(text)
-            }
-
-            TEXTAREA -> {
-                Text(text)
-            }
-
-            SWITCH -> {
-                Text(text)
-            }
-
-            TAG -> {
-                Text(text)
-            }
-
-            NUMBER -> TODO()
-            LINK -> TODO()
-            DATE -> TODO()
-            DATETIME -> TODO()
-            SELECT -> TODO()
-            MULTISELECT -> TODO()
-            CHECKBOX -> TODO()
-            RADIO -> TODO()
-            CODE -> TODO()
-            HTML -> TODO()
-            MONEY -> TODO()
-            CURRENCY -> TODO()
-            PERCENT -> TODO()
-            BAR -> TODO()
-            TREE -> TODO()
-            COMPUTED -> TODO()
-            AUTO_COMPLETE -> TODO()
+            return renderType
         }
 
-
+    /** 自定义列表渲染函数 */
+    var customRender: @Composable (E) -> Unit = {
+        FormItem(this, null)
     }
-) {
+
+    /** 自定义验证函数 */
+    val validator: (E?) -> Boolean
+        get() = {
+
+            val any = it?.let { it1 -> getFun(it1) }
+
+            if (required) {
+                ObjUtil.isNotEmpty(any)
+            }
+            //如果是手机号
+
+            //如果是身份证号
+            true
+        }
+
 }
 
-private fun <E : Any> setImmutableObj(e: E, fieldName: String, value: Any?): E {
+private fun <E : Any> setImmutableObj(e: E?, addColumn: AddColumn<E>, value: Any?): E? {
+    if (e.isNull()) {
+        return e
+    }
     //先写死clazz测试
-    val toJson = e.toJson()
+    val toJson = e!!.toJson()
     val parseObject = JSON.parseObject(toJson)
-    parseObject.put(fieldName, value)
+    parseObject.put(addColumn.fieldName, value)
     val toJson1 = parseObject.toJson()
     val fromString = ImmutableObjects.fromString(e.javaClass, toJson1)
     return fromString
-
-
-//    return setImmuInternal(e, fieldName, value)
-
 }
 
 private fun <E : Any> setImmuInternal(e: E, fieldName: String, value: Any?): E {

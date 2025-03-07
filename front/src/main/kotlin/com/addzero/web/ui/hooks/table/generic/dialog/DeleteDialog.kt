@@ -16,7 +16,7 @@ fun <E : Any> DeleteDialog(
     val currentSelectItem = useTableContent.currentSelectItem ?: return
 
     GenericDialog(
-        show = useTableContent.showDeleteFlag,
+        showFlag = useTableContent.showDeleteFlag,
         title = "确认删除",
         onDismiss = { useTableContent.showDeleteFlag = false },
         onConfirm = { onDelete((idFun(currentSelectItem))) },

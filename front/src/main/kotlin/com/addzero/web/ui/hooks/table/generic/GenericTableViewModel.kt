@@ -34,8 +34,6 @@ class GenericTableViewModel<E : Any> {
                 excludeFields.add(it)
             }
             val metadata = clazz.getMetadata()
-
-
             val filter = metadata.fields
 
                 .filter {
