@@ -1,5 +1,6 @@
 package com.addzero.web.ui.system
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import com.addzero.web.log
 import com.addzero.web.ui.components.dialog.AddDialog
@@ -54,7 +55,7 @@ fun ErrorHandler(content: @Composable () -> Unit) {
             onDismissRequest = { ErrorState.clearError() },
             title = "错误提示",
             content = {
-                androidx.compose.material3.Text(text = errorMessage ?: "")
+                Text(text = errorMessage ?: "")
             },
             confirmButton = {
                 DefaultDialogButton(

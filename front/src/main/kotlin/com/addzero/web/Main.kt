@@ -44,7 +44,7 @@ fun main(args: Array<String>) {
         )
 
         Window(
-            onCloseRequest = ::exitApplication, title = "+0 后台管理系统", state = windowState
+            onCloseRequest = ::exitApplication, title = "compose desktop", state = windowState
         ) {
             App()
         }

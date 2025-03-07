@@ -44,11 +44,14 @@ class GenericTableViewModel<E : Any> {
                 }.map { field ->
                     val getter = field.property.getter
                     val addColumn =
-                        AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+                        AddColumn<E>(
+                            title = field.description.toNotBlankStr(), getFun = { getter.call(it) },
+                        )
                     addColumn.fieldName = field.name
                     if (addColumn.title.isBlank()) {
                         addColumn.title = field.name
                     }
+                    addColumn.clazz=clazz
                     addColumn
                 }
 

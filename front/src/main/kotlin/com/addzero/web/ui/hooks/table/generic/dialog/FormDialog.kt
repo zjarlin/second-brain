@@ -12,21 +12,23 @@ fun <E : Any> FormDialog(
     useTableContent: UseTableContent<E>, onFormSubmit: (E) -> Unit
 ) {
     val item = useTableContent.currentSelectItem
-    val show= useTableContent.showFormFlag
+    val show = useTableContent.showFormFlag
 
-    if (item==null) {
+    if (item == null) {
         return
     }
     GenericDialog(
         show = show,
         title = "编辑",
-        onDismiss ={useTableContent.showFormFlag=false} ,
+        onDismiss = { useTableContent.showFormFlag = false },
         onConfirm = { onFormSubmit(item) },
         content = {
             DynamicFormComponent(
                 columns = useTableContent.columns,
-                data = item,
-                onDataChange = {},
+                onDataChange = {
+                    useTableContent.currentSelectItem = it
+                },
+                data = useTableContent.currentSelectItem!!,
             )
         }
     )

@@ -22,7 +22,7 @@ import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 
-class UseTableContent<E>(
+class UseTableContent<E : Any>(
 //    val onSelectionChange: (List<E>) -> Unit = {},
     val getIdFun: (E) -> Any = { it.hashCode() }
 ) : UseHook<UseTableContent<E>> {

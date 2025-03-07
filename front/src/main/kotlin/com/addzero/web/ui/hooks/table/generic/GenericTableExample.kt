@@ -3,6 +3,7 @@ package com.addzero.web.ui.hooks.table.generic
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,12 +24,14 @@ fun GenericTableExample() {
     // 自定义列配置
     val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }) {
         val blackFlag = it.blackFlag
-
-        if (blackFlag == true) {
-            Text("名字包含黑")
-        } else {
-            Text("名字不包含黑")
-        }
+        Switch(
+            checked = blackFlag == true,
+            onCheckedChange = {
+                TODO()
+//                sql.update(SysArea::class,it)
+//                更新数据
+            }
+        )
     }
     val toList = (1..100)
         .map {
@@ -53,11 +56,10 @@ fun GenericTableExample() {
                     createQuery
                 },
                 onSave = {
-                    // 处理编辑操作
-                    println("编辑用户: $it")
+                    sql.save(it)
                 },
                 onDelete = {
-                    // 处理删除操作
+                    sql.deleteById(SysArea::class, it)
                 },
             )
         }

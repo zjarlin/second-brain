@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import org.babyfish.jimmer.Input
 
 /**
  * 动态表单组件
@@ -89,7 +90,7 @@ fun <E : Any> DynamicFormComponent(
  * @param customRenders 自定义渲染函数映射
  */
 @Composable
-fun <E : Any> DynamicForm(
+fun <E : Any,I:Input<E>> DynamicForm(
     columns: List<AddColumn<E>>,
     data: E,
     onDataChange: (E) -> Unit,
@@ -97,6 +98,10 @@ fun <E : Any> DynamicForm(
     columnCount: Int = 2,
     customRenders: Map<String, @Composable (E, AddColumn<E>, (Any?) -> Unit) -> Unit> = emptyMap()
 ) {
+    LaunchedEffect(data){
+        //刷新表单数据
+        onDataChange(data)
+    }
 
     // 计算每行的列数和总行数
     val itemsPerRow = columnCount
@@ -110,7 +115,7 @@ fun <E : Any> DynamicForm(
             .padding(16.dp)
     ) {
         // 按行渲染表单项
-        for (rowIndex in 0 until rowCount) {
+        for (rowIndex in 0..<rowCount) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 // 计算当前行的起始和结束索引
                 val startIndex = rowIndex * itemsPerRow

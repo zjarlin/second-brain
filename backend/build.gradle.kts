@@ -12,6 +12,7 @@ version = "1.0.0"
 ksp {
     arg("jimmer.dto.dirs", "src/main/kotlin")
     arg("jimmer.dto.defaultNullableInputModifier", "dynamic")
+    arg("jimmer.dto.mutable", "true")
 }
 
 kotlin {
@@ -69,8 +70,6 @@ dependencies {
     // 测试依赖
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.bundles.testing)
-
-
 
 
 }
