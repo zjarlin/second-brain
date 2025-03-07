@@ -1,8 +1,19 @@
+#logging.level.org.springframework.ai.chat.client.advisor=DEBUG
+
+# 需要配合docker镜像做离线ocr
+ocr.ip: 192.168.0.110:8089
+pkg: com.addzero
+controller:
+  advice:
+    path: ${pkg}
 server:
+
   port: 12344
   servlet:
     context-path: /api
 jimmer:
+  dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
+  #      ref-path: ${server.servlet.context-path}${jimmer.client.openapi.path}
   language: kotlin
   database-validation-mode: none    #验证数据库结构与实体
   in-list-padding-enabled: true     #开启Padding优化
@@ -22,10 +33,13 @@ jimmer:
       properties:
         info:
           description: document
-#      ref-path: ${server.servlet.context-path}${jimmer.client.openapi.path}
 
 
 spring:
+  profiles:
+    active: local
+
+
   jackson:
     time-zone: GMT+8
     #    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
@@ -65,7 +79,6 @@ spring:
       api-key: 2
     zhipuai:
       api-key: xxxxxxxxxxxxxx
-
 
     openai:
       chat:
@@ -144,10 +157,10 @@ dromara:
     minio:
       - platform: minio-1 # 存储平台标识
         enable-storage: true  # 启用存储
-        access-key: ${MINIO_USERNAME:zjarlin}
-        secret-key: ${MINIO_PASSWORD:zhou9955}
-        end-point: http://${MINIO_HOST:localhost}:${MINIO_PORT:19000}
-        bucket-name: ${MINIO_BUCKET_NAME:jl-starter}
+        access-key: ${MINIO_USERNAME:minioadmin}
+        secret-key: ${MINIO_PASSWORD:minioadmin}
+        end-point: http://${MINIO_HOST:localhost}:${MINIO_PORT:9000}
+        bucket-name: ${MINIO_BUCKET_NAME:xxxxxxxxxx}
 
     thumbnail-suffix: ".min.jpg" #缩略图后缀，例如【.min.jpg】【.png】
     #对应平台的配置写在这里，注意缩进要对齐
