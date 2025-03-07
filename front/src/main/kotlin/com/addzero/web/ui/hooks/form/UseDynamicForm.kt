@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -21,7 +21,6 @@ import com.addzero.web.ui.hooks.table.entity.RenderType.*
 @Composable
 fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<E>?) {
     val currentFormItem = useDynamicForm?.currentFormItem
-
     val renderType = columnMeta.renderType
     val getFun = columnMeta.getFun
     val setFun = columnMeta.setFun
@@ -31,85 +30,94 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
     val validRes = currentFormItem?.let { columnMeta.validator(it) }
 
     val text = fieldValue.toNotBlankStr()
-    when (renderType) {
-        TEXT -> {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { newval ->
-                    useDynamicForm ?: return@OutlinedTextField
-                    useDynamicForm.currentFormItem = setFun(currentFormItem, columnMeta, newval)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(columnMeta.placeholder) },
-                isError = validRes == false,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = columnMeta.title,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        when (renderType) {
+            TEXT -> {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { newval ->
+                        useDynamicForm ?: return@OutlinedTextField
+                        val newItem = setFun(currentFormItem, columnMeta, newval)
+                        useDynamicForm.currentFormItem = newItem
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(columnMeta.placeholder) },
+                    isError = validRes == false,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+            }
+
+            IMAGE -> {
+                Text(text)
+            }
+
+            CUSTOM -> {
+            }
+
+            TEXTAREA -> {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { newval ->
+                        useDynamicForm ?: return@OutlinedTextField
+                        val newItem = setFun(currentFormItem, columnMeta, newval)
+                        useDynamicForm.currentFormItem = newItem
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(columnMeta.placeholder) },
+                    isError = !columnMeta.validator(currentFormItem),
+    //                singleLine = true,
+                    maxLines = 5,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+
+            }
+
+            SWITCH -> {
+                Switch(
+                    checked = fieldValue == true,
+                    onCheckedChange = {
+                        useDynamicForm ?: return@Switch
+                        val newItem = setFun(currentFormItem, columnMeta, it)
+                        useDynamicForm.currentFormItem = newItem
+                    }
+                )
+            }
+
+            TAG -> {
+                Text(text)
+            }
+
+            NUMBER -> {}
+            LINK -> {}
+            DATE -> {}
+            DATETIME -> {}
+            SELECT -> {}
+            MULTISELECT -> {}
+            CHECKBOX -> {}
+            RADIO -> {}
+            CODE -> {}
+            HTML -> {}
+            MONEY -> {}
+            CURRENCY -> {}
+            PERCENT -> {}
+            BAR -> {}
+            TREE -> {}
+            COMPUTED -> {}
+            AUTO_COMPLETE -> {}
+            FILE -> {}
         }
-
-        IMAGE -> {
-            Text(text)
-        }
-
-        CUSTOM -> {
-        }
-
-        TEXTAREA -> {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { newval ->
-
-                    useDynamicForm ?: return@OutlinedTextField
-
-
-                    useDynamicForm.currentFormItem = setFun(currentFormItem, columnMeta, newval)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(columnMeta.placeholder) },
-                isError = !columnMeta.validator(currentFormItem),
-//                singleLine = true,
-                maxLines = 5,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
-
-        }
-
-        SWITCH -> {
-            Switch(
-                checked = fieldValue == true,
-                onCheckedChange = {
-
-                    useDynamicForm ?: return@Switch
-                    useDynamicForm.currentFormItem = setFun(currentFormItem, columnMeta, it)
-                }
-            )
-        }
-
-        TAG -> {
-            Text(text)
-        }
-
-        NUMBER -> {}
-        LINK -> {}
-        DATE -> {}
-        DATETIME -> {}
-        SELECT -> {}
-        MULTISELECT -> {}
-        CHECKBOX -> {}
-        RADIO -> {}
-        CODE -> {}
-        HTML -> {}
-        MONEY -> {}
-        CURRENCY -> {}
-        PERCENT -> {}
-        BAR -> {}
-        TREE -> {}
-        COMPUTED -> {}
-        AUTO_COMPLETE -> {}
-        FILE -> {}
     }
-
 }
+
 
 class UseDynamicForm<E : Any>(
     private val useTableContent: UseTableContent<E>,
@@ -119,6 +127,7 @@ class UseDynamicForm<E : Any>(
     private var validationErrors by mutableStateOf(mutableStateMapOf<String, String>())
 
     var currentFormItem by mutableStateOf(useTableContent.currentSelectItem)
+    var currentColumn:AddColumn<E>? by mutableStateOf(null)
 
     fun validate(): Boolean {
         useTableContent.columns.forEach { column ->
@@ -138,42 +147,49 @@ class UseDynamicForm<E : Any>(
 
     override val render: @Composable () -> Unit
         get() = {
+            val useDynamicForm = this.getState()
             val useTableContent = useTableContent.getState()
             val columns = useTableContent.columns
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount
             val rowCount = (columns.size + itemsPerRow - 1) / itemsPerRow
 
-
             val scrollState = rememberScrollState()
 
             Column(
-                modifier = Modifier.fillMaxWidth().verticalScroll(scrollState).padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
                 // 按行渲染表单项
                 for (rowIndex in 0..<rowCount) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         // 计算当前行的起始和结束索引
                         val startIndex = rowIndex * itemsPerRow
                         val endIndex = minOf(startIndex + itemsPerRow, columns.size)
 
                         // 渲染当前行的表单项
                         for (colIndex in startIndex until endIndex) {
-                            val column = columns[colIndex]
-                            Box(modifier = Modifier.weight(1f).padding(8.dp)) {
-                                Column {
-                                    // 标题和必填标记
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        FormItem(column, getState())
-                                    }
-                                }
+                            currentColumn = columns[colIndex]
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+                                FormItem(currentColumn!!, useDynamicForm)
                             }
+                        }
 
-                            // 如果当前行的列数不足，添加空白占位
-                            if (endIndex - startIndex < itemsPerRow) {
-                                for (i in 0 until (itemsPerRow - (endIndex - startIndex))) {
-                                    Box(modifier = Modifier.weight(1f).padding(8.dp))
-                                }
+                        // 如果当前行的列数不足，添加空的占位Box以保持对齐
+                        if (endIndex - startIndex < itemsPerRow) {
+                            repeat(itemsPerRow - (endIndex - startIndex)) {
+                                Box(modifier = Modifier.weight(1f))
                             }
                         }
                     }
