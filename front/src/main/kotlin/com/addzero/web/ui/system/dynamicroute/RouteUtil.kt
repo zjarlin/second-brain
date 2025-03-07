@@ -3,11 +3,14 @@ package com.addzero.web.ui.system.dynamicroute
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ClassUtil
 import cn.hutool.core.util.StrUtil
 import com.addzero.common.kt_util.isNotBlank
+import com.addzero.common.kt_util.isNotNull
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.common.util.data_structure.tree.List2TreeUtil
+import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
@@ -202,4 +205,23 @@ object RouteUtil {
         val routeMetadata = associate[path]
         return routeMetadata
     }
+
+    @Composable
+    fun nagive(currentRoute: String) {
+        val routeComponentByPath = RouteUtil.getRouteComponentByPath(currentRoute)
+        val clazz = routeComponentByPath?.clazz
+        val func = routeComponentByPath?.func
+        if (func.isNotNull()) {
+            // 处理函数组件路由
+            func?.let { it() }
+        } else if (clazz.isNotNull()) {
+            //处理类组件路由
+            val createInstance = clazz?.createInstance()
+            if (createInstance != null) {
+                val metaSpec = createInstance as MetaSpec
+                metaSpec.render()
+            }
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.addzero.web.ui.hooks.table.generic
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
@@ -56,7 +57,7 @@ class UseTable<E : Any>(
 
     val useSearch = UseSearch(
         onSearch = {
-            useTablePagination.pageNo=1
+            useTablePagination.pageNo = 1
             refreshData()
         })
 
@@ -88,20 +89,23 @@ class UseTable<E : Any>(
     }
 
 
-    override val render:
-
-            @Composable () -> Unit
+    override val render: @Composable () -> Unit
         get() = {
             val useSearch = useSearch.getState()
             val useTableContent = useTableContent.getState()
             val useTablePagination = useTablePagination.getState()
 
-            useSearch.render()
-            useTableContent.render()
 
-            FormDialog(useTableContent, onFormSubmit = onSave)
 
-            DeleteDialog(useTableContent, onDelete = onDelete)
+            Column {
+                useSearch.render()
+                useTableContent.render()
+
+                FormDialog(useTableContent, onFormSubmit = onSave)
+
+                DeleteDialog(useTableContent, onDelete = onDelete)
+            }
+
 
 
             LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize, useTablePagination.totalPages) {

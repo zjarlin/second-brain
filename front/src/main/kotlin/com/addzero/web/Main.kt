@@ -9,9 +9,6 @@ import androidx.compose.ui.window.rememberWindowState
 import com.addzero.SpringBootApp.Companion.runSpringBootApp
 import com.addzero.web.ui.system.layout.MainLayout
 import com.addzero.web.ui.system.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -36,10 +33,10 @@ fun main(args: Array<String>) {
     //怕springboot没完全跑起来影响前台
     application {
         // 在协程中启动后端服务
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
+//        val scope = CoroutineScope(Dispatchers.IO)
+//        scope.launch {
             runSpringBootApp(args)
-        }
+//        }
 
 
         val windowState = rememberWindowState(
