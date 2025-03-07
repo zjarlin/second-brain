@@ -5,12 +5,12 @@ spring:
       datasource:
         pg:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:15432/postgres?currentSchema=public
+          url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public
           username: postgres
           password: postgres
 #        dm:
 #          driver-class-name: dm.jdbc.driver.DmDriver
-#          url: jdbc:dm://82.157.77.120:5236/SJZYXT?searchpath=public&stringtype =unspecified &clobAsString=1
+#          url: jdbc:dm://11111111111111111:5236/SJZYXT?searchpath=public&stringtype =unspecified &clobAsString=1
 #          username: SJZYXT
 #          password: sjzyxt2024
 #        mysql:
