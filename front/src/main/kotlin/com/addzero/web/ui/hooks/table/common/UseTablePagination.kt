@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
 import androidx.compose.material3.*
@@ -98,7 +98,7 @@ class UseTablePagination : UseHook<UseTablePagination> {
                         OutlinedIconButton(
                             onClick = { pageNo++ }, enabled = pageNo < totalPages, modifier = Modifier.size(36.dp)
                         ) {
-                            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "下一页")
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "下一页")
                         }
 
                         OutlinedIconButton(

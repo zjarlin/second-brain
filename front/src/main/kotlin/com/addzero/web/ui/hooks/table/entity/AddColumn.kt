@@ -6,12 +6,12 @@ import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
 import com.addzero.web.infra.jackson.toJson
-import com.addzero.web.ui.hooks.form.FormItem
 import com.addzero.web.ui.hooks.form.UseDynamicForm
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import com.alibaba.fastjson2.JSON
 import kotlinx.serialization.json.JsonNull.content
+import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
@@ -34,7 +34,9 @@ data class AddColumn<E : Any>(
 
     /** 设置值的函数，用于表单编辑 */
     val setFun: (E?, AddColumn<E>, Any?) -> E? = { e, c, value ->
-        setImmutableObj(e, c, value)
+//        DraftObjects.produce
+        val immuInternal = setImmuInternal(e, c.fieldName, value)
+        immuInternal
     },
 
     /** 是否必填 */
@@ -45,7 +47,7 @@ data class AddColumn<E : Any>(
 
     ) {
 
-    var currentField: FieldMetadata<E>?=null
+    var currentField: FieldMetadata<E>? = null
 
     /** 占位文本 */
     val placeholder: String
@@ -60,7 +62,7 @@ data class AddColumn<E : Any>(
     /** 推测列渲染类型的函数，默认为文本类型 */
     val renderType: RenderType
         get() {
-            currentField?: return TEXT
+            currentField ?: return TEXT
 //            // 如果明确指定了渲染类型，则使用指定的类型
 //            if (renderType.isNotNull()) {
 //                return CUSTOM
@@ -79,7 +81,7 @@ data class AddColumn<E : Any>(
                 fieldName.containsAnyIgnoreCase("time", "datetime") -> DATETIME
                 fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
                 returnType.classifier == String::class -> TEXT
-                 returnType.classifier == Boolean::class -> SWITCH
+                returnType.classifier == Boolean::class -> SWITCH
                 else -> {
                     CUSTOM
                 }
@@ -93,13 +95,11 @@ data class AddColumn<E : Any>(
         val currentItem = getFun(it)
         val content = currentItem.toNotBlankStr()
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-            tooltip = {
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
                 PlainTooltip {
                     Text(content)
                 }
-            },
-            state = rememberTooltipState()
+            }, state = rememberTooltipState()
         ) {
             SelectionContainer {
                 val displayText = if (content.length > 30) {
@@ -133,7 +133,6 @@ private fun <E : Any> setImmutableObj(e: E?, addColumn: AddColumn<E>, value: Any
     if (e.isNull()) {
         return e
     }
-    //先写死clazz测试
     val toJson = e!!.toJson()
     val parseObject = JSON.parseObject(toJson)
     parseObject.put(addColumn.fieldName, value)
@@ -142,15 +141,21 @@ private fun <E : Any> setImmutableObj(e: E?, addColumn: AddColumn<E>, value: Any
     return fromString
 }
 
-private fun <E : Any> setImmuInternal(e: E, fieldName: String, value: Any?): E {
-    var obj: E? = null
-    Internal.produce(ImmutableType.get(e.javaClass), e, { d ->
-        val toJson = d.toJson()
-        val parseObject = JSON.parseObject(toJson)
-        parseObject.put(fieldName, value)
-        val toJson1 = parseObject.toJson()
-        val fromString = ImmutableObjects.fromString(e.javaClass, toJson1)
-        obj = fromString
+private fun <E : Any> setImmuInternal(e: E?, fieldName: String, value: Any?): E? {
+    if (e == null) {
+        return null
+    }
+
+    val produce = Internal.produce(ImmutableType.get(e.javaClass), e, { d ->
+
+        DraftObjects.set(d, fieldName, value)
+        d
+//        val toJson = d.toJson()
+//        val parseObject = JSON.parseObject(toJson)
+//        parseObject.put(fieldName, value)
+//        val toJson1 = parseObject.toJson()
+//        val fromString = ImmutableObjects.fromString(e.javaClass, toJson1)
+//        obj = fromString
     })
-    return obj!!
+    return produce as E!!
 }

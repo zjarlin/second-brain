@@ -25,7 +25,7 @@ fun <E : Any> FormDialog(
             val validate = useDynamicForm.validate()
             if (validate) {
                 // 使用useDynamicForm中的currentFormItem而不是原始的item
-                useDynamicForm.currentFormItem?.let { updatedItem ->
+                useTableContent.currentSelectItem?.let { updatedItem ->
                     onFormSubmit(updatedItem)
                 }
 

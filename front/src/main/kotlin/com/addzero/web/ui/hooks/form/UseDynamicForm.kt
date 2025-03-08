@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -12,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
@@ -22,8 +22,8 @@ import org.babyfish.jimmer.Formula
 import kotlin.reflect.full.hasAnnotation
 
 @Composable
-fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<E>?) {
-    val currentFormItem = useDynamicForm?.currentFormItem
+fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<E>,useTableContent: UseTableContent<E>) {
+    val currentFormItem = useTableContent.currentSelectItem
     val renderType = columnMeta.renderType
     val getFun = columnMeta.getFun
     val setFun = columnMeta.setFun
@@ -71,8 +71,7 @@ private fun <E : Any> renderByType(
                 value = text,
                 onValueChange = { newval ->
                     useDynamicForm ?: return@OutlinedTextField
-                    val newItem = setFun(currentFormItem, columnMeta, newval)
-                    useDynamicForm.currentFormItem = newItem
+                    simpleupdateFormItem(currentFormItem, columnMeta, newval, setFun, useDynamicForm)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(columnMeta.placeholder) },
@@ -98,8 +97,7 @@ private fun <E : Any> renderByType(
                 value = text,
                 onValueChange = { newval ->
                     useDynamicForm ?: return@OutlinedTextField
-                    val newItem = setFun(currentFormItem, columnMeta, newval)
-                    useDynamicForm.currentFormItem = newItem
+                    simpleupdateFormItem(currentFormItem, columnMeta, newval, setFun, useDynamicForm)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(columnMeta.placeholder) },
@@ -119,8 +117,7 @@ private fun <E : Any> renderByType(
                     checked = fieldValue == true,
                     onCheckedChange = {
                         useDynamicForm ?: return@Switch
-                        val newItem = setFun(currentFormItem, columnMeta, it)
-                        useDynamicForm.currentFormItem = newItem
+                        simpleupdateFormItem<E>(currentFormItem, columnMeta, it, setFun, useDynamicForm)
                     }
                 )
 
@@ -152,6 +149,21 @@ private fun <E : Any> renderByType(
     }
 }
 
+private fun <E : Any> simpleupdateFormItem(
+    currentFormItem: E?,
+    columnMeta: AddColumn<E>,
+    newval: Any,
+    setFun: (E?, AddColumn<E>, Any?) -> E?,
+    useDynamicForm: UseDynamicForm<E>
+) {
+    val oldValue = currentFormItem?.let { columnMeta.getFun(it) }
+    // 只有当值真正发生变化时才更新表单
+    if (oldValue != newval) {
+        val newItem = setFun(currentFormItem, columnMeta, newval)
+        useDynamicForm.updateFormItem(newItem)
+    }
+}
+
 @Composable
 private fun <E : Any> renderLabel(columnMeta: AddColumn<E>) {
     if (columnMeta.required) {
@@ -166,25 +178,36 @@ class UseDynamicForm<E : Any>(
     private val useTableContent: UseTableContent<E>,
     private val columnCount: Int = 2,
 ) : UseHook<UseDynamicForm<E>> {
+
+
     // 表单验证错误信息
     private var validationErrors by mutableStateOf(mutableStateMapOf<String, String>())
 
-    var currentFormItem by mutableStateOf(useTableContent.currentSelectItem)
+//    var currentFormItem by mutableStateOf(currentSelectItem)
+
+
     var currentColumn: AddColumn<E>? by mutableStateOf(null)
+
+    /**
+     * 更新表单项，优化重组逻辑
+     * 通过先设置为null再设置新值，强制触发一次更新
+     */
+    fun updateFormItem(newItem: E?) {
+        // 直接赋值可能不会触发所有依赖该状态的组件重组
+        useTableContent.currentSelectItem = null
+        // 设置新值
+        useTableContent.currentSelectItem = newItem
+        // 打印日志，确认更新
+        println("更新表单项: ${useTableContent.currentSelectItem}")
+    }
 
     fun validate(): Boolean {
         useTableContent.columns.forEach { column ->
-            if (!column.validator(currentFormItem!!)) {
+            if (!column.validator(useTableContent.currentSelectItem!!)) {
                 validationErrors[column.title] = column.errorMessage
             }
         }
         return validationErrors.isEmpty()
-    }
-
-    fun refreshFromFieldValue(addColumn: AddColumn<E>, newval: Any?): Unit {
-//        val currentSelectItem = useTableContent.currentSelectItem
-        val setFun = addColumn.setFun
-        currentFormItem = setFun(currentFormItem, addColumn, newval)
     }
 
 
@@ -225,7 +248,7 @@ class UseDynamicForm<E : Any>(
                                     .weight(1f)
                                     .fillMaxWidth()
                             ) {
-                                FormItem(currentColumn!!, useDynamicForm)
+                                FormItem(currentColumn!!,    useDynamicForm,useTableContent )
                             }
                         }
 
