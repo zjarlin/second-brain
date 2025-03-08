@@ -29,6 +29,21 @@ data class TreeNode<T>(
     val isEditable: Boolean = true
 )
 
+// 预定义节点类型
+object NodeTypes {
+    const val DEFAULT = "default"
+    const val FOLDER = "folder"
+    const val FILE = "file"
+    const val DOCUMENT = "document"
+    const val IMAGE = "image"
+    const val VIDEO = "video"
+    const val AUDIO = "audio"
+    const val LINK = "link"
+    const val TAG = "tag"
+    const val TASK = "task"
+    const val NOTE = "note"
+}
+
 // 树形选择控件的视图模型
 class TreeSelectViewModel<T>(
     private val initialNodes: List<TreeNode<T>>,
@@ -208,6 +223,68 @@ private fun filterNode(node: TreeNode<T>, searchText: String): TreeNode<T>? {
 }
 }
 
+// 渲染节点内容
+@Composable
+private fun <T> renderNodeContent(node: TreeNode<T>) {
+    when (node.type) {
+        NodeTypes.FOLDER -> {
+            Text(
+                text = "📁 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.FILE -> {
+            Text(
+                text = "📄 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.DOCUMENT -> {
+            Text(
+                text = "📝 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.IMAGE -> {
+            Text(
+                text = "🖼️ ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.VIDEO -> {
+            Text(
+                text = "🎬 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.AUDIO -> {
+            Text(
+                text = "🎵 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.LINK -> {
+            Text(
+                text = "🔗 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.TAG -> {
+            Text(
+                text = "🏷️ ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.TASK -> {
+            Text(
+                text = "✅ ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        NodeTypes.NOTE -> {
+            Text(
+                text = "📔 ${node.label}", modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        else -> {
+            Text(
+                text = node.label, modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
 // 树形选择控件的UI组件
 @Composable
 fun <T> TreeSelect(
@@ -287,25 +364,7 @@ private fun <T> TreeNodeItem(
             if (node.customRender != null) {
                 node.customRender.invoke(node)
             } else {
-                when (node.type) {
-                    "folder" -> {
-                        Text(
-                            text = "📁 ${node.label}", modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-
-                    "file" -> {
-                        Text(
-                            text = "📄 ${node.label}", modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-
-                    else -> {
-                        Text(
-                            text = node.label, modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
+                renderNodeContent(node)
             }
         }
 
@@ -351,9 +410,20 @@ class LeafNodeState : NodeState {
 class NonLeafUnselectedState : NodeState {
     override fun toggleSelection(node: TreeNode<*>, viewModel: TreeSelectViewModel<*>) {
         // 选中当前节点及其所有子节点
-        viewModel.toggleSelection(node.id)
+        val currentSelectedNodes = viewModel._selectedNodes.value
+        viewModel._selectedNodes.value = currentSelectedNodes + node.id
+        
+        // 直接选中所有子节点，避免递归调用
+        val childrenToSelect = mutableSetOf<String>()
+        collectAllChildrenIds(node, childrenToSelect)
+        viewModel._selectedNodes.value = viewModel._selectedNodes.value + childrenToSelect
+    }
+    
+    // 收集所有子节点ID
+    private fun collectAllChildrenIds(node: TreeNode<*>, result: MutableSet<String>) {
         node.children.forEach { child ->
-            viewModel.toggleSelection(child.id)
+            result.add(child.id)
+            collectAllChildrenIds(child, result)
         }
     }
 
@@ -366,9 +436,20 @@ class NonLeafUnselectedState : NodeState {
 class NonLeafIndeterminateState : NodeState {
     override fun toggleSelection(node: TreeNode<*>, viewModel: TreeSelectViewModel<*>) {
         // 全选当前节点及其所有子节点
-        viewModel.toggleSelection(node.id)
+        val currentSelectedNodes = viewModel._selectedNodes.value
+        viewModel._selectedNodes.value = currentSelectedNodes + node.id
+        
+        // 直接选中所有子节点，避免递归调用
+        val childrenToSelect = mutableSetOf<String>()
+        collectAllChildrenIds(node, childrenToSelect)
+        viewModel._selectedNodes.value = viewModel._selectedNodes.value + childrenToSelect
+    }
+    
+    // 收集所有子节点ID
+    private fun collectAllChildrenIds(node: TreeNode<*>, result: MutableSet<String>) {
         node.children.forEach { child ->
-            viewModel.toggleSelection(child.id)
+            result.add(child.id)
+            collectAllChildrenIds(child, result)
         }
     }
 
@@ -381,9 +462,20 @@ class NonLeafIndeterminateState : NodeState {
 class NonLeafSelectedState : NodeState {
     override fun toggleSelection(node: TreeNode<*>, viewModel: TreeSelectViewModel<*>) {
         // 取消选中当前节点及其所有子节点
-        viewModel.toggleSelection(node.id)
+        val currentSelectedNodes = viewModel._selectedNodes.value
+        viewModel._selectedNodes.value = currentSelectedNodes - node.id
+        
+        // 直接取消选中所有子节点，避免递归调用
+        val childrenToDeselect = mutableSetOf<String>()
+        collectAllChildrenIds(node, childrenToDeselect)
+        viewModel._selectedNodes.value = viewModel._selectedNodes.value - childrenToDeselect
+    }
+    
+    // 收集所有子节点ID
+    private fun collectAllChildrenIds(node: TreeNode<*>, result: MutableSet<String>) {
         node.children.forEach { child ->
-            viewModel.toggleSelection(child.id)
+            result.add(child.id)
+            collectAllChildrenIds(child, result)
         }
     }
 
