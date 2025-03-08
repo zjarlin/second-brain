@@ -1,18 +1,21 @@
 package com.addzero.web.ui.hooks.table.entity
 
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
 import com.addzero.web.infra.jackson.toJson
 import com.addzero.web.ui.hooks.form.FormItem
+import com.addzero.web.ui.hooks.form.UseDynamicForm
+import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import com.alibaba.fastjson2.JSON
-import org.babyfish.jimmer.Formula
+import kotlinx.serialization.json.JsonNull.content
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
 import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
 
 
 /**
@@ -84,8 +87,28 @@ data class AddColumn<E : Any>(
         }
 
     /** 自定义列表渲染函数 */
+    @OptIn(ExperimentalMaterial3Api::class)
     var customRender: @Composable (E) -> Unit = {
-        FormItem(this, null)
+        val currentItem = getFun(it)
+        val content = currentItem.toNotBlankStr()
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = {
+                PlainTooltip {
+                    Text(content)
+                }
+            },
+            state = rememberTooltipState()
+        ) {
+            SelectionContainer {
+                val displayText = if (content.length > 30) {
+                    content.take(30) + "..."
+                } else {
+                    content
+                }
+                Text(text = displayText)
+            }
+        }
     }
 
     /** 自定义验证函数 */

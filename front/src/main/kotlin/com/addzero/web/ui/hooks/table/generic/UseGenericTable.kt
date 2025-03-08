@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.util.fastDistinctBy
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
-import com.addzero.common.kt_util.getMetadata
-import com.addzero.common.kt_util.ignoreCaseNotIn
-import com.addzero.common.kt_util.isNotEmpty
-import com.addzero.common.kt_util.toNotBlankStr
+import com.addzero.common.kt_util.*
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseSearch
 import com.addzero.web.ui.hooks.table.common.UseTableContent
@@ -20,6 +18,7 @@ import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
 import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
 import org.babyfish.jimmer.Page
 import kotlin.reflect.KClass
+import kotlin.text.isBlank
 
 
 fun <E : Any> getDefaultColumns(
@@ -40,10 +39,12 @@ fun <E : Any> getDefaultColumns(
             val getter = field.property.getter
             val addColumn = AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
             addColumn.fieldName = field.name
+
             if (addColumn.title.isBlank()) {
                 addColumn.title = field.name
             }
-            addColumn.currentField=field
+
+            addColumn.currentField = field
             addColumn
         }
 
@@ -73,11 +74,7 @@ class UseTable<E : Any>(
         useTablePagination.totalPages = pageResult.totalPageCount.toInt()
     }
 
-    private val useTableContent = UseTableContent<E>().apply {
-        if (columns.isNotEmpty()) {
-            this.columns += columns
-        }
-    }
+    private val useTableContent = UseTableContent<E>()
 
     val useTablePagination = UseTablePagination()
 
@@ -87,12 +84,34 @@ class UseTable<E : Any>(
 //    }
 
     init {
-//        viewModel.searchText= useSearch.searchText
-//        viewModel.pageNo= useTablePagination.pageNo
-//        viewModel.pageSize = useTablePagination.pageSize
-
         val defaultColumns = getDefaultColumns(clazz, excludeFields)
-        useTableContent.columns += defaultColumns
+        val existingTitles = mutableSetOf<String>()
+        
+        // 使用sequence优化性能
+        useTableContent.columns = sequence {
+            // 添加默认列
+            defaultColumns.forEach { column ->
+                existingTitles.add(column.title)
+                yield(column)
+            }
+            
+            // 处理自定义列
+            if (columns.isNotEmpty()) {
+                val customColumnMap = columns.associateBy { it.title }
+                
+                // 更新已存在的列的自定义渲染
+                defaultColumns.filter { it.title in customColumnMap }
+                    .forEach { column ->
+                        column.customRender = customColumnMap[column.title]!!.customRender
+                    }
+                
+                // 添加新的自定义列
+                columns.filterNot { it.title in existingTitles }
+                    .forEach { column ->
+                        yield(column)
+                    }
+            }
+        }.toList()
     }
 
 
@@ -104,7 +123,7 @@ class UseTable<E : Any>(
 
             Column(modifier = Modifier.fillMaxSize()) {
                 useSearch.render()
-                
+
                 Box(modifier = Modifier.weight(1f)) {
                     Column {
                         useTableContent.render()
@@ -113,7 +132,8 @@ class UseTable<E : Any>(
                     }
                 }
 
-                LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize, useTablePagination.totalPages) {
+                // 优化LaunchedEffect依赖项
+                LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize) {
                     refreshData()
                 }
 

@@ -16,6 +16,7 @@ import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import org.babyfish.jimmer.Formula
 import kotlin.reflect.full.hasAnnotation
@@ -36,7 +37,8 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
 
     val text = fieldValue.toNotBlankStr()
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    renderByType(renderType, iscacle, columnMeta, text, useDynamicForm, setFun, currentFormItem, validRes, fieldValue)
+//    Column(modifier = Modifier.fillMaxWidth()) {
 //        Text(
 //            text = columnMeta.title,
 //            style = MaterialTheme.typography.bodySmall,
@@ -44,96 +46,109 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
 //            textAlign = androidx.compose.ui.text.style.TextAlign.Center
 //        )
 //        Spacer(modifier = Modifier.height(4.dp))
-        when (renderType) {
-            TEXT -> {
-                OutlinedTextField(
-                    enabled = !iscacle,
-                    label = {
-                        renderLabel(columnMeta)
+//    }
+}
 
-                    },
-                    value = text,
-                    onValueChange = { newval ->
-                        useDynamicForm ?: return@OutlinedTextField
-                        val newItem = setFun(currentFormItem, columnMeta, newval)
-                        useDynamicForm.currentFormItem = newItem
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(columnMeta.placeholder) },
-                    isError = validRes == false,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                )
-            }
-
-            IMAGE -> {
-                Text(text)
-            }
-
-            CUSTOM -> {
-            }
-
-            TEXTAREA -> {
-                OutlinedTextField(
-                    enabled = !iscacle,
-                    label = {
-                        renderLabel(columnMeta)
-                    },
-                    value = text,
-                    onValueChange = { newval ->
-                        useDynamicForm ?: return@OutlinedTextField
-                        val newItem = setFun(currentFormItem, columnMeta, newval)
-                        useDynamicForm.currentFormItem = newItem
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(columnMeta.placeholder) },
-                    isError = validRes == false,
-                    //                singleLine = true,
-                    maxLines = 5,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                )
-
-            }
-
-            SWITCH -> {
-                Column {
-                    Text(columnMeta.title)
-                    Switch(
-                        enabled = !iscacle,
-                        checked = fieldValue == true,
-                        onCheckedChange = {
-                            useDynamicForm ?: return@Switch
-                            val newItem = setFun(currentFormItem, columnMeta, it)
-                            useDynamicForm.currentFormItem = newItem
-                        }
-                    )
-
-                }
-            }
-
-            TAG -> {
-                Text(text)
-            }
-
-            NUMBER -> {}
-            LINK -> {}
-            DATE -> {}
-            DATETIME -> {}
-            SELECT -> {}
-            MULTISELECT -> {}
-            CHECKBOX -> {}
-            RADIO -> {}
-            CODE -> {}
-            HTML -> {}
-            MONEY -> {}
-            CURRENCY -> {}
-            PERCENT -> {}
-            BAR -> {}
-            TREE -> {}
-            COMPUTED -> {}
-            AUTO_COMPLETE -> {}
-            FILE -> {}
+@Composable
+private fun <E : Any> renderByType(
+    renderType: RenderType,
+    iscacle: Boolean,
+    columnMeta: AddColumn<E>,
+    text: String,
+    useDynamicForm: UseDynamicForm<E>?,
+    setFun: (E?, AddColumn<E>, Any?) -> E?,
+    currentFormItem: E?,
+    validRes: Boolean?,
+    fieldValue: Any?
+) {
+    when (renderType) {
+        TEXT -> {
+            OutlinedTextField(
+                enabled = !iscacle,
+                label = {
+                    renderLabel(columnMeta)
+                },
+                value = text,
+                onValueChange = { newval ->
+                    useDynamicForm ?: return@OutlinedTextField
+                    val newItem = setFun(currentFormItem, columnMeta, newval)
+                    useDynamicForm.currentFormItem = newItem
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(columnMeta.placeholder) },
+                isError = validRes == false,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
         }
+
+        IMAGE -> {
+            Text(text)
+        }
+
+        CUSTOM -> {
+        }
+
+        TEXTAREA -> {
+            OutlinedTextField(
+                enabled = !iscacle,
+                label = {
+                    renderLabel(columnMeta)
+                },
+                value = text,
+                onValueChange = { newval ->
+                    useDynamicForm ?: return@OutlinedTextField
+                    val newItem = setFun(currentFormItem, columnMeta, newval)
+                    useDynamicForm.currentFormItem = newItem
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(columnMeta.placeholder) },
+                isError = validRes == false,
+                //                singleLine = true,
+                maxLines = 5,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+
+        }
+
+        SWITCH -> {
+            Column {
+                Text(columnMeta.title)
+                Switch(
+                    enabled = !iscacle,
+                    checked = fieldValue == true,
+                    onCheckedChange = {
+                        useDynamicForm ?: return@Switch
+                        val newItem = setFun(currentFormItem, columnMeta, it)
+                        useDynamicForm.currentFormItem = newItem
+                    }
+                )
+
+            }
+        }
+
+        TAG -> {
+            Text(text)
+        }
+
+        NUMBER -> {}
+        LINK -> {}
+        DATE -> {}
+        DATETIME -> {}
+        SELECT -> {}
+        MULTISELECT -> {}
+        CHECKBOX -> {}
+        RADIO -> {}
+        CODE -> {}
+        HTML -> {}
+        MONEY -> {}
+        CURRENCY -> {}
+        PERCENT -> {}
+        BAR -> {}
+        TREE -> {}
+        COMPUTED -> {}
+        AUTO_COMPLETE -> {}
+        FILE -> {}
     }
 }
 

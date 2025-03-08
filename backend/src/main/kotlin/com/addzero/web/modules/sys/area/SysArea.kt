@@ -19,7 +19,10 @@ import org.babyfish.jimmer.sql.Table
 @Entity
 @Table(name = "sys_area")
 @Schema(description = "区域")
+
 public interface SysArea  {
+
+    @get:Schema(description = "名字是否有黑")
     @Formula(dependencies = ["delflag"])
     val blackFlag: Boolean?
         get() = city?.contains("黑")

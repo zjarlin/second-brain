@@ -89,6 +89,7 @@ class UseTableContent<E : Any>(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             columns.forEach { column ->
+
                                 Text(
                                     text = column.title,
                                     style = MaterialTheme.typography.titleMedium,
@@ -174,31 +175,14 @@ class UseTableContent<E : Any>(
                                                     .padding(horizontal = 8.dp).height(IntrinsicSize.Min),
                                                 contentAlignment = Alignment.CenterStart
                                             ) {
-                                                val content = column.getFun(item).toNotBlankStr()
-                                                val displayText = if (content.length > 30) {
-                                                    content.take(30) + "..."
-                                                } else {
-                                                    content
-                                                }
 
-                                                TooltipBox(
-                                                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                                    tooltip = {
-                                                        PlainTooltip {
-                                                            Text(content)
-                                                        }
-                                                    },
-                                                    state = rememberTooltipState()
-                                                ) {
-                                                    SelectionContainer {
-                                                        Text(
-                                                            text = displayText,
-                                                            maxLines = 2,
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            color = MaterialTheme.colorScheme.onSurface
-                                                        )
-                                                    }
-                                                }
+//                                                val currentItem = column.getFun(item)
+//
+//                                                val content = currentItem.toNotBlankStr()
+
+                                                column.customRender(item)
+
+
                                             }
                                         }
                                     }

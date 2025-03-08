@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.common.consts.sql
-import com.addzero.common.kt_util.add
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
 import com.addzero.web.modules.sys.area.name
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.generic.dialog.UseDialog
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
 import org.babyfish.jimmer.sql.kt.ast.expression.or
@@ -23,18 +23,18 @@ fun GenericTableExample() {
     // 自定义列配置
     val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
         customRender = {
-//                更新数据
             val blackFlag = it.blackFlag
-            //                sql.update(SysArea::class,it)
-            //                更新数据
+
+            val useDialog = UseDialog("点我干嘛")
             Switch(
                 checked = blackFlag == true,
                 onCheckedChange = {
-                    TODO()
-                    //                sql.update(SysArea::class,it)
-                    //                更新数据
+                    useDialog.apply {
+                       showFlag =true
+                    }
                 }
             )
+            useDialog.getState().render()
 
         }
     }
@@ -46,7 +46,10 @@ fun GenericTableExample() {
                 getFun = { title },
             )
             addColumn1
-        }.toList()
+        }.toMutableList()
+
+
+
     toList.add(addColumn)
 
 
