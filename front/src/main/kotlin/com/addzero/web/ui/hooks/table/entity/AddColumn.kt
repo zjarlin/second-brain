@@ -45,7 +45,7 @@ data class AddColumn<E : Any>(
 
     ) {
 
-    lateinit var currentField: FieldMetadata<E>
+    var currentField: FieldMetadata<E>?=null
 
     /** 占位文本 */
     val placeholder: String
@@ -60,13 +60,14 @@ data class AddColumn<E : Any>(
     /** 推测列渲染类型的函数，默认为文本类型 */
     val renderType: RenderType
         get() {
+            currentField?: return TEXT
 //            // 如果明确指定了渲染类型，则使用指定的类型
 //            if (renderType.isNotNull()) {
 //                return CUSTOM
 //            }
             val fieldName = this.fieldName
 
-            val property = currentField.property
+            val property = currentField!!.property
 
 
             val returnType = property.returnType

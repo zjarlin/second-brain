@@ -32,7 +32,7 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
 
     val validRes = currentFormItem?.let { columnMeta.validator(it) }
     //如果是计算属性
-    val property = columnMeta.currentField.property
+    val property = columnMeta.currentField?.property!!
     val iscacle = property.hasAnnotation<Transient>() || property.hasAnnotation<Formula>()
 
     val text = fieldValue.toNotBlankStr()
@@ -192,7 +192,7 @@ class UseDynamicForm<E : Any>(
         get() = {
             val useDynamicForm = this.getState()
             val useTableContent = useTableContent.getState()
-            val columns = useTableContent.columns
+            val columns = useTableContent.columns.filter { it.currentField != null }
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount
             val rowCount = (columns.size + itemsPerRow - 1) / itemsPerRow

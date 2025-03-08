@@ -30,6 +30,7 @@ fun <E : Any> FormDialog(
                 }
 
             }
+            useTableContent.showFormFlag = false
         },
         content = {
             useDynamicForm.render()

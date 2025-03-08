@@ -20,36 +20,29 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
 @Composable
 fun GenericTableExample() {
-    // 自定义列配置
+// 自定义列配置
     val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
         customRender = {
             val blackFlag = it.blackFlag
-
             val useDialog = UseDialog("点我干嘛")
             Switch(
-                checked = blackFlag == true,
-                onCheckedChange = {
+                checked = blackFlag == true, onCheckedChange = {
                     useDialog.apply {
-                       showFlag =true
+                        showFlag = true
                     }
-                }
-            )
+                })
             useDialog.getState().render()
-
         }
     }
-    val toList = (1..100)
-        .map {
-            val title = it.toString()
-            val addColumn1 = AddColumn<SysArea>(
-                title = title,
-                getFun = { title },
-            )
-            addColumn1
-        }.toMutableList()
-
-
-
+    //随机生成100个自定义列
+    val toList = (1..100).map {
+        val title = it.toString()
+        val addColumn1 = AddColumn<SysArea>(
+            title = title,
+            getFun = { title },
+        )
+        addColumn1
+    }.toMutableList()
     toList.add(addColumn)
 
 
@@ -58,7 +51,7 @@ fun GenericTableExample() {
             GenericTable<SysArea>(
                 columns = toList,
                 onLoadData = {
-                    // 模拟搜索功能
+// 模拟搜索功能
                     val searchText = it.useSearch.searchText
                     val createQuery = selectArea(searchText, it)
                     createQuery
@@ -75,16 +68,13 @@ fun GenericTableExample() {
 }
 
 private fun selectArea(
-    keyword: String,
-    useTable: UseTable<SysArea>
+    keyword: String, useTable: UseTable<SysArea>
 ): Page<SysArea> {
     val createQuery = sql.createQuery(SysArea::class) {
         where(
             or(
-                table.city `ilike?` keyword,
-                table.name `ilike?` keyword
+                table.city `ilike?` keyword, table.name `ilike?` keyword
             )
-
         )
         orderBy(table.makeOrders("sid asc"))
         select(table)

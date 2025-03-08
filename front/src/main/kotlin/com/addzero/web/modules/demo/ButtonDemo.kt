@@ -33,7 +33,7 @@ class ButtonDemo : MetaSpec {
         val activeProfile = SpringUtil.getActiveProfile()
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "$activeProfile",
+                text = activeProfile,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )

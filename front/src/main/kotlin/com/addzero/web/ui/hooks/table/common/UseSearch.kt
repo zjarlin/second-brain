@@ -19,7 +19,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
 
-class UseSearch(val onSearch: () -> Unit) : UseHook<UseSearch> {
+class UseSearch(
+val onSearch: () -> Unit
+) : UseHook<UseSearch> {
     var searchText by mutableStateOf("")
 
     override val render: @Composable

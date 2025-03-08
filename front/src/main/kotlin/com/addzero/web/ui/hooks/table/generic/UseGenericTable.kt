@@ -64,6 +64,7 @@ class UseTable<E : Any>(
     val useSearch = UseSearch(
         onSearch = {
             useTablePagination.pageNo = 1
+            useTablePagination.pageSize=10
             refreshData()
         })
 

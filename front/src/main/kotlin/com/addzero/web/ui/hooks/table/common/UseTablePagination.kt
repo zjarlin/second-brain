@@ -3,7 +3,7 @@ package com.addzero.web.ui.hooks.table.common
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
@@ -70,7 +70,7 @@ class UseTablePagination : UseHook<UseTablePagination> {
                         OutlinedIconButton(
                             onClick = { pageNo -= 1 }, enabled = pageNo > 1, modifier = Modifier.size(36.dp)
                         ) {
-                            Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "上一页")
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "上一页")
                         }
 
                         Row(

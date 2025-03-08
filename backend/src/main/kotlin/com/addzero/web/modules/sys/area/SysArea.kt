@@ -25,7 +25,7 @@ public interface SysArea  {
     @get:Schema(description = "名字是否有黑")
     @Formula(dependencies = ["delflag"])
     val blackFlag: Boolean?
-        get() = city?.contains("黑")
+        get() = name?.contains("黑") == true || city?.contains("黑") == true
 
     /**
      *  主键
