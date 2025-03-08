@@ -3,6 +3,7 @@ package com.addzero.web.ui.hooks.table.generic.dialog
 import androidx.compose.runtime.Composable
 import com.addzero.web.ui.hooks.form.UseDynamicForm
 import com.addzero.web.ui.hooks.table.common.UseTableContent
+import kotlinx.serialization.json.JsonNull.content
 
 /**
  * 编辑对话框组件
@@ -11,26 +12,26 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
 fun <E : Any> FormDialog(
     useTableContent: UseTableContent<E>, onFormSubmit: (E) -> Unit, columnCount: Int = 2
 ) {
-    val item = useTableContent.currentSelectItem
-    val show = useTableContent.showFormFlag
-
-    if (item == null) {
-        return
-    }
+    val item = useTableContent.currentSelectItem ?: return
 
     val useDynamicForm = UseDynamicForm(useTableContent, columnCount).getState()
 
     GenericDialog(
-        showFlag = show,
+        showFlag = useTableContent.showFormFlag,
         title = "编辑",
         onDismiss = { useTableContent.showFormFlag = false },
         onConfirm = {
             //验证表单
             val validate = useDynamicForm.validate()
-            onFormSubmit(item)
+            if (validate) {
+                // 使用useDynamicForm中的currentFormItem而不是原始的item
+                useDynamicForm.currentFormItem?.let { updatedItem ->
+                    onFormSubmit(updatedItem)
+                }
+
+            }
         },
         content = {
             useDynamicForm.render()
-        }
-    )
+        })
 }

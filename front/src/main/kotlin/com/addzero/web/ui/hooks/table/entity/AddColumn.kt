@@ -7,10 +7,12 @@ import com.addzero.web.infra.jackson.toJson
 import com.addzero.web.ui.hooks.form.FormItem
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import com.alibaba.fastjson2.JSON
+import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
 import kotlin.reflect.KClass
+import kotlin.reflect.full.hasAnnotation
 
 
 /**
@@ -62,6 +64,8 @@ data class AddColumn<E : Any>(
             val fieldName = this.fieldName
 
             val property = currentField.property
+
+
             val returnType = property.returnType
 
             val renderType = when {
@@ -71,8 +75,7 @@ data class AddColumn<E : Any>(
                 fieldName.containsAnyIgnoreCase("time", "datetime") -> DATETIME
                 fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
                 returnType.classifier == String::class -> TEXT
-                returnType.classifier == Boolean::class -> SWITCH
-
+                 returnType.classifier == Boolean::class -> SWITCH
                 else -> {
                     CUSTOM
                 }

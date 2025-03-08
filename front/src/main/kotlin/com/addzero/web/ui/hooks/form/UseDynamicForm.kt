@@ -17,6 +17,8 @@ import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.AddColumn
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
+import org.babyfish.jimmer.Formula
+import kotlin.reflect.full.hasAnnotation
 
 @Composable
 fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<E>?) {
@@ -28,20 +30,28 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
     val fieldValue = currentFormItem?.let { getFun(it) }
 
     val validRes = currentFormItem?.let { columnMeta.validator(it) }
+    //如果是计算属性
+    val property = columnMeta.currentField.property
+    val iscacle = property.hasAnnotation<Transient>() || property.hasAnnotation<Formula>()
 
     val text = fieldValue.toNotBlankStr()
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = columnMeta.title,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+//        Text(
+//            text = columnMeta.title,
+//            style = MaterialTheme.typography.bodySmall,
+//            modifier = Modifier.fillMaxWidth(),
+//            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+//        )
+//        Spacer(modifier = Modifier.height(4.dp))
         when (renderType) {
             TEXT -> {
                 OutlinedTextField(
+                    enabled = !iscacle,
+                    label = {
+                        renderLabel(columnMeta)
+
+                    },
                     value = text,
                     onValueChange = { newval ->
                         useDynamicForm ?: return@OutlinedTextField
@@ -65,6 +75,10 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
 
             TEXTAREA -> {
                 OutlinedTextField(
+                    enabled = !iscacle,
+                    label = {
+                        renderLabel(columnMeta)
+                    },
                     value = text,
                     onValueChange = { newval ->
                         useDynamicForm ?: return@OutlinedTextField
@@ -73,8 +87,8 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
                     },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text(columnMeta.placeholder) },
-                    isError = !columnMeta.validator(currentFormItem),
-    //                singleLine = true,
+                    isError = validRes == false,
+                    //                singleLine = true,
                     maxLines = 5,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 )
@@ -82,14 +96,19 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
             }
 
             SWITCH -> {
-                Switch(
-                    checked = fieldValue == true,
-                    onCheckedChange = {
-                        useDynamicForm ?: return@Switch
-                        val newItem = setFun(currentFormItem, columnMeta, it)
-                        useDynamicForm.currentFormItem = newItem
-                    }
-                )
+                Column {
+                    Text(columnMeta.title)
+                    Switch(
+                        enabled = !iscacle,
+                        checked = fieldValue == true,
+                        onCheckedChange = {
+                            useDynamicForm ?: return@Switch
+                            val newItem = setFun(currentFormItem, columnMeta, it)
+                            useDynamicForm.currentFormItem = newItem
+                        }
+                    )
+
+                }
             }
 
             TAG -> {
@@ -118,6 +137,15 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
     }
 }
 
+@Composable
+private fun <E : Any> renderLabel(columnMeta: AddColumn<E>) {
+    if (columnMeta.required) {
+        Text("* ${columnMeta.title}")
+    } else {
+        Text(columnMeta.title)
+    }
+}
+
 
 class UseDynamicForm<E : Any>(
     private val useTableContent: UseTableContent<E>,
@@ -127,7 +155,7 @@ class UseDynamicForm<E : Any>(
     private var validationErrors by mutableStateOf(mutableStateMapOf<String, String>())
 
     var currentFormItem by mutableStateOf(useTableContent.currentSelectItem)
-    var currentColumn:AddColumn<E>? by mutableStateOf(null)
+    var currentColumn: AddColumn<E>? by mutableStateOf(null)
 
     fun validate(): Boolean {
         useTableContent.columns.forEach { column ->
