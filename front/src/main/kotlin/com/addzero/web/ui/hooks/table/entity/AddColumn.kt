@@ -6,11 +6,8 @@ import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
 import com.addzero.web.infra.jackson.toJson
-import com.addzero.web.ui.hooks.form.UseDynamicForm
-import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import com.alibaba.fastjson2.JSON
-import kotlinx.serialization.json.JsonNull.content
 import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
@@ -147,15 +144,8 @@ private fun <E : Any> setImmuInternal(e: E?, fieldName: String, value: Any?): E?
     }
 
     val produce = Internal.produce(ImmutableType.get(e.javaClass), e, { d ->
-
         DraftObjects.set(d, fieldName, value)
         d
-//        val toJson = d.toJson()
-//        val parseObject = JSON.parseObject(toJson)
-//        parseObject.put(fieldName, value)
-//        val toJson1 = parseObject.toJson()
-//        val fromString = ImmutableObjects.fromString(e.javaClass, toJson1)
-//        obj = fromString
     })
     return produce as E!!
 }

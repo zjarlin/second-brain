@@ -61,6 +61,7 @@ private fun <E : Any> renderByType(
     validRes: Boolean?,
     fieldValue: Any?
 ) {
+
     when (renderType) {
         TEXT -> {
             OutlinedTextField(
@@ -186,7 +187,7 @@ class UseDynamicForm<E : Any>(
 //    var currentFormItem by mutableStateOf(currentSelectItem)
 
 
-    var currentColumn: AddColumn<E>? by mutableStateOf(null)
+//    private var currentColumn: AddColumn<E>? by mutableStateOf(null)
 
     /**
      * 更新表单项，优化重组逻辑
@@ -194,11 +195,13 @@ class UseDynamicForm<E : Any>(
      */
     fun updateFormItem(newItem: E?) {
         // 直接赋值可能不会触发所有依赖该状态的组件重组
+        println(useTableContent.currentSelectItem.hashCode())
         useTableContent.currentSelectItem = null
         // 设置新值
         useTableContent.currentSelectItem = newItem
         // 打印日志，确认更新
         println("更新表单项: ${useTableContent.currentSelectItem}")
+        println(useTableContent.currentSelectItem.hashCode())
     }
 
     fun validate(): Boolean {
@@ -242,13 +245,14 @@ class UseDynamicForm<E : Any>(
 
                         // 渲染当前行的表单项
                         for (colIndex in startIndex until endIndex) {
-                            currentColumn = columns[colIndex]
+                            val addColumn = columns[colIndex]
+//                            currentColumn = addColumn
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxWidth()
                             ) {
-                                FormItem(currentColumn!!,    useDynamicForm,useTableContent )
+                                FormItem(addColumn!!,    useDynamicForm,useTableContent )
                             }
                         }
 
