@@ -3,6 +3,7 @@ package com.addzero.web.ui.hooks.table.entity
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import cn.hutool.core.bean.BeanUtil
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
 import com.addzero.web.infra.jackson.toJson
@@ -12,6 +13,7 @@ import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
+import sun.jvm.hotspot.oops.CellTypeState.value
 import kotlin.reflect.KClass
 
 
@@ -31,9 +33,8 @@ data class AddColumn<E : Any>(
 
     /** 设置值的函数，用于表单编辑 */
     val setFun: (E?, AddColumn<E>, Any?) -> E? = { e, c, value ->
-//        DraftObjects.produce
-        val immuInternal = setImmuInternal(e, c.fieldName, value)
-        immuInternal
+        val copy = e.copy(c.fieldName, value)
+        copy
     },
 
     /** 是否必填 */
@@ -67,8 +68,6 @@ data class AddColumn<E : Any>(
             val fieldName = this.fieldName
 
             val property = currentField!!.property
-
-
             val returnType = property.returnType
 
             val renderType = when {
@@ -112,14 +111,11 @@ data class AddColumn<E : Any>(
     /** 自定义验证函数 */
     val validator: (E?) -> Boolean
         get() = {
-
             val any = it?.let { it1 -> getFun(it1) }
-
             if (required) {
                 ObjUtil.isNotEmpty(any)
             }
             //如果是手机号
-
             //如果是身份证号
             true
         }
@@ -138,14 +134,21 @@ private fun <E : Any> setImmutableObj(e: E?, addColumn: AddColumn<E>, value: Any
     return fromString
 }
 
-private fun <E : Any> setImmuInternal(e: E?, fieldName: String, value: Any?): E? {
-    if (e == null) {
+ fun <E : Any> E?.copy( fieldName: String, value: Any?): E? {
+    if (this == null) {
         return null
     }
-
-    val produce = Internal.produce(ImmutableType.get(e.javaClass), e, { d ->
+    val produce = Internal.produce(ImmutableType.get(this.javaClass), this, { d ->
         DraftObjects.set(d, fieldName, value)
         d
     })
     return produce as E!!
+}
+fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
+    if (this == null) {
+        return null
+    }
+    val beanToMap = BeanUtil.beanToMap(this, false, true)
+    return beanToMap
+
 }
