@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.m3.Markdown
 
 @Composable
 fun MarkdownEditor(
@@ -33,8 +34,7 @@ fun MarkdownEditor(
 
         // 编辑器/预览区
         if (isPreview) {
-            // TODO: 添加Markdown渲染
-            Text(value)
+            Markdown(value)
         } else {
             OutlinedTextField(
                 value = value,

@@ -16,13 +16,18 @@ import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.IAddColumn
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import org.babyfish.jimmer.Formula
 import kotlin.reflect.full.hasAnnotation
 
 @Composable
-fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<E>,useTableContent: UseTableContent<E>) {
+fun <E : Any> FormItem(
+    columnMeta: IAddColumn<E>,
+    useDynamicForm: UseDynamicForm<E>,
+    useTableContent: UseTableContent<E>
+) {
     val currentFormItem = useTableContent.currentSelectItem
     val renderType = columnMeta.renderType
     val getFun = columnMeta.getFun
@@ -53,10 +58,10 @@ fun <E : Any> FormItem(columnMeta: AddColumn<E>, useDynamicForm: UseDynamicForm<
 private fun <E : Any> renderByType(
     renderType: RenderType,
     iscacle: Boolean,
-    columnMeta: AddColumn<E>,
+    columnMeta: IAddColumn<E>,
     text: String,
     useDynamicForm: UseDynamicForm<E>?,
-    setFun: (E?, AddColumn<E>, Any?) -> E?,
+    setFun: (E?, IAddColumn<E>, Any?) -> E?,
     currentFormItem: E?,
     validRes: Boolean?,
     fieldValue: Any?
@@ -152,9 +157,9 @@ private fun <E : Any> renderByType(
 
 private fun <E : Any> simpleupdateFormItem(
     currentFormItem: E?,
-    columnMeta: AddColumn<E>,
+    columnMeta: IAddColumn<E>,
     newval: Any,
-    setFun: (E?, AddColumn<E>, Any?) -> E?,
+    setFun: (E?, IAddColumn<E>, Any?) -> E?,
     useDynamicForm: UseDynamicForm<E>
 ) {
     val oldValue = currentFormItem?.let { columnMeta.getFun(it) }
@@ -166,7 +171,7 @@ private fun <E : Any> simpleupdateFormItem(
 }
 
 @Composable
-private fun <E : Any> renderLabel(columnMeta: AddColumn<E>) {
+private fun <E : Any> renderLabel(columnMeta: IAddColumn<E>) {
     if (columnMeta.required) {
         Text("* ${columnMeta.title}")
     } else {
@@ -187,7 +192,7 @@ class UseDynamicForm<E : Any>(
 //    var currentFormItem by mutableStateOf(currentSelectItem)
 
 
-//    private var currentColumn: AddColumn<E>? by mutableStateOf(null)
+//    private var currentColumn: IAddColumn<E>? by mutableStateOf(null)
 
     /**
      * 更新表单项，优化重组逻辑
@@ -201,7 +206,6 @@ class UseDynamicForm<E : Any>(
         useTableContent.currentSelectItem = newItem
         // 打印日志，确认更新
         println("更新表单项: ${useTableContent.currentSelectItem}")
-        println(useTableContent.currentSelectItem.hashCode())
     }
 
     fun validate(): Boolean {
@@ -252,7 +256,7 @@ class UseDynamicForm<E : Any>(
                                     .weight(1f)
                                     .fillMaxWidth()
                             ) {
-                                FormItem(addColumn!!,    useDynamicForm,useTableContent )
+                                FormItem(addColumn!!, useDynamicForm, useTableContent)
                             }
                         }
 

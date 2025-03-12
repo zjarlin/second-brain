@@ -7,13 +7,13 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.IAddColumn
 
 @Composable
 fun <E : Any> SelectInput(
     value: String,
     onValueChange: (Any?) -> Unit,
-    column: AddColumn<E>,
+    column: IAddColumn<E>,
     error: String?
 ) {
     var expanded by remember { mutableStateOf(false) }

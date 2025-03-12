@@ -1,5 +1,6 @@
 package com.addzero.web.modules.second_brain.dotfiles
 
+import com.addzero.common.anno.Shit
 import com.addzero.web.infra.jimmer.base.baseentity.BaseEntity
 import com.addzero.web.modules.second_brain.tag.BizTag
 import com.addzero.web.modules.sys.dict.SysDict
@@ -9,13 +10,6 @@ import org.babyfish.jimmer.sql.*
 import org.babyfish.jimmer.sql.JoinTable.*
 import javax.swing.text.html.HTML.Tag
 
-//import org.babyfish.jimmer.sql.Key
-
-fun main() {
-    BizDotfiles {
-
-    }
-}
 /**
  * <p>
  *  环境变量管理
@@ -27,6 +21,7 @@ fun main() {
  */
 @Entity
 @Table(name = "biz_dotfiles")
+
 public interface BizDotfiles : BaseEntity {
 
     /**

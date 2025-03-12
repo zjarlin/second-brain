@@ -1,6 +1,7 @@
 package com.addzero.web.modules.second_brain.dotfiles;
 
 import cn.idev.excel.annotation.ExcelProperty;
+import com.addzero.common.anno.Shit
 import com.addzero.web.modules.second_brain.dotfiles.BizDotfiles
 
 fun BizDotfiles.toExcelDTO(): BizDotfilesExcelDTO {

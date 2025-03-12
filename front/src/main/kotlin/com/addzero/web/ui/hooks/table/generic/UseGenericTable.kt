@@ -23,7 +23,7 @@ import kotlin.text.isBlank
 
 fun <E : Any> getDefaultColumns(
     clazz: KClass<E>, excludeFields: MutableSet<String>
-): List<AddColumn<E>> {
+): List<IAddColumn<E>> {
 
     DEFAULT_EXCLUDE_FIELDS.forEach {
         excludeFields.add(it)
@@ -37,7 +37,7 @@ fun <E : Any> getDefaultColumns(
             ignoreCaseNotIn
         }.map { field ->
             val getter = field.property.getter
-            val addColumn = AddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+            val addColumn = JimmerAddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
             addColumn.fieldName = field.name
 
             if (addColumn.title.isBlank()) {
@@ -54,7 +54,7 @@ fun <E : Any> getDefaultColumns(
 class UseTable<E : Any>(
     val clazz: KClass<E>,
     val excludeFields: MutableSet<String>,
-    val columns: List<AddColumn<E>> = emptyList(),
+    val columns: List<IAddColumn<E>> = emptyList(),
     val getIdFun: (E) -> Any = { it.hashCode() },
     val onLoadData: (UseTable<E>) -> Page<E>? = { null },
     val onSave: (E) -> Unit,
@@ -146,7 +146,7 @@ class UseTable<E : Any>(
 @Composable
 inline fun <reified E : Any> GenericTable(
     excludeFields: MutableSet<String> = DEFAULT_EXCLUDE_FIELDS,
-    columns: List<AddColumn<E>> = emptyList(),
+    columns: List<IAddColumn<E>> = emptyList(),
     noinline getIdFun: (E) -> Any = { it.hashCode() },
     noinline onSave: (E) -> Unit,
     noinline onDelete: (Any) -> Unit,

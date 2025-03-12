@@ -5,7 +5,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.addzero.web.ui.hooks.table.entity.AddColumn
 
 @Composable
 fun <E : Any> TextInput(

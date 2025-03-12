@@ -4,47 +4,70 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.web.ui.hooks.UseHook
 
-/**
- * 复选框组件的函数式实现
- * @param viewModel 复选框视图模型
- * @param items 选项列表
- * @param isMultiSelect 是否多选
- * @param getLabel 获取选项标签的函数
- * @param modifier 修饰符
- * @param onToggle 切换选中状态的回调函数
- */
-@Composable
-fun <T> Checkbox(
-    viewModel: CheckboxViewModel<T>,
-    items: List<T>,
-    isMultiSelect: Boolean,
-    getLabel: (T) -> String = { it.toString() },
-    modifier: Modifier = Modifier,
-    onToggle: (T) -> Unit
-) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        viewModel.title?.let { title ->
-            Text(text = title, modifier = Modifier.padding(end = 8.dp))
-        }
-        items.forEach { item ->
-            Row(
-                modifier = Modifier.padding(end = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = viewModel.selected.contains(item),
-                    onCheckedChange = { onToggle(item) }
-                )
-                Text(
-                    text = getLabel(item),
-                    modifier = Modifier.padding(start = 4.dp)
-                )
+class UseCheckbox<T>(
+    val title: String? = null,
+    val options: List<T>,
+    val isMultiSelect: Boolean = true,
+    val getLabel: (T) -> String = { it.toString() },
+    val onToggle: (T) -> Unit
+) : UseHook<UseCheckbox<T>> {
+    var selected by mutableStateOf<List<T>>(emptyList())
+
+    override val render: @Composable () -> Unit
+        get() = {
+            Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+                title?.let { title ->
+                    Text(text = title, modifier = Modifier.padding(end = 8.dp))
+                }
+                options.forEach { item ->
+                    Row(
+                        modifier = Modifier.padding(end = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = selected.contains(item),
+                            onCheckedChange = { 
+                                selected = if (isMultiSelect) {
+                                    if (it) selected + item else selected - item
+                                } else {
+                                    if (it) listOf(item) else emptyList()
+                                }
+                                onToggle(item)
+                            }
+                        )
+                        Text(
+                            text = getLabel(item),
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
             }
         }
-    }
+}
+
+@Composable
+fun <T> Checkbox(
+    options: List<T>,
+    title: String? = null,
+    isMultiSelect: Boolean = true,
+    getLabel: (T) -> String = { it.toString() },
+    onToggle: (T) -> Unit
+) {
+    val useCheckbox = remember {
+        UseCheckbox(
+            title = title,
+            options = options,
+            isMultiSelect = isMultiSelect,
+            getLabel = getLabel,
+            onToggle = onToggle
+        )
+    }.getState()
+
+    useCheckbox.render()
 }
