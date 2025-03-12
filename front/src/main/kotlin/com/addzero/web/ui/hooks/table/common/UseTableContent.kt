@@ -18,22 +18,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
-import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.IColumn
 
 class UseTableContent<E : Any>(
-//    val onSelectionChange: (List<E>) -> Unit = {},
     val getIdFun: (E) -> Any = { it.hashCode() }
 ) : UseHook<UseTableContent<E>> {
 
-    var columns: List<AddColumn<E>> by mutableStateOf(listOf())
+    var columns: List<IColumn<E>> by mutableStateOf(listOf())
     var dataList: List<E> by mutableStateOf(listOf())
     var selectedItems: List<E> by mutableStateOf(listOf())
     val isEditMode by mutableStateOf(false)
-
     var currentSelectItem: E? by mutableStateOf(null)
-
     var showFormFlag: Boolean by mutableStateOf(false)
     var showDeleteFlag: Boolean by mutableStateOf(false)
 

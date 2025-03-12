@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,7 +14,7 @@ import com.addzero.web.ui.hooks.UseHook
 
 class UseTextAreaInput(val title: String) : UseHook<UseTextAreaInput> {
     var modelValue by mutableStateOf("")
-    override val render: () -> Unit
+    override val render: @Composable  () -> Unit
         get() = {
             OutlinedTextField(
                 value = modelValue,

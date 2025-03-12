@@ -1,5 +1,4 @@
 package com.addzero.web.modules.second_brain.dotfiles
-import com.addzero.common.anno.Shit
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import org.babyfish.jimmer.sql.EnumItem
@@ -21,6 +20,17 @@ enum class EnumDefType(
     val code: String?,
     val desc: String
 ) {
+    /**
+     * alias
+     */
+    @EnumItem(name = "1")
+    ALIAS("1", "alias"),
+
+    /**
+     * export
+     */
+    @EnumItem(name = "2")
+    EXPORT("2", "export"),
 
     /**
      * function

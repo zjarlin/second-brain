@@ -11,7 +11,7 @@ import com.addzero.common.consts.sql
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
 import com.addzero.web.modules.sys.area.name
-import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.generic.dialog.UseDialog
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
@@ -21,7 +21,8 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 @Composable
 fun GenericTableExample() {
 // 自定义列配置
-    val addColumn = AddColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
+    val addColumn = JimmerColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag })
+        .apply {
         customRender = {
             val blackFlag = it.blackFlag
             val useDialog = UseDialog("点我干嘛")
@@ -37,7 +38,7 @@ fun GenericTableExample() {
     //随机生成100个自定义列
     val toList = (1..100).map {
         val title = it.toString()
-        val addColumn1 = AddColumn<SysArea>(
+        val addColumn1 = JimmerColumn<SysArea>(
             title = title,
             getFun = { title },
         )

@@ -8,39 +8,31 @@ import androidx.compose.runtime.mutableStateOf
 import cn.hutool.core.bean.BeanUtil
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
-import com.addzero.web.infra.jackson.toJson
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
-import com.alibaba.fastjson2.JSON
 import org.babyfish.jimmer.DraftObjects
-import org.babyfish.jimmer.ImmutableObjects
+import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
+import org.babyfish.jimmer.spring.repo.PageParam
 import kotlin.reflect.KClass
+import kotlin.reflect.full.hasAnnotation
 
 
 /**
  * 表格列定义类
  * @param E 数据实体类型
  */
-data class JimmerAddColumn<E : Any>(
+data class JimmerColumn<E : Any>(
     override var title: String,
     override var fieldName: String = "",
-
-    override var clazz: KClass<E>? = null,
-
     override val getFun: (E) -> Any?,
-
-    override val setFun: (E?, IAddColumn<E>, Any?) -> E? = { e, c, value ->
-        val copy = e.copy(c.fieldName, value)
-        val att by mutableStateOf(copy)
-        att
+    override val setFun: (E, IColumn<E>, Any?) -> E = { e, c, value ->
+        e.copy(c.fieldName, value)!!
     },
 
     override val required: Boolean = false,
 
-    override val options: List<Pair<Any, String>> = emptyList(),
-
-    ) : IAddColumn<E> {
+    ) : IColumn<E> {
 
     var currentField: FieldMetadata<E>? = null
 
@@ -58,16 +50,15 @@ data class JimmerAddColumn<E : Any>(
     override val renderType: RenderType
         get() {
             currentField ?: return TEXT
-//            // 如果明确指定了渲染类型，则使用指定的类型
-//            if (renderType.isNotNull()) {
-//                return CUSTOM
-//            }
             val fieldName = this.fieldName
-
             val property = currentField!!.property
             val returnType = property.returnType
-
+            val iscacle = property.hasAnnotation<Transient>() || property.hasAnnotation<Formula>()
             val renderType = when {
+                iscacle -> {
+                    CUSTOM
+                }
+
                 fieldName.containsAnyIgnoreCase("url,file") -> RenderType.FILE
                 fieldName.containsAnyIgnoreCase("image") -> IMAGE
                 fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> DATE
@@ -85,6 +76,8 @@ data class JimmerAddColumn<E : Any>(
     /** 自定义列表渲染函数 */
     @OptIn(ExperimentalMaterial3Api::class)
     override var customRender: @Composable (E) -> Unit = {
+
+
         val currentItem = getFun(it)
         val content = currentItem.toNotBlankStr()
         TooltipBox(
@@ -119,25 +112,12 @@ data class JimmerAddColumn<E : Any>(
 
 }
 
-private fun <E : Any> setImmutableObj(e: E?, addColumn: JimmerAddColumn<E>, value: Any?): E? {
-    if (e.isNull()) {
-        return e
-    }
-    val toJson = e!!.toJson()
-    val parseObject = JSON.parseObject(toJson)
-    parseObject.put(addColumn.fieldName, value)
-    val toJson1 = parseObject.toJson()
-    val fromString = ImmutableObjects.fromString(e.javaClass, toJson1)
-    return fromString
+fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity ->
+    Internal.produce(ImmutableType.get(entity.javaClass), entity) { d ->
+        DraftObjects.set(d, fieldName, value)
+        d
+    } as E
 }
-
-fun <E : Any> E?.copy(fieldName: String, value: Any?): E? =
-    this?.let { entity ->
-        Internal.produce(ImmutableType.get(entity.javaClass), entity) { d ->
-            DraftObjects.set(d, fieldName, value)
-            d
-        } as E
-    }
 
 fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
     if (this == null) {

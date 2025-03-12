@@ -8,16 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.addzero.web.ui.hooks.UseHook
-import com.addzero.web.ui.hooks.table.entity.IAddColumn
 
-class UseAutoComplete<T, V>(
-    val placeholder: String,
+class UseAutoComplete<T>(
+    val title: String,
     val options: List<T>,
     val getLabelFun: (T) -> String,
-    val getValueFun: (T) -> V,
-    val onValueChange: (T?) -> Unit
-) : UseHook<UseAutoComplete<T, V>> {
-
+) : UseHook<UseAutoComplete<T>> {
     var inputValue by mutableStateOf("")
     var expanded by mutableStateOf(false)
     var isError by mutableStateOf(false)
@@ -32,7 +28,7 @@ class UseAutoComplete<T, V>(
                         expanded = true
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(placeholder) },
+                    placeholder = { Text("请输入$title") },
                     isError = isError,
                     singleLine = true,
                     trailingIcon = {
@@ -56,7 +52,6 @@ class UseAutoComplete<T, V>(
                             text = { Text(getLabelFun(option)) },
                             onClick = {
                                 inputValue = getLabelFun(option)
-                                onValueChange(option)
                                 expanded = false
                             }
                         )
@@ -64,26 +59,4 @@ class UseAutoComplete<T, V>(
                 }
             }
         }
-}
-
-@Composable
-fun <E : Any> AutoCompleteInput(
-    value: String,
-    onValueChange: (Any?) -> Unit,
-    column: IAddColumn<E>,
-    error: String?
-) {
-    val useAutoComplete = remember {
-        UseAutoComplete(
-            placeholder = column.placeholder,
-            options = column.options,
-            getLabelFun = { it.second },
-            getValueFun = { it.first },
-            onValueChange = { option -> onValueChange(option?.first) }
-        )
-    }
-
-    useAutoComplete.inputValue = value
-    useAutoComplete.isError = error != null
-    useAutoComplete.render()
 }

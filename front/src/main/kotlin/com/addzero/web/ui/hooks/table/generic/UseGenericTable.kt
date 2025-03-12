@@ -13,17 +13,19 @@ import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseSearch
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.common.UseTablePagination
-import com.addzero.web.ui.hooks.table.entity.AddColumn
+import com.addzero.web.ui.hooks.table.entity.IColumn
+import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
 import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
 import org.babyfish.jimmer.Page
+import kotlin.collections.filter
 import kotlin.reflect.KClass
 import kotlin.text.isBlank
 
 
 fun <E : Any> getDefaultColumns(
     clazz: KClass<E>, excludeFields: MutableSet<String>
-): List<IAddColumn<E>> {
+): List<IColumn<E>> {
 
     DEFAULT_EXCLUDE_FIELDS.forEach {
         excludeFields.add(it)
@@ -37,24 +39,21 @@ fun <E : Any> getDefaultColumns(
             ignoreCaseNotIn
         }.map { field ->
             val getter = field.property.getter
-            val addColumn = JimmerAddColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+            val addColumn = JimmerColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
             addColumn.fieldName = field.name
-
             if (addColumn.title.isBlank()) {
                 addColumn.title = field.name
             }
-
             addColumn.currentField = field
             addColumn
         }
-
     return filter
 }
 
 class UseTable<E : Any>(
     val clazz: KClass<E>,
     val excludeFields: MutableSet<String>,
-    val columns: List<IAddColumn<E>> = emptyList(),
+    val columns: List<IColumn<E>> = emptyList(),
     val getIdFun: (E) -> Any = { it.hashCode() },
     val onLoadData: (UseTable<E>) -> Page<E>? = { null },
     val onSave: (E) -> Unit,
@@ -64,7 +63,7 @@ class UseTable<E : Any>(
     val useSearch = UseSearch(
         onSearch = {
             useTablePagination.pageNo = 1
-            useTablePagination.pageSize=10
+            useTablePagination.pageSize = 10
             refreshData()
         })
 
@@ -87,7 +86,7 @@ class UseTable<E : Any>(
     init {
         val defaultColumns = getDefaultColumns(clazz, excludeFields)
         val existingTitles = mutableSetOf<String>()
-        
+
         // 使用sequence优化性能
         useTableContent.columns = sequence {
             // 添加默认列
@@ -95,17 +94,17 @@ class UseTable<E : Any>(
                 existingTitles.add(column.title)
                 yield(column)
             }
-            
+
             // 处理自定义列
             if (columns.isNotEmpty()) {
                 val customColumnMap = columns.associateBy { it.title }
-                
+
                 // 更新已存在的列的自定义渲染
                 defaultColumns.filter { it.title in customColumnMap }
                     .forEach { column ->
                         column.customRender = customColumnMap[column.title]!!.customRender
                     }
-                
+
                 // 添加新的自定义列
                 columns.filterNot { it.title in existingTitles }
                     .forEach { column ->
@@ -146,7 +145,7 @@ class UseTable<E : Any>(
 @Composable
 inline fun <reified E : Any> GenericTable(
     excludeFields: MutableSet<String> = DEFAULT_EXCLUDE_FIELDS,
-    columns: List<IAddColumn<E>> = emptyList(),
+    columns: List<IColumn<E>> = emptyList(),
     noinline getIdFun: (E) -> Any = { it.hashCode() },
     noinline onSave: (E) -> Unit,
     noinline onDelete: (Any) -> Unit,

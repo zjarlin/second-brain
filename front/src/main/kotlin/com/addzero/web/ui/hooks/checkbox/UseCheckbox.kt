@@ -51,23 +51,3 @@ class UseCheckbox<T>(
         }
 }
 
-@Composable
-fun <T> Checkbox(
-    options: List<T>,
-    title: String? = null,
-    isMultiSelect: Boolean = true,
-    getLabel: (T) -> String = { it.toString() },
-    onToggle: (T) -> Unit
-) {
-    val useCheckbox = remember {
-        UseCheckbox(
-            title = title,
-            options = options,
-            isMultiSelect = isMultiSelect,
-            getLabel = getLabel,
-            onToggle = onToggle
-        )
-    }.getState()
-
-    useCheckbox.render()
-}
