@@ -77,9 +77,7 @@ class UseDynamicForm<E : Any>(
             val useTableContent = useTableContent.getState()
 
             // 过滤掉不需要自定义列
-            val columns = useTableContent.columns.filter {
-                it .renderType != RenderType.CUSTOM
-            }
+            val columns = useTableContent.columns
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount
             val rowCount = (columns.size + itemsPerRow - 1) / itemsPerRow

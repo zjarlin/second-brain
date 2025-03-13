@@ -20,59 +20,29 @@ import kotlin.reflect.full.hasAnnotation
  */
 class JimmerColumn<E : Any>(
     override var title: String,
-    override var fieldName: String = "",
     override val getFun: (E) -> Any?,
     override val setFun: (E, IColumn<E>, Any?) -> E = { e, c, value ->
         e.copy(c.fieldName, value)!!
     },
+) : IColumn<E> {
 
-    override val required: Boolean = false,
-
-    ) : IColumn<E> {
-
-    var currentField: FieldMetadata<E>? = null
+    override var fieldName: String=""
+    var currentField: FieldMetadata<E>?=null
 
 
     val property = currentField?.property
 
-    override var renderType: RenderType = when {
-
-        property?.hasAnnotation<Transient>() == true || property?.hasAnnotation<Formula>() == true -> {
-            CUSTOM
+    override var renderType: RenderType
+        get() {
+            val property1 = currentField?.property
+            return when {
+                property1?.returnType?.classifier == String::class -> TEXT
+                property1?.returnType?.classifier == Boolean::class -> SWITCH
+                property?.hasAnnotation<Transient>() == true || property?.hasAnnotation<Formula>() == true -> CUSTOM
+                else -> super.renderType
+            }
         }
-
-        fieldName.containsAnyIgnoreCase("url,file") -> {
-            FILE
-        }
-
-        fieldName.containsAnyIgnoreCase("image") -> {
-            IMAGE
-        }
-
-        fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> {
-            DATE
-        }
-
-        fieldName.containsAnyIgnoreCase("time", "datetime") -> {
-            DATETIME
-        }
-
-        fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> {
-            TEXTAREA
-        }
-
-        currentField?.property?.returnType?.classifier == String::class -> {
-            TEXT
-        }
-
-        currentField?.property?.returnType?.classifier == Boolean::class -> {
-            SWITCH
-        }
-
-        else -> {
-            CUSTOM
-        }
-    }
+        set(value) = value.run{}
 
 
     /** 自定义列表渲染函数 */

@@ -106,6 +106,7 @@ class UseTable<E : Any>(
                 defaultColumns.filter { it.title in customColumnMap }
                     .forEach { column ->
                         column.customRender = customColumnMap[column.title]!!.customRender
+                        //自定义列
                         column.renderType= RenderType.CUSTOM
                     }
 
