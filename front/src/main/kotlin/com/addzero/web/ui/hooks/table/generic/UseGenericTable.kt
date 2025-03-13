@@ -71,7 +71,7 @@ class UseTable<E : Any>(
         })
 
 
-    private fun refreshData() {
+    fun refreshData() {
         val pageResult = onLoadData(this)!!
         useTableContent.dataList = pageResult.rows
         useTablePagination.totalPages = pageResult.totalPageCount.toInt()
@@ -85,6 +85,10 @@ class UseTable<E : Any>(
 //    private val viewModel = remember {
 //        GenericTableViewModel<E>()
 //    }
+
+    private fun <T> withRefresh(action: () -> T): T {
+        return action().also { refreshData() }
+    }
 
     init {
         val defaultColumns = getDefaultColumns(clazz, excludeFields)
@@ -132,8 +136,12 @@ class UseTable<E : Any>(
                 Box(modifier = Modifier.weight(1f)) {
                     Column {
                         useTableContent.render()
-                        FormDialog(useTableContent, onFormSubmit = onSave)
-                        DeleteDialog(useTableContent, onDelete = onDelete)
+                        FormDialog(useTableContent, onFormSubmit = { item ->
+                            withRefresh { onSave(item) }
+                        })
+                        DeleteDialog(useTableContent, onDelete = { id ->
+                            withRefresh { onDelete(id) }
+                        })
                     }
                 }
 
