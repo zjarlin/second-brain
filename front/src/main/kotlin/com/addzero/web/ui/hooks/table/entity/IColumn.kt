@@ -64,5 +64,5 @@ interface IColumn<E : Any> {
 
     /** 是否可以编辑 */
     val enabled: Boolean
-        get() = true
+        get() = renderType != CUSTOM
 }
