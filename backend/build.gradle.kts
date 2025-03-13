@@ -21,17 +21,15 @@ kotlin {
     }
 }
 
-
-tasks.register<Copy>("copyLibs") {
-    into("build/libs/lib")
-    from(configurations.runtimeClasspath)
+springBoot {
+    mainClass.set("com.addzero.SpringBootAppKt")
 }
 
 tasks.bootJar {
     enabled = true
     archiveClassifier = "exec"
     setExcludes(listOf("*.jar"))
-    dependsOn("copyLibs")
+//    dependsOn("copyLibs")
     manifest {
         attributes["Class-Path"] = configurations.runtimeClasspath
             .get().files
@@ -49,6 +47,12 @@ dependencies {
     // ----------------------------------------
 //    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
+
+    implementation("com.google.auto.service:auto-service-annotations:+")
+    ksp("com.google.auto.service:auto-service:+")
+
+    implementation("com.google.devtools.ksp:symbol-processing-api:+")
+    ksp("com.google.devtools.ksp:symbol-processing:+")
 
     implementation("org.tomlj:tomlj:1.1.1")
     // 引入 Spring Boot 相关依赖

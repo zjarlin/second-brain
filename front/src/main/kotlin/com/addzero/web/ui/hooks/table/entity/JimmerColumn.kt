@@ -119,6 +119,13 @@ fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity -
     } as E
 }
 
+fun <E : Any> E?.copy(block: (Any) -> Unit = {}): E? = this?.let { entity ->
+    Internal.produce(ImmutableType.get(entity.javaClass), entity) { d ->
+        block(d)
+        d
+    } as E
+}
+
 fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
     if (this == null) {
         return null

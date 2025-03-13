@@ -6,21 +6,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.common.anno.Shit
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
+import com.addzero.web.ui.hooks.table.entity.copy
+import org.babyfish.jimmer.DraftObjects
 
- class UseDynamicForm<E : Any>(
+class UseDynamicForm<E : Any>(
     private val useTableContent: UseTableContent<E>,
     private val columnCount: Int = 2,
 ) : UseHook<UseDynamicForm<E>> {
 
     // 表单验证错误信息
     private var validationErrors by mutableStateOf(mutableStateMapOf<String, String>())
-
-//    var currentFormItem by mutableStateOf(currentSelectItem)
-
-
-//    private var currentColumn: IColumn<E>? by mutableStateOf(null)
+    
+    // 存储修改过的属性值
+    private var modifiedFields by mutableStateOf(mutableStateMapOf<String, Any?>())
 
     /**
      * 更新表单项，优化重组逻辑
@@ -32,6 +33,8 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
         useTableContent.currentSelectItem = null
         // 设置新值
         useTableContent.currentSelectItem = newItem
+        // 清空修改记录
+        modifiedFields.clear()
         // 打印日志，确认更新
         println("更新表单项: ${useTableContent.currentSelectItem}")
     }
@@ -45,13 +48,30 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
         return validationErrors.isEmpty()
     }
 
+    /**
+     * 批量更新表单项属性
+     */
+    fun batchUpdateFields(updates: Map<String, Any?>) {
+        val currentItem = useTableContent.currentSelectItem ?: return
+        val newItem = currentItem.copy { draft ->
+            updates.forEach { (fieldName, value) ->
+                DraftObjects.set(draft, fieldName, value)
+                modifiedFields[fieldName] = value
+            }
+        }
+        useTableContent.currentSelectItem = newItem
+    }
+
+    /**
+     * 获取修改过的字段
+     */
+    fun getModifiedFields(): Map<String, Any?> = modifiedFields.toMap()
 
     override val render: @Composable () -> Unit
         get() = {
             val useDynamicForm = this.getState()
             val useTableContent = useTableContent.getState()
             val columns = useTableContent.columns
-//            .filter { it.currentField != null }
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount
             val rowCount = (columns.size + itemsPerRow - 1) / itemsPerRow
@@ -79,7 +99,6 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
                         // 渲染当前行的表单项
                         for (colIndex in startIndex until endIndex) {
                             val addColumn = columns[colIndex]
-//                            currentColumn = addColumn
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
