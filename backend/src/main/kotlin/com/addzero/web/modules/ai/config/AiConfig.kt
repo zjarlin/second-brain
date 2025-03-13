@@ -7,8 +7,6 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory
 import org.springframework.ai.chat.model.ChatModel
 import org.springframework.ai.embedding.EmbeddingModel
 import org.springframework.ai.image.ImageModel
-import org.springframework.ai.model.function.FunctionCallback
-import org.springframework.ai.model.function.FunctionCallbackResolver
 import org.springframework.ai.ollama.OllamaChatModel
 import org.springframework.ai.ollama.OllamaEmbeddingModel
 import org.springframework.ai.ollama.api.OllamaApi

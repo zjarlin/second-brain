@@ -90,7 +90,8 @@ class ChatController(
 
     @GetMapping("dasoijdaoisdj")
     fun test(): Unit {
-        val aiUtil = AiUtil("deepseek-r1:latest", "hello").ask("","")
+        ChatModels.OLLAMA
+        val aiUtil = AiUtil("qwen", "hello").ask("","")
         println(aiUtil)
 
     }

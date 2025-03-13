@@ -3,8 +3,6 @@ package com.addzero.web.ui.hooks.table.entity
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import cn.hutool.core.bean.BeanUtil
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
@@ -13,8 +11,6 @@ import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
-import org.babyfish.jimmer.spring.repo.PageParam
-import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 
 
@@ -22,7 +18,7 @@ import kotlin.reflect.full.hasAnnotation
  * 表格列定义类
  * @param E 数据实体类型
  */
-data class JimmerColumn<E : Any>(
+class JimmerColumn<E : Any>(
     override var title: String,
     override var fieldName: String = "",
     override val getFun: (E) -> Any?,
@@ -37,31 +33,47 @@ data class JimmerColumn<E : Any>(
     var currentField: FieldMetadata<E>? = null
 
 
-    /** 推测列渲染类型的函数，默认为文本类型 */
-    override val renderType: RenderType
-        get() {
-            currentField ?: return TEXT
-            val fieldName = this.fieldName
-            val property = currentField!!.property
-            val returnType = property.returnType
-            val iscacle = property.hasAnnotation<Transient>() || property.hasAnnotation<Formula>()
-            val renderType = when {
-                iscacle -> {
-                    CUSTOM
-                }
-                fieldName.containsAnyIgnoreCase("url,file") -> RenderType.FILE
-                fieldName.containsAnyIgnoreCase("image") -> IMAGE
-                fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> DATE
-                fieldName.containsAnyIgnoreCase("time", "datetime") -> DATETIME
-                fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
-                returnType.classifier == String::class -> TEXT
-                returnType.classifier == Boolean::class -> SWITCH
-                else -> {
-                    CUSTOM
-                }
-            }
-            return renderType
+    val property = currentField?.property
+
+    override var renderType: RenderType = when {
+
+        property?.hasAnnotation<Transient>() == true || property?.hasAnnotation<Formula>() == true -> {
+            CUSTOM
         }
+
+        fieldName.containsAnyIgnoreCase("url,file") -> {
+            FILE
+        }
+
+        fieldName.containsAnyIgnoreCase("image") -> {
+            IMAGE
+        }
+
+        fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> {
+            DATE
+        }
+
+        fieldName.containsAnyIgnoreCase("time", "datetime") -> {
+            DATETIME
+        }
+
+        fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> {
+            TEXTAREA
+        }
+
+        currentField?.property?.returnType?.classifier == String::class -> {
+            TEXT
+        }
+
+        currentField?.property?.returnType?.classifier == Boolean::class -> {
+            SWITCH
+        }
+
+        else -> {
+            CUSTOM
+        }
+    }
+
 
     /** 自定义列表渲染函数 */
     @OptIn(ExperimentalMaterial3Api::class)

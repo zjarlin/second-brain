@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.util.fastDistinctBy
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
 import com.addzero.common.kt_util.*
 import com.addzero.web.ui.hooks.UseHook
@@ -15,6 +14,7 @@ import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.common.UseTablePagination
 import com.addzero.web.ui.hooks.table.entity.IColumn
 import com.addzero.web.ui.hooks.table.entity.JimmerColumn
+import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
 import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
 import org.babyfish.jimmer.Page
@@ -39,7 +39,10 @@ fun <E : Any> getDefaultColumns(
             ignoreCaseNotIn
         }.map { field ->
             val getter = field.property.getter
-            val addColumn = JimmerColumn<E>(title = field.description.toNotBlankStr(), getFun = { getter.call(it) })
+            val addColumn = JimmerColumn<E>(
+                title = field.description.toNotBlankStr(),
+                getFun = { getter.call(it) },
+            )
             addColumn.fieldName = field.name
             if (addColumn.title.isBlank()) {
                 addColumn.title = field.name
@@ -103,6 +106,7 @@ class UseTable<E : Any>(
                 defaultColumns.filter { it.title in customColumnMap }
                     .forEach { column ->
                         column.customRender = customColumnMap[column.title]!!.customRender
+                        column.renderType= RenderType.CUSTOM
                     }
 
                 // 添加新的自定义列

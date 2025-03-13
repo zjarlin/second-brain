@@ -78,8 +78,7 @@ class UseDynamicForm<E : Any>(
 
             // 过滤掉不需要自定义列
             val columns = useTableContent.columns.filter {
-                it
-                    .renderType == RenderType.CUSTOM
+                it .renderType != RenderType.CUSTOM
             }
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount

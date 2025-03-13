@@ -1,6 +1,7 @@
 package com.addzero.web.ui.hooks.table.entity
 
 import androidx.compose.runtime.Composable
+import com.addzero.common.kt_util.isNotEmpty
 
 /**
  * 表格列定义接口
@@ -14,7 +15,7 @@ interface IColumn<E : Any> {
     var fieldName: String
 
     /** 渲染类型 */
-    val renderType: RenderType
+    var renderType: RenderType
 
     /** 是否必填 */
     val required: Boolean
@@ -29,6 +30,11 @@ interface IColumn<E : Any> {
 
     /** 自定义列表渲染函数 */
     var customRender: @Composable ((E) -> Unit)
+
+    /** 自定义列表渲染函数(策略模式) */
+    var customRenderWithStrategy: @Composable ((E, IColumn<E>) -> Unit)
+        get() = { e, _ -> customRender(e) }
+        set(value) { customRender = { e -> value(e, this) } }
 
     /** 验证函数 */
     val validator: (E?) -> Boolean
