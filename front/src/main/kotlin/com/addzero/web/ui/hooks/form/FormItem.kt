@@ -28,9 +28,7 @@ fun <E : Any> FormItem(
     val setFun = icolumn.setFun
 
     val fieldValue = currentFormItem?.let { getFun(it) }
-
     val validRes = currentFormItem?.let { icolumn.validator(it) }
-
     val text = fieldValue.toNotBlankStr()
 
     when (renderType) {

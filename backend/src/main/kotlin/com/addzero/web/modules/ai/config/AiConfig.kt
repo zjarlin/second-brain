@@ -1,11 +1,19 @@
 package com.addzero.web.modules.ai.config
 
 import cn.hutool.extra.spring.SpringUtil
+import io.micrometer.observation.ObservationRegistry
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.memory.InMemoryChatMemory
+import org.springframework.ai.chat.model.ChatModel
 import org.springframework.ai.embedding.EmbeddingModel
 import org.springframework.ai.image.ImageModel
+import org.springframework.ai.model.function.FunctionCallback
+import org.springframework.ai.model.function.FunctionCallbackResolver
+import org.springframework.ai.ollama.OllamaChatModel
 import org.springframework.ai.ollama.OllamaEmbeddingModel
+import org.springframework.ai.ollama.api.OllamaApi
+import org.springframework.ai.ollama.api.OllamaOptions
+import org.springframework.ai.ollama.management.ModelManagementOptions
 import org.springframework.ai.transformer.splitter.TokenTextSplitter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -73,8 +81,30 @@ class AiConfig {
 
     @Bean
     fun chatMemory(): ChatMemory {
-        return InMemoryChatMemory()
-    } //    public void diajsoid() {
+        val inMemoryChatMemory = InMemoryChatMemory()
+        return inMemoryChatMemory
+    }
+
+//    @Bean
+//    @Primary
+//    fun ollamaChatModel(): ChatModel {
+//        val ollamaApi = OllamaApi(ollamaUrl)
+//        OllamaOptions.builder()
+//        val defaultOptions = OllamaOptions.create()
+//        val observationRegistry = ObservationRegistry.create()
+//        val modelManagementOptions = ModelManagementOptions.builder().build()
+//        val toolCallingManager = org.springframework.ai.model.tool.ToolCallingManager.builder().build()
+//
+//        return OllamaChatModel(
+//            ollamaApi,
+//            defaultOptions,
+//            toolCallingManager,
+//            observationRegistry,
+//            modelManagementOptions
+//        )
+//    }
+
+    //    public void diajsoid() {
 
     //        ChatClient.create(new OllamaChatModel(new OllamaApi(ollamaUrl), OllamaOptions.create().withEmbeddingModel(embeddingModel())))
     //    }

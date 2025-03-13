@@ -36,15 +36,6 @@ data class JimmerColumn<E : Any>(
 
     var currentField: FieldMetadata<E>? = null
 
-    /** 占位文本 */
-    override val placeholder: String
-        get() = "请输入${this.title}"
-
-
-    /** 验证错误提示信息 */
-    override val errorMessage: String
-        get() = "${this.title}的值非法"
-
 
     /** 推测列渲染类型的函数，默认为文本类型 */
     override val renderType: RenderType
@@ -58,7 +49,6 @@ data class JimmerColumn<E : Any>(
                 iscacle -> {
                     CUSTOM
                 }
-
                 fieldName.containsAnyIgnoreCase("url,file") -> RenderType.FILE
                 fieldName.containsAnyIgnoreCase("image") -> IMAGE
                 fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> DATE
@@ -76,9 +66,8 @@ data class JimmerColumn<E : Any>(
     /** 自定义列表渲染函数 */
     @OptIn(ExperimentalMaterial3Api::class)
     override var customRender: @Composable (E) -> Unit = {
-
-
         val currentItem = getFun(it)
+
         val content = currentItem.toNotBlankStr()
         TooltipBox(
             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
@@ -99,16 +88,16 @@ data class JimmerColumn<E : Any>(
     }
 
     /** 自定义验证函数 */
-    override val validator: (E?) -> Boolean
-        get() = {
-            val any = it?.let { it1 -> getFun(it1) }
-            if (required) {
-                ObjUtil.isNotEmpty(any)
-            }
-            //如果是手机号
-            //如果是身份证号
-            true
+    /** 自定义验证函数 */
+    override val validator: (E?) -> Boolean = {
+        val any = it?.let { it1 -> getFun(it1) }
+        if (required) {
+            ObjUtil.isNotEmpty(any)
         }
+        //如果是手机号
+        //如果是身份证号
+        true
+    }
 
 }
 
@@ -132,5 +121,4 @@ fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
     }
     val beanToMap = BeanUtil.beanToMap(this, false, true)
     return beanToMap
-
 }

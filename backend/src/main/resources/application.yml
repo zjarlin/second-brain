@@ -44,7 +44,6 @@ spring:
     time-zone: GMT+8
     #    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
 
-
   servlet:
     multipart:
       max-file-size: 500MB
@@ -82,7 +81,10 @@ spring:
 
     openai:
       chat:
-        api-key: xxxxxxxxxxxxx
+        api-key:
+        options:
+          model:
+
 
     # 阿里灵积
     dashscope:

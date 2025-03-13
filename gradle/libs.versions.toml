@@ -22,7 +22,7 @@ minio = "8.5.8"
 x-file-storage = "2.1.0"
 fastjson2 = "2.0.53"
 spring-boot = "3.3.5"
-spring-ai = "1.0.0-M5"
+spring-ai = "1.0.0-M6"
 hutool = "5.8.26"
 inputmapping = "1.1.1-beta"
 knife4j = "4.5.0"
@@ -95,5 +95,8 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 database = [ "postgresql" , "h2" ]
 testing = ["spring-boot-starter-test", "kotlin-test-junit5", "junit-jupiter"]
 spring-boot = ["aspectj", "spring-boot-starter-validation", "spring-boot-starter-web"]
-spring-ai = ["spring-ai-ollama-starter", "spring-ai-pgvector-store-starter", "spring-ai-tika-document-reader"]
+spring-ai = ["spring-ai-ollama-starter", "spring-ai-pgvector-store-starter",
+    "spring-ai-tika-document-reader"
+#    ,"spring-ai-openai"
+    ]
 tools = ["jackson-module-kotlin", "kotlin-reflect", "fastjson2-kotlin", "hutool-all", "minio", "x-file-storage-spring", "pinyin4j", "fastexcel", "knife4j-openapi3"]

@@ -56,7 +56,7 @@ class GraphController {
 // 读取文件内容
         val readContent = AiUtil.readContent(file)
         val toList = readContent.map {
-            val content = it.content .toGraphQuestion(modelName)
+            val content = it.text .toGraphQuestion(modelName)
             content
         }.toList()
         return toList

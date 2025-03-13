@@ -131,7 +131,8 @@ object AiCtx {
 
         if (defaultChatModel is OllamaChatModel) {
             val ollamaOptions = buildOpt as OllamaOptions
-            buildOpt = ollamaOptions.withModel(modelName).build() as ChatOptions
+            ollamaOptions.model = modelName
+            buildOpt = ollamaOptions as ChatOptions
         }
 //        defaultChatModel is dashsc
 

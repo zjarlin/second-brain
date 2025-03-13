@@ -18,15 +18,17 @@ interface IColumn<E : Any> {
 
     /** 是否必填 */
     val required: Boolean
-    
+
     /** 占位文本 */
     val placeholder: String
-    
+        get() = "请输入${this.title}"
+
     /** 验证错误提示信息 */
     val errorMessage: String
+        get() = "${this.title}的值非法"
 
     /** 自定义列表渲染函数 */
-    var customRender: @Composable (E) -> Unit
+    var customRender: @Composable ((E) -> Unit)
 
     /** 验证函数 */
     val validator: (E?) -> Boolean
@@ -37,6 +39,7 @@ interface IColumn<E : Any> {
     /** 设置值的函数 */
     val setFun: (E, IColumn<E>, Any?) -> E
 
+    /** 是否可以编辑 */
     val enabled: Boolean
         get() = true
 }

@@ -9,17 +9,21 @@ import androidx.compose.ui.unit.dp
 import com.addzero.common.anno.Shit
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
+import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.entity.copy
 import org.babyfish.jimmer.DraftObjects
 
 class UseDynamicForm<E : Any>(
     private val useTableContent: UseTableContent<E>,
+    /**
+     *几栏显示
+     */
     private val columnCount: Int = 2,
 ) : UseHook<UseDynamicForm<E>> {
 
     // 表单验证错误信息
     private var validationErrors by mutableStateOf(mutableStateMapOf<String, String>())
-    
+
     // 存储修改过的属性值
     private var modifiedFields by mutableStateOf(mutableStateMapOf<String, Any?>())
 
@@ -29,7 +33,7 @@ class UseDynamicForm<E : Any>(
      */
     fun updateFormItem(newItem: E?) {
         // 直接赋值可能不会触发所有依赖该状态的组件重组
-        println(useTableContent.currentSelectItem.hashCode())
+//        println(useTableContent.currentSelectItem.hashCode())
         useTableContent.currentSelectItem = null
         // 设置新值
         useTableContent.currentSelectItem = newItem
@@ -71,7 +75,12 @@ class UseDynamicForm<E : Any>(
         get() = {
             val useDynamicForm = this.getState()
             val useTableContent = useTableContent.getState()
-            val columns = useTableContent.columns
+
+            // 过滤掉不需要自定义列
+            val columns = useTableContent.columns.filter {
+                it
+                    .renderType == RenderType.CUSTOM
+            }
             // 计算每行的列数和总行数
             val itemsPerRow = columnCount
             val rowCount = (columns.size + itemsPerRow - 1) / itemsPerRow

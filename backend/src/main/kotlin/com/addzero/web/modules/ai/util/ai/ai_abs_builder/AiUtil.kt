@@ -186,7 +186,7 @@ class AiUtil(
 
             val call = spec.call()
 
-            val content = call.chatResponse()?.result?.output?.content
+            val content = call.chatResponse()?.result?.output?.text
             val b = StrUtil.containsIgnoreCase(content, "true")
             return b
         }

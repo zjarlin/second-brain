@@ -88,6 +88,12 @@ class ChatController(
         return TODO("提供返回值")
     }
 
+    @GetMapping("dasoijdaoisdj")
+    fun test(): Unit {
+        val aiUtil = AiUtil("deepseek-r1:latest", "hello").ask("","")
+        println(aiUtil)
+
+    }
 
 
 
