@@ -11,6 +11,8 @@ import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.entity.copy
+import com.addzero.web.ui.hooks.table.entity.fromMap
+import com.alibaba.fastjson2.util.BeanUtils.fieldName
 import org.babyfish.jimmer.DraftObjects
 
 class UseDynamicForm<E : Any>(
@@ -57,11 +59,8 @@ class UseDynamicForm<E : Any>(
      */
     fun batchUpdateFields(updates: Map<String, Any?>) {
         val currentItem = useTableContent.currentSelectItem ?: return
-        val newItem = currentItem.copy { draft ->
-            updates.forEach { (fieldName, value) ->
-                DraftObjects.set(draft, fieldName, value)
-                modifiedFields[fieldName] = value
-            }
+        val newItem = currentItem.fromMap(updates) { fieldName, value ->
+            modifiedFields[fieldName] = value
         }
         useTableContent.currentSelectItem = newItem
     }

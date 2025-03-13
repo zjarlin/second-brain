@@ -3,14 +3,20 @@ package com.addzero.web.ui.hooks.table.entity
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import cn.hutool.core.bean.BeanUtil
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.*
+import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.Formula
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.reflect.full.hasAnnotation
 
 
@@ -26,8 +32,8 @@ class JimmerColumn<E : Any>(
     },
 ) : IColumn<E> {
 
-    override var fieldName: String=""
-    var currentField: FieldMetadata<E>?=null
+    override var fieldName: String = ""
+    var currentField: FieldMetadata<E>? = null
 
 
     val property = currentField?.property
@@ -42,7 +48,7 @@ class JimmerColumn<E : Any>(
                 else -> super.renderType
             }
         }
-        set(value) = value.run{}
+        set(value) = value.run {}
 
 
     /** 自定义列表渲染函数 */
@@ -84,10 +90,10 @@ class JimmerColumn<E : Any>(
 }
 
 fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity ->
-    Internal.produce(ImmutableType.get(entity.javaClass), entity) { d ->
-        DraftObjects.set(d, fieldName, value)
-        d
-    } as E
+    val copy = this.copy {
+        DraftObjects.set(it, fieldName, value)
+    }
+    return copy
 }
 
 fun <E : Any> E?.copy(block: (Any) -> Unit = {}): E? = this?.let { entity ->
@@ -95,6 +101,16 @@ fun <E : Any> E?.copy(block: (Any) -> Unit = {}): E? = this?.let { entity ->
         block(d)
         d
     } as E
+}
+
+fun <E : Any> E.fromMap(updates: Map<String, Any?>, block: (String, Any?) -> Unit = { _, _ -> }): E? {
+    val newItem = this.copy { draft ->
+        updates.forEach { (fieldName, value) ->
+            DraftObjects.set(draft, fieldName, value)
+            block(fieldName, value)
+        }
+    }
+    return newItem
 }
 
 fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
