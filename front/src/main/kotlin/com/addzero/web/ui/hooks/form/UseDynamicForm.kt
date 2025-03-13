@@ -36,7 +36,7 @@ class UseDynamicForm<E : Any>(
         // 清空修改记录
         modifiedFields.clear()
         // 打印日志，确认更新
-        println("更新表单项: ${useTableContent.currentSelectItem}")
+//        println("更新表单项: ${useTableContent.currentSelectItem}")
     }
 
     fun validate(): Boolean {
