@@ -18,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
+import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
 
 class UseSearch(
 val onSearch: () -> Unit
 ) : UseHook<UseSearch> {
     var searchText by mutableStateOf("")
+
 
     override val render: @Composable
         () -> Unit

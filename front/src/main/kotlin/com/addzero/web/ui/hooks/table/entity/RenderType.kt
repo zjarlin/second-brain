@@ -21,6 +21,10 @@ enum class RenderType {
     HTML,
     MONEY,
     CURRENCY,
+
+    /**
+     *百分比
+     */
     PERCENT,
     BAR,
     TREE,

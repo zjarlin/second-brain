@@ -1,0 +1,4 @@
+specification SysAreaSpec {
+   like/i(name,city) as keyword
+}
+

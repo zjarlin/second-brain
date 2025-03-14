@@ -39,12 +39,14 @@ interface IColumn<E : Any> {
         set(value) = value.run{}
 
     /** 是否必填 */
-    val required: Boolean
+    var required: Boolean
         get() = false
+        set(value) {value.run {  }}
 
     /** 占位文本 */
-    val placeholder: String
+    var placeholder: String
         get() = "请输入${this.title}"
+        set(value) {value.run {  }}
 
     /** 验证错误提示信息 */
     val errorMessage: String
@@ -65,4 +67,13 @@ interface IColumn<E : Any> {
     /** 是否可以编辑 */
     val enabled: Boolean
         get() = renderType != CUSTOM
+
+    /**
+     * 选项列表，用于下拉选择、单选按钮等
+     * 返回选项列表，可以是静态列表或动态生成的列表
+     */
+    var options: List<OptionItem>?
+        get() = null
+        set(value) {value?.run {  }}
+
 }

@@ -9,20 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.common.consts.sql
 import com.addzero.web.modules.sys.area.SysArea
-import com.addzero.web.modules.sys.area.city
-import com.addzero.web.modules.sys.area.name
+import com.addzero.web.modules.sys.area.dto.SysAreaSpec
 import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.generic.dialog.UseDialog
 import org.babyfish.jimmer.Page
-import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
-import org.babyfish.jimmer.sql.kt.ast.expression.or
+import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
+import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery
 import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 
 @Composable
 fun GenericTableExample() {
 // 自定义列配置
-    val addColumn = JimmerColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag })
-        .apply {
+    val addColumn = JimmerColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
         customRender = {
             val blackFlag = it.blackFlag
             val useDialog = UseDialog("点我干嘛")
@@ -52,9 +50,11 @@ fun GenericTableExample() {
             GenericTable<SysArea>(
                 columns = toList,
                 onLoadData = {
-// 模拟搜索功能
                     val searchText = it.useSearch.searchText
-                    val createQuery = selectArea(searchText, it)
+                    val sysAreaSpec = SysAreaSpec(
+                        keyword = searchText
+                    )
+                    val createQuery = selectArea(sysAreaSpec, it)
                     createQuery
                 },
                 onSave = {
@@ -69,17 +69,18 @@ fun GenericTableExample() {
 }
 
 private fun selectArea(
-    keyword: String, useTable: UseTable<SysArea>
+    spec: SysAreaSpec, useTable: UseTable<SysArea>
 ): Page<SysArea> {
-    val createQuery = sql.createQuery(SysArea::class) {
-        where(
-            or(
-                table.city `ilike?` keyword, table.name `ilike?` keyword
-            )
-        )
+
+    val block: KMutableRootQuery<SysArea>.() -> KConfigurableRootQuery<SysArea, SysArea> = { ->
+        where( spec )
         orderBy(table.makeOrders("sid asc"))
         select(table)
-    }.fetchPage(useTable.useTablePagination.pageNo - 1, useTable.useTablePagination.pageSize)
+    }
+
+
+    val createQuery = sql.createQuery(SysArea::class, block)
+        .fetchPage(useTable.useTablePagination.pageNo - 1, useTable.useTablePagination.pageSize)
     return createQuery
 }
 

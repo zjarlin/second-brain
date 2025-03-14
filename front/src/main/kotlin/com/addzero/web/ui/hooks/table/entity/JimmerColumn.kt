@@ -87,6 +87,8 @@ class JimmerColumn<E : Any>(
         true
     }
 
+
+
 }
 
 fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity ->
