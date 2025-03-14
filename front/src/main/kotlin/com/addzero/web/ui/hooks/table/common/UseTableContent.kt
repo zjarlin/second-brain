@@ -53,6 +53,23 @@ class UseTableContent<E : Any>(
                     modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                         .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // 编辑模式切换按钮
+                    Box(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FilledTonalIconToggleButton(
+                            checked = isEditMode,
+                            onCheckedChange = { toggleEditMode() }
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = if (isEditMode) "退出编辑" else "进入编辑",
+                                tint = if (isEditMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
                     // 选择框表头
                     if (isEditMode) {
                         Box(
