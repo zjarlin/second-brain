@@ -23,6 +23,7 @@ import com.addzero.web.ui.designer.models.FormField
 fun PropertiesEditor(
     selectedField: FormField?,
     onFieldUpdated: (FormField) -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -44,21 +45,41 @@ fun PropertiesEditor(
                 )
             }
         } else {
-            // 编辑字段属性
+            // 编辑字段属性 - 使用单个滚动区域
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
                     .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
             ) {
-                Text(
-                    "属性编辑",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                // 标题行
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "字段属性",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    
+                    Spacer(modifier = Modifier.weight(1f))
+                    
+                    // 添加返回按钮
+                    IconButton(
+                        onClick = onClose,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "返回表单配置",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Divider(modifier = Modifier.padding(vertical = 8.dp))
                 
-                // 基本属性
+                // 字段基本属性
                 Text(
                     "基本属性",
                     style = MaterialTheme.typography.titleSmall

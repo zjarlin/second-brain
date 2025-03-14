@@ -14,7 +14,7 @@ data class FormConfig(
     val name: String = "新建表单",
     val title: String = "表单标题",
     val description: String = "",
-    val columnCount: Int = 1,
+    val columnCount: Int = 2,
     val fields: List<FormField> = emptyList(),
     val properties: Map<String, String> = emptyMap()
 ) {
