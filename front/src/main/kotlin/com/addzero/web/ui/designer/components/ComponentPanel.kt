@@ -1,7 +1,5 @@
 package com.addzero.web.ui.designer.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,17 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import kotlin.math.roundToInt
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.ui.draw.scale
 
 /**
  * 组件类型定义
@@ -107,169 +95,27 @@ fun getComponentByType(typeId: String): ComponentType? {
 @Composable
 fun ComponentPanel(
     onComponentDrag: (String) -> Unit,
-    onComponentDragStart: (String) -> Unit = {},
-    onComponentDragMove: (Offset) -> Unit = {},
-    onComponentDragEnd: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var isDragging by remember { mutableStateOf(false) }
-    var draggedComponent by remember { mutableStateOf("") }
-    var dragPosition by remember { mutableStateOf(Offset.Zero) }
-    
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(8.dp)
-    ) {
-        Text(
-            "组件",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-        
-        // 组件分类
-        Text(
-            "基础组件",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-        )
-        
-        // 组件列表
-        availableComponents.forEach { component ->
-            DraggableComponent(
-                type = component.id,
-                component = component,
-                onDragStart = {
-                    isDragging = true
-                    draggedComponent = component.id
-                    onComponentDragStart(component.id)
-                },
-                onDragEnd = { dropped ->
-                    isDragging = false
-                    onComponentDragEnd(dropped)
-                },
-                onDragMove = { offset ->
-                    dragPosition = offset
-                    onComponentDragMove(offset)
-                },
-                onClick = { onComponentDrag(component.id) }
-            )
-        }
-    }
-    
-    // 如果正在拖拽，显示悬浮预览
-    if (isDragging) {
-        Box(
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        (dragPosition.x + 10).roundToInt(),
-                        (dragPosition.y + 10).roundToInt()
-                    )
-                }
-                .zIndex(100f)
-                .shadow(8.dp, MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(8.dp)
-                .width(200.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(0.85f)
-            ) {
-                val component = getComponentByType(draggedComponent)
-                if (component != null) {
-                    FormComponent(
-                        field = com.addzero.web.ui.designer.models.FormField(
-                            id = "preview",
-                            name = "preview",
-                            label = component.name,
-                            type = component.id
-                        ),
-                        component = component
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DraggableComponent(
-    type: String,
-    component: ComponentType,
-    onDragStart: () -> Unit,
-    onDragEnd: (Boolean) -> Unit,
-    onDragMove: (Offset) -> Unit,
-    onClick: () -> Unit
-) {
-    var isDragging by remember { mutableStateOf(false) }
-    
-    // 添加悬停和拖拽状态动画
-    val elevation by animateDpAsState(
-        targetValue = if (isDragging) 8.dp else 1.dp,
-        label = "componentElevation"
-    )
-    
-    val scale by animateFloatAsState(
-        targetValue = if (isDragging) 0.95f else 1f,
-        label = "componentScale"
-    )
-    
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .scale(scale) // 缩放效果
-            .shadow(elevation) // 阴影效果
-            .pointerInput(type) {
-                detectDragGestures(
-                    onDragStart = {
-                        isDragging = true
-                        onDragStart()
-                    },
-                    onDragEnd = {
-                        // 检测是否拖放到了有效区域
-                        val dropped = true // 这里需要实际检测是否在有效区域
-                        isDragging = false
-                        onDragEnd(dropped)
-                    },
-                    onDragCancel = {
-                        isDragging = false
-                        onDragEnd(false)
-                    },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        onDragMove(change.position)
-                    }
-                )
-            },
-        onClick = onClick,
-        color = MaterialTheme.colorScheme.surface
+        modifier = modifier,
+        tonalElevation = 1.dp
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(end = 4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                component.icon()
-            }
-            
-            Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.padding(8.dp)) {
             Text(
-                component.name,
-                style = MaterialTheme.typography.bodyMedium
+                "组件",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(8.dp)
             )
+            
+            LazyColumn {
+                items(availableComponents) { component ->
+                    ComponentItem(
+                        component = component,
+                        onDrag = { onComponentDrag(component.id) }
+                    )
+                }
+            }
         }
     }
 }

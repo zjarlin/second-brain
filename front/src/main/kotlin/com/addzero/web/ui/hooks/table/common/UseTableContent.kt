@@ -28,7 +28,14 @@ class UseTableContent<E : Any>(
     var columns: List<IColumn<E>> by mutableStateOf(listOf())
     var dataList: List<E> by mutableStateOf(listOf())
     var selectedItems: List<E> by mutableStateOf(listOf())
-    val isEditMode by mutableStateOf(false)
+    var isEditMode by mutableStateOf(false)
+
+    fun toggleEditMode() {
+        isEditMode = !isEditMode
+        if (!isEditMode) {
+            selectedItems = emptyList()
+        }
+    }
     var currentSelectItem: E? by mutableStateOf(null)
     var showFormFlag: Boolean by mutableStateOf(false)
     var showDeleteFlag: Boolean by mutableStateOf(false)
