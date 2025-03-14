@@ -179,27 +179,28 @@ fun CompleteCrudExample() {
         // 搜索区
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            tonalElevation = 1.dp,
-            shape = MaterialTheme.shapes.medium
+            tonalElevation = 0.dp,
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surface
         ) {
             SearchForm(
-                initialData = Product(),
+                initialData = searchProduct,
                 fields = fields,
-                onSearch = { searchData ->
+                onSearch = { search ->
                     // 根据搜索条件过滤产品
                     filteredProducts = products.filter { product ->
-                        (searchData.name.isEmpty() || product.name.contains(searchData.name, ignoreCase = true)) &&
-                        (searchData.category.isEmpty() || product.category == searchData.category) &&
-                        (searchData.price == 0.0 || product.price >= searchData.price) &&
-                        (searchData.stock == 0 || product.stock >= searchData.stock) &&
-                        (searchData.isActive == product.isActive)
+                        (search.name.isEmpty() || product.name.contains(search.name, ignoreCase = true)) &&
+                        (search.category.isEmpty() || product.category == search.category) &&
+                        (search.price == 0.0 || product.price <= search.price) &&
+                        (search.stock == 0 || product.stock >= search.stock)
                     }
-                    searchProduct = searchData
                 },
                 onReset = {
                     filteredProducts = products
-                    searchProduct = Product()
-                }
+                },
+                columnCount = 4,
+                compact = true,
+                transparent = true
             )
         }
         
