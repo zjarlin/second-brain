@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.jetbrainsCompose) apply false
+//    kotlin("plugin.serialization") version "1.8.0"
 //    id("org.jetbrains.compose") apply false
 //    id("org.jetbrains.kotlin.plugin.compose") apply false
 }
@@ -25,13 +26,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-
 dependencies {
-
-
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
 //    implementation(libs.kotlin.reflect)
-
 }
 
 
