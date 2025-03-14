@@ -2,18 +2,7 @@ package com.addzero.web.ui.hooks.table.entity
 
 import androidx.compose.runtime.Composable
 import com.addzero.common.kt_util.containsAnyIgnoreCase
-import com.addzero.common.kt_util.isNotEmpty
-import com.addzero.web.ui.hooks.table.entity.RenderType.CUSTOM
-import com.addzero.web.ui.hooks.table.entity.RenderType.DATE
-import com.addzero.web.ui.hooks.table.entity.RenderType.DATETIME
-import com.addzero.web.ui.hooks.table.entity.RenderType.FILE
-import com.addzero.web.ui.hooks.table.entity.RenderType.IMAGE
-import com.addzero.web.ui.hooks.table.entity.RenderType.SWITCH
-import com.addzero.web.ui.hooks.table.entity.RenderType.TEXT
-import com.addzero.web.ui.hooks.table.entity.RenderType.TEXTAREA
-import org.babyfish.jimmer.Formula
-import kotlin.contracts.Returns
-import kotlin.reflect.full.hasAnnotation
+import com.addzero.web.ui.hooks.table.entity.RenderType.*
 
 /**
  * 表格列定义接口
@@ -36,17 +25,21 @@ interface IColumn<E : Any> {
             fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
             else -> CUSTOM
         }
-        set(value) = value.run{}
+        set(value) = value.run {}
 
     /** 是否必填 */
     var required: Boolean
         get() = false
-        set(value) {value.run {  }}
+        set(value) {
+            value.run { }
+        }
 
     /** 占位文本 */
     var placeholder: String
         get() = "请输入${this.title}"
-        set(value) {value.run {  }}
+        set(value) {
+            value.run { }
+        }
 
     /** 验证错误提示信息 */
     val errorMessage: String
@@ -68,12 +61,19 @@ interface IColumn<E : Any> {
     val enabled: Boolean
         get() = renderType != CUSTOM
 
+
+    /** 是否可以编辑 */
+    val showInSearch: Boolean
+        get() = false
+
     /**
      * 选项列表，用于下拉选择、单选按钮等
      * 返回选项列表，可以是静态列表或动态生成的列表
      */
     var options: List<OptionItem>?
         get() = null
-        set(value) {value?.run {  }}
+        set(value) {
+            value?.run { }
+        }
 
 }

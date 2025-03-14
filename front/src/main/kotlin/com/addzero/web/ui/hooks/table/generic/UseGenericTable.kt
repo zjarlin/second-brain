@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
+import com.addzero.common.consts.sql
 import com.addzero.common.kt_util.*
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.common.UseSearch
@@ -17,7 +18,13 @@ import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
 import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
+import kotlinx.coroutines.selects.select
 import org.babyfish.jimmer.Page
+import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
+import org.babyfish.jimmer.sql.kt.ast.expression.like
+import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
+import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery
+import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
 import kotlin.collections.filter
 import kotlin.reflect.KClass
 import kotlin.text.isBlank
@@ -62,6 +69,7 @@ class UseTable<E : Any>(
     val onSave: (E) -> Unit,
     val onDelete: (Any) -> Unit,
 ) : UseHook<UseTable<E>> {
+
 
     val useSearch = UseSearch(
         onSearch = {
@@ -111,7 +119,7 @@ class UseTable<E : Any>(
                     .forEach { column ->
                         column.customRender = customColumnMap[column.title]!!.customRender
                         //自定义列
-                        column.renderType= RenderType.CUSTOM
+                        column.renderType = RenderType.CUSTOM
                     }
 
                 // 添加新的自定义列
@@ -121,38 +129,53 @@ class UseTable<E : Any>(
                     }
             }
         }.toList()
+
+
+//        val createQuery = sql.createQuery<E, E>(clazz) {
+//            select(table)
+//        }
+//            .fetchPage(1, 10)
+//        where(
+//            or(
+//                table.city `ilike?` keyword, table.name `ilike?` keyword
+//            )
+//        )
+//        orderBy(table.makeOrders("sid asc"))
+//        select(table)
     }
 
 
-    override val render: @Composable () -> Unit
-        get() = {
-            val useSearch = useSearch.getState()
-            val useTableContent = useTableContent.getState()
-            val useTablePagination = useTablePagination.getState()
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                useSearch.render()
 
-                Box(modifier = Modifier.weight(1f)) {
-                    Column {
-                        useTableContent.render()
-                        FormDialog(useTableContent, onFormSubmit = { item ->
-                            withRefresh { onSave(item) }
-                        })
-                        DeleteDialog(useTableContent, onDelete = { id ->
-                            withRefresh { onDelete(id) }
-                        })
-                    }
+override val render: @Composable () -> Unit
+    get() = {
+        val useSearch = useSearch.getState()
+        val useTableContent = useTableContent.getState()
+        val useTablePagination = useTablePagination.getState()
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            useSearch.render()
+
+            Box(modifier = Modifier.weight(1f)) {
+                Column {
+                    useTableContent.render()
+                    FormDialog(useTableContent, onFormSubmit = { item ->
+                        withRefresh { onSave(item) }
+                    })
+                    DeleteDialog(useTableContent, onDelete = { id ->
+                        withRefresh { onDelete(id) }
+                    })
                 }
-
-                // 优化LaunchedEffect依赖项
-                LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize) {
-                    refreshData()
-                }
-
-                useTablePagination.render()
             }
+
+            // 优化LaunchedEffect依赖项
+            LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize) {
+                refreshData()
+            }
+
+            useTablePagination.render()
         }
+    }
 }
 
 @Composable

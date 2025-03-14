@@ -51,9 +51,7 @@ fun GenericTableExample() {
                 columns = toList,
                 onLoadData = {
                     val searchText = it.useSearch.searchText
-                    val sysAreaSpec = SysAreaSpec(
-                        keyword = searchText
-                    )
+                    val sysAreaSpec = SysAreaSpec(keyword = searchText)
                     val createQuery = selectArea(sysAreaSpec, it)
                     createQuery
                 },
@@ -73,7 +71,7 @@ private fun selectArea(
 ): Page<SysArea> {
 
     val block: KMutableRootQuery<SysArea>.() -> KConfigurableRootQuery<SysArea, SysArea> = { ->
-        where( spec )
+        where(spec)
         orderBy(table.makeOrders("sid asc"))
         select(table)
     }
