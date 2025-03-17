@@ -31,15 +31,9 @@ class UseTableContent<E : Any>(
 
     var columns: List<IColumn<E>> by mutableStateOf(listOf())
     var dataList: List<E> by mutableStateOf(listOf())
+    var filteredDataList: List<E> by mutableStateOf(listOf())
     var selectedItems: List<E> by mutableStateOf(listOf())
     var isEditMode by mutableStateOf(false)
-
-    fun toggleEditMode() {
-        isEditMode = !isEditMode
-        if (!isEditMode) {
-            selectedItems = emptyList()
-        }
-    }
     var currentSelectItem: E? by mutableStateOf(null)
     var showFormFlag: Boolean by mutableStateOf(false)
     var showDeleteFlag: Boolean by mutableStateOf(false)
@@ -47,132 +41,78 @@ class UseTableContent<E : Any>(
     var showImportFlag: Boolean by mutableStateOf(false)
     var showExportFlag: Boolean by mutableStateOf(false)
 
+    // 使用现有的 UseTableToolBar 组件
+    private val tableToolBar by lazy {
+        UseTableToolBar<E>(
+            onAddClick = {
+                currentSelectItem = null
+                showFormFlag = true
+            },
+            onBatchDelete = { ids ->
+                showBatchDeleteFlag = true
+            },
+            onImport = {
+                showImportFlag = true
+            },
+            onExport = {
+                showExportFlag = true
+            }
+        )
+    }
+
+    init {
+        // 初始同步状态
+        syncToolBarState()
+    }
+
+    // 状态同步函数 - 使用新的updateState方法
+    private fun syncToolBarState() {
+        tableToolBar.updateState(
+            newEditMode = isEditMode,
+            newSelectedItems = selectedItems.map { getIdFun(it) },
+            newDataList = dataList
+        )
+    }
+
+    fun toggleEditMode() {
+        isEditMode = !isEditMode
+        if (!isEditMode) {
+            selectedItems = emptyList()
+        }
+        // 同步状态到工具栏
+        syncToolBarState()
+    }
+    
+    // 同步工具栏状态到表格
+    private fun syncFromToolBar() {
+        // 仅在必要时同步，避免循环更新
+        if (isEditMode != tableToolBar.isEditMode) {
+            isEditMode = tableToolBar.isEditMode
+            if (!isEditMode) {
+                selectedItems = emptyList()
+            }
+        }
+        
+        // 同步各种标志
+        showBatchDeleteFlag = tableToolBar.showBatchDeleteFlag
+        showImportFlag = tableToolBar.showImportFlag 
+        showExportFlag = tableToolBar.showExportFlag
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val render: @Composable
         () -> Unit
         get() = {
+            // 每次渲染前同步状态到工具栏
+            syncToolBarState()
+            // 同步工具栏状态到表格
+            syncFromToolBar()
+            
             Column(modifier = Modifier.fillMaxSize()) {
                 val horizontalScrollState = rememberScrollState()
                 
-                // 按钮工具栏区域 - 在表格上方单独设置一个区域
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 编辑模式切换按钮
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text(if (isEditMode) "退出编辑" else "进入编辑") }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        FilledTonalIconToggleButton(
-                            checked = isEditMode,
-                            onCheckedChange = { toggleEditMode() },
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = if (isEditMode) "退出编辑" else "进入编辑",
-                                tint = if (isEditMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    
-                    // 新增按钮
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text("新增") }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = {
-                                currentSelectItem = null
-                                showFormFlag = true
-                            },
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = "新增",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    
-                    // 批量删除按钮 - 仅在编辑模式下且有选中项时可用
-                    if (isEditMode) {
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                            tooltip = {
-                                PlainTooltip { Text("批量删除") }
-                            },
-                            state = rememberTooltipState()
-                        ) {
-                            FilledTonalIconButton(
-                                onClick = {
-                                    if (selectedItems.isNotEmpty()) {
-                                        showBatchDeleteFlag = true
-                                    }
-                                },
-                                enabled = selectedItems.isNotEmpty(),
-                                modifier = Modifier.padding(end = 8.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.DeleteSweep,
-                                    contentDescription = "批量删除",
-                                    tint = if (selectedItems.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-                    }
-                    
-                    // 导入按钮
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text("导入") }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = { showImportFlag = true },
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.FileUpload,
-                                contentDescription = "导入",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    
-                    // 导出按钮 - 仅在有数据时可用
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text("导出") }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = { showExportFlag = true },
-                            enabled = dataList.isNotEmpty(),
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.FileDownload,
-                                contentDescription = "导出",
-                                tint = if (dataList.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
+                // 使用 UseTableToolBar 渲染按钮区域
+                tableToolBar.render()
 
                 // 表头区域
                 Row(
@@ -194,6 +134,8 @@ class UseTableContent<E : Any>(
                                     } else {
                                         selectedItems = emptyList()
                                     }
+                                    // 同步状态到工具栏
+                                    syncToolBarState()
                                 }
                             )
                         }
@@ -274,6 +216,8 @@ class UseTableContent<E : Any>(
                                                 } else {
                                                     selectedItems - item
                                                 }
+                                                // 同步状态到工具栏
+                                                syncToolBarState()
                                             }
                                         )
                                     }
