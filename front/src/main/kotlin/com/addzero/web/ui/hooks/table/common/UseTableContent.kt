@@ -20,6 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.IColumn
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
 
 class UseTableContent<E : Any>(
     val getIdFun: (E) -> Any = { it.hashCode() }
@@ -39,6 +43,9 @@ class UseTableContent<E : Any>(
     var currentSelectItem: E? by mutableStateOf(null)
     var showFormFlag: Boolean by mutableStateOf(false)
     var showDeleteFlag: Boolean by mutableStateOf(false)
+    var showBatchDeleteFlag: Boolean by mutableStateOf(false)
+    var showImportFlag: Boolean by mutableStateOf(false)
+    var showExportFlag: Boolean by mutableStateOf(false)
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -47,20 +54,25 @@ class UseTableContent<E : Any>(
         get() = {
             Column(modifier = Modifier.fillMaxSize()) {
                 val horizontalScrollState = rememberScrollState()
-
-                // 表头区域
+                
+                // 按钮工具栏区域 - 在表格上方单独设置一个区域
                 Row(
-                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                        .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 编辑模式切换按钮
-                    Box(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.Center
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text(if (isEditMode) "退出编辑" else "进入编辑") }
+                        },
+                        state = rememberTooltipState()
                     ) {
                         FilledTonalIconToggleButton(
                             checked = isEditMode,
-                            onCheckedChange = { toggleEditMode() }
+                            onCheckedChange = { toggleEditMode() },
+                            modifier = Modifier.padding(end = 8.dp)
                         ) {
                             Icon(
                                 Icons.Default.Edit,
@@ -69,27 +81,127 @@ class UseTableContent<E : Any>(
                             )
                         }
                     }
+                    
+                    // 新增按钮
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text("新增") }
+                        },
+                        state = rememberTooltipState()
+                    ) {
+                        FilledTonalIconButton(
+                            onClick = {
+                                currentSelectItem = null
+                                showFormFlag = true
+                            },
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "新增",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    
+                    // 批量删除按钮 - 仅在编辑模式下且有选中项时可用
+                    if (isEditMode) {
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip { Text("批量删除") }
+                            },
+                            state = rememberTooltipState()
+                        ) {
+                            FilledTonalIconButton(
+                                onClick = {
+                                    if (selectedItems.isNotEmpty()) {
+                                        showBatchDeleteFlag = true
+                                    }
+                                },
+                                enabled = selectedItems.isNotEmpty(),
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.DeleteSweep,
+                                    contentDescription = "批量删除",
+                                    tint = if (selectedItems.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
+                    
+                    // 导入按钮
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text("导入") }
+                        },
+                        state = rememberTooltipState()
+                    ) {
+                        FilledTonalIconButton(
+                            onClick = { showImportFlag = true },
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.FileUpload,
+                                contentDescription = "导入",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    
+                    // 导出按钮 - 仅在有数据时可用
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text("导出") }
+                        },
+                        state = rememberTooltipState()
+                    ) {
+                        FilledTonalIconButton(
+                            onClick = { showExportFlag = true },
+                            enabled = dataList.isNotEmpty(),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.FileDownload,
+                                contentDescription = "导出",
+                                tint = if (dataList.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f) else MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
 
+                // 表头区域
+                Row(
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                        .padding(vertical = 12.dp), 
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     // 选择框表头
                     if (isEditMode) {
                         Box(
-                            modifier = androidx.compose.ui.Modifier.width(48.dp).padding(horizontal = 8.dp),
+                            modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Checkbox(
-                                checked = selectedItems.size == dataList.size, onCheckedChange = {
+                                checked = selectedItems.size == dataList.size, 
+                                onCheckedChange = {
                                     if (it) {
                                         selectedItems = dataList
                                     } else {
                                         selectedItems = emptyList()
                                     }
-                                })
+                                }
+                            )
                         }
                     }
 
                     // 序号表头
                     Box(
-                        modifier = androidx.compose.ui.Modifier.width(60.dp).padding(horizontal = 8.dp),
+                        modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -109,12 +221,11 @@ class UseTableContent<E : Any>(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             columns.forEach { column ->
-
                                 Text(
                                     text = column.title,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = androidx.compose.ui.Modifier.width(150.dp).padding(horizontal = 8.dp)
+                                    modifier = Modifier.width(150.dp).padding(horizontal = 8.dp)
                                 )
                             }
                         }
@@ -122,7 +233,7 @@ class UseTableContent<E : Any>(
 
                     // 操作列表头
                     Box(
-                        modifier = androidx.compose.ui.Modifier.width(120.dp).padding(horizontal = 8.dp),
+                        modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -143,34 +254,34 @@ class UseTableContent<E : Any>(
                                         selectedItems.contains(item) -> MaterialTheme.colorScheme.primaryContainer.copy(
                                             alpha = 0.12f
                                         )
-
                                         dataList.indexOf(item) % 2 == 1 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
-
                                         else -> MaterialTheme.colorScheme.surface
                                     }
-                                ).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically
+                                ).padding(vertical = 8.dp), 
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // 选择框列
                                 if (isEditMode) {
                                     Box(
-                                        modifier = androidx.compose.ui.Modifier.width(48.dp).padding(horizontal = 8.dp),
+                                        modifier = Modifier.width(48.dp).padding(horizontal = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Checkbox(
-                                            checked = selectedItems.contains(item), onCheckedChange = { checked ->
+                                            checked = selectedItems.contains(item), 
+                                            onCheckedChange = { checked ->
                                                 selectedItems = if (checked) {
                                                     selectedItems + item
                                                 } else {
                                                     selectedItems - item
                                                 }
-
-                                            })
+                                            }
+                                        )
                                     }
                                 }
 
                                 // 序号列
                                 Box(
-                                    modifier = androidx.compose.ui.Modifier.width(60.dp).padding(horizontal = 8.dp),
+                                    modifier = Modifier.width(60.dp).padding(horizontal = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -191,18 +302,11 @@ class UseTableContent<E : Any>(
                                     ) {
                                         columns.forEach { column ->
                                             Box(
-                                                modifier = androidx.compose.ui.Modifier.width(150.dp)
+                                                modifier = Modifier.width(150.dp)
                                                     .padding(horizontal = 8.dp).height(IntrinsicSize.Min),
                                                 contentAlignment = Alignment.CenterStart
                                             ) {
-
-//                                                val currentItem = column.getFun(item)
-//
-//                                                val content = currentItem.toNotBlankStr()
-
                                                 column.customRender(item)
-
-
                                             }
                                         }
                                     }
@@ -210,7 +314,7 @@ class UseTableContent<E : Any>(
 
                                 // 操作列
                                 Box(
-                                    modifier = androidx.compose.ui.Modifier.width(120.dp).padding(horizontal = 8.dp),
+                                    modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Row(
