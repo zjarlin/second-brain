@@ -4,7 +4,7 @@ package com.addzero
 @Retention(AnnotationRetention.SOURCE)
 annotation class Route(
     val path: String = "",
-    val title: String,
+    val title: String="",
     val parent: String = "",
     val icon: String = "",
     val visible: Boolean = true,

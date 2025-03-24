@@ -28,7 +28,7 @@ class RouteProcessor(
         val containingClassName =
             (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
         val path = getAnnoProperty(annotation, "path", String::class).ifBlank { declarationQulifiedName }
-        val title = getAnnoProperty(annotation, "title", String::class)
+        val title = getAnnoProperty(annotation, "title", String::class).ifBlank { declarationSimpleName }
         val parent = getAnnoProperty(annotation, "parent", String::class)
         val icon = getAnnoProperty(annotation, "icon", String::class)
 
