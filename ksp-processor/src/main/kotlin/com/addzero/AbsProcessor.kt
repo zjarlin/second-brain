@@ -2,6 +2,7 @@ package com.addzero
 
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.*
 import kotlin.reflect.KClass
 
@@ -20,7 +21,13 @@ inline fun <reified T : Any>getAnnoProperty(annotation: KSAnnotation, propName: 
 
 
 
-abstract class AbsProcessor<Meta> : SymbolProcessor {
+abstract class AbsProcessor<Meta>(
+    environment: SymbolProcessorEnvironment
+
+) : SymbolProcessor {
+        protected val codeGenerator = environment.codeGenerator
+    protected val logger = environment.logger
+
 
 
     // 存储收集到的元数据
@@ -38,6 +45,13 @@ abstract class AbsProcessor<Meta> : SymbolProcessor {
         
         // 处理声明上的注解
 
+        // 生成目标代码
+        try {
+            generateCode(resolver,metaList)
+        } catch (e: FileAlreadyExistsException) {
+            // 处理文件已存在异常
+            logger.warn("File already exists: ${e.message}")
+        }
 
 
         return emptyList()
@@ -56,8 +70,6 @@ abstract class AbsProcessor<Meta> : SymbolProcessor {
 
 
     override fun finish() {
-        // 生成目标代码
-        generateCode(metaList)
     }
     
     /**
@@ -73,6 +85,6 @@ abstract class AbsProcessor<Meta> : SymbolProcessor {
     /**
      * 根据收集的元数据生成代码
      */
-    protected abstract fun generateCode( metaList: List<Meta>)
+    protected abstract fun generateCode(resolver: Resolver, metaList: List<Meta>)
 
 }

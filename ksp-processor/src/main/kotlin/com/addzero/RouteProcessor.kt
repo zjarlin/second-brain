@@ -1,6 +1,7 @@
 package com.addzero
 
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -12,10 +13,10 @@ private const val FILE_NAME = "RouteTable"
 
 class RouteProcessor(
     environment: SymbolProcessorEnvironment
-) : AbsProcessor<KspRouteMeta>() {
+) : AbsProcessor<KspRouteMeta>(environment) {
 
-    private val codeGenerator = environment.codeGenerator
-    private val logger = environment.logger
+//    private val codeGenerator = environment.codeGenerator
+//    private val logger = environment.logger
 
     override fun getAnnotationName(): String = Route::class.qualifiedName!!
 
@@ -62,7 +63,7 @@ class RouteProcessor(
     }
 
 
-    override fun generateCode( metaList: List<KspRouteMeta>) {
+    override fun generateCode(resolver: Resolver, metaList: List<KspRouteMeta>) {
         logger.info("Generating route table")
         if (metaList.isNotEmpty()) {
 
@@ -93,20 +94,14 @@ class RouteProcessor(
         }
     """.trimIndent()
 
-                        codeGenerator.createNewFile(
-                            dependencies = Dependencies(
-                                aggregating = false,
-//                                metaList.toList().toTypedArray()
-                            ),
-
-//                            dependencies = Dependencies(
-//            false
-//                            ),
-
-                            packageName = PKG,
-                            fileName = FILE_NAME
-                        ).use { output ->
-
+            codeGenerator.createNewFile(
+                dependencies = Dependencies(
+                    aggregating = true,
+                    *resolver.getAllFiles().toList().toTypedArray()
+                ),
+                packageName = PKG,
+                fileName = FILE_NAME
+            ).use { output ->
 
 
 //            codeGenerator.createNewFile(
