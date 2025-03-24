@@ -48,11 +48,12 @@ dependencies {
 //    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation("com.google.auto.service:auto-service-annotations:+")
-    ksp("com.google.auto.service:auto-service:+")
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:+")
-    ksp("com.google.devtools.ksp:symbol-processing:+")
+//    implementation("com.google.auto.service:auto-service-annotations:+")
+//    ksp("com.google.auto.service:auto-service:+")
+//    
+//    implementation("com.google.devtools.ksp:symbol-processing-api:+")
+//    ksp("com.google.devtools.ksp:symbol-processing:+")
 
     implementation("org.tomlj:tomlj:1.1.1")
     // 引入 Spring Boot 相关依赖

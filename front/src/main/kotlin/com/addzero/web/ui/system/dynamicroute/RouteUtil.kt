@@ -4,12 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import cn.hutool.core.util.ClassUtil
 import cn.hutool.core.util.StrUtil
 import com.addzero.common.kt_util.isNotBlank
 import com.addzero.common.kt_util.isNotNull
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.common.util.data_structure.tree.List2TreeUtil
+import com.addzero.ksp.route.RouteTable
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
@@ -49,10 +51,12 @@ object RouteUtil {
 
 
         val metaSpecRoutes = getMetaSpecMetaData(packageName)
-        val functionRoutes = getFunctionsRouteMetaData(packageName)
+//        val functionRoutes = getFunctionsRouteMetaData(packageName)
+        val kspRoute = getKspRouteMetaData(packageName)
 
-        allRoutes.addAll(functionRoutes)
+//        allRoutes.addAll(functionRoutes)
         allRoutes.addAll(metaSpecRoutes)
+        allRoutes.addAll(kspRoute)
 
 
         // 处理上级名称为空的路由,把父类当做虚拟路由添加到列表中
@@ -78,6 +82,36 @@ object RouteUtil {
         // 过滤和排序
         val sortedBy = allRoutes.filter { it.visible }.sortedBy { it.title }.sortedBy { it.order }
         return sortedBy
+    }
+
+    private fun getKspRouteMetaData(string: String): List<RouteMetadata> {
+//        val loadClass = ClassUtil.loadClass<Any>("com.addzero.ksp.route" +
+//                ".RouteTable")
+        val map = RouteTable.routes.map {
+            val kspRouteMeta = it.key
+            val value = it.value
+            RouteMetadata(
+                routerPath = kspRouteMeta.path,
+                title = kspRouteMeta.title,
+                parentName = kspRouteMeta.parent,
+                icon = getIconByString(kspRouteMeta.icon),
+                visible = kspRouteMeta.visible,
+                permissions = kspRouteMeta.permissions.split(","),
+                order = kspRouteMeta.order,
+                children = emptyList(),
+                func = { value.invoke() },
+                clazz = null
+            )
+        }
+      return  map
+
+    }
+
+    private fun getIconByString(string: String): ImageVector? {
+        return when (string) {
+            "Apps" -> Icons.Default.Apps
+            else -> null
+        }
     }
 
     private fun getFunctionsRouteMetaData(packageName: String): List<RouteMetadata> {
@@ -211,9 +245,10 @@ object RouteUtil {
         val routeComponentByPath = RouteUtil.getRouteComponentByPath(currentRoute)
         val clazz = routeComponentByPath?.clazz
         val func = routeComponentByPath?.func
+
         if (func.isNotNull()) {
             // 处理函数组件路由
-            func?.let { it() }
+            func?.invoke()
         } else if (clazz.isNotNull()) {
             //处理类组件路由
             val createInstance = clazz?.createInstance()

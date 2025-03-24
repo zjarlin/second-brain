@@ -2,6 +2,7 @@ package com.addzero.web.ui.system.dynamicroute
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlin.reflect.KClass
 
@@ -13,7 +14,7 @@ data class RouteMetadata(
 
 
     //会有默认实现 ,函数式则ref#functionName,类Spec则全限定类名
-    var routerPath: String="",
+    var routerPath: String ="",
     //id
     val title: String,
     //pid
@@ -23,10 +24,6 @@ data class RouteMetadata(
     val permissions: List<String> = emptyList(),
     val order: Double = 0.0, // 添加order字段用于菜单排序
     val children: List<RouteMetadata> = emptyList(),
-    var clazz: KClass<*>?=null,
-    val func: (() -> Unit)? = null
-){
-//    @JvmConstructor
-//   constructor()
-
-}
+    var clazz: KClass<*>? =null,
+    val func: ( @Composable () -> Unit)? = null
+)

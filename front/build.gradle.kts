@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.compose)
@@ -7,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
-//    alias(libs.plugins.ksp)
+    alias(libs.plugins.ksp)
 
 }
 
@@ -19,10 +20,17 @@ dependencies {
 
     implementation("com.mikepenz:multiplatform-markdown-renderer-code:+")
 
+
+    implementation(project(":ksp-annotation"))
+    ksp(project(":ksp-processor"))
+
     // material3 contains opinionated components to streamline development
 //    implementation("io.github.boswelja.markdown:material3:+")
 
     api(project(":backend"))
+
+
+
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
 //    implementation(libs.compose.material3.desktop)

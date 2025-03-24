@@ -27,3 +27,5 @@ pluginManagement {
 
 
 rootProject.name = "second-brain"
+include("ksp-processor")
+include("ksp-annotation")

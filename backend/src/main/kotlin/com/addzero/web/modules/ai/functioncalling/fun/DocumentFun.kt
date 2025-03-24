@@ -28,7 +28,7 @@ class DocumentFun {
             }
             val tikaDocumentReader = TikaDocumentReader(FileSystemResource(path))
             val read = tikaDocumentReader.read()
-            FunctionCallingResponse(read[0].content)
+            FunctionCallingResponse(read[0].text?:"解析失败")
         }
         return requestResponseFunction
     }
