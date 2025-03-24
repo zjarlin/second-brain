@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks.table.common
+package com.addzero.web.ui.hooks.table.table
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -20,10 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.IColumn
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FileUpload
 
 class UseTableContent<E : Any>(
     val getIdFun: (E) -> Any = { it.hashCode() }
@@ -31,88 +26,32 @@ class UseTableContent<E : Any>(
 
     var columns: List<IColumn<E>> by mutableStateOf(listOf())
     var dataList: List<E> by mutableStateOf(listOf())
-    var filteredDataList: List<E> by mutableStateOf(listOf())
+
     var selectedItems: List<E> by mutableStateOf(listOf())
     var isEditMode by mutableStateOf(false)
     var currentSelectItem: E? by mutableStateOf(null)
+
     var showFormFlag: Boolean by mutableStateOf(false)
+
     var showDeleteFlag: Boolean by mutableStateOf(false)
-    var showBatchDeleteFlag: Boolean by mutableStateOf(false)
-    var showImportFlag: Boolean by mutableStateOf(false)
-    var showExportFlag: Boolean by mutableStateOf(false)
 
-    // 使用现有的 UseTableToolBar 组件
-    private val tableToolBar by lazy {
-        UseTableToolBar<E>(
-            onAddClick = {
-                currentSelectItem = null
-                showFormFlag = true
-            },
-            onBatchDelete = { ids ->
-                showBatchDeleteFlag = true
-            },
-            onImport = {
-                showImportFlag = true
-            },
-            onExport = {
-                showExportFlag = true
-            }
-        )
-    }
 
-    init {
-        // 初始同步状态
-        syncToolBarState()
-    }
 
-    // 状态同步函数 - 使用新的updateState方法
-    private fun syncToolBarState() {
-        tableToolBar.updateState(
-            newEditMode = isEditMode,
-            newSelectedItems = selectedItems.map { getIdFun(it) },
-            newDataList = dataList
-        )
-    }
-
-    fun toggleEditMode() {
-        isEditMode = !isEditMode
-        if (!isEditMode) {
-            selectedItems = emptyList()
-        }
-        // 同步状态到工具栏
-        syncToolBarState()
-    }
-    
-    // 同步工具栏状态到表格
-    private fun syncFromToolBar() {
-        // 仅在必要时同步，避免循环更新
-        if (isEditMode != tableToolBar.isEditMode) {
-            isEditMode = tableToolBar.isEditMode
-            if (!isEditMode) {
-                selectedItems = emptyList()
-            }
-        }
-        
-        // 同步各种标志
-        showBatchDeleteFlag = tableToolBar.showBatchDeleteFlag
-        showImportFlag = tableToolBar.showImportFlag 
-        showExportFlag = tableToolBar.showExportFlag
-    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val render: @Composable
         () -> Unit
         get() = {
-            // 每次渲染前同步状态到工具栏
-            syncToolBarState()
-            // 同步工具栏状态到表格
-            syncFromToolBar()
+
+
+//             同步工具栏状态到表格
+//            syncFromToolBar()
             
             Column(modifier = Modifier.fillMaxSize()) {
                 val horizontalScrollState = rememberScrollState()
                 
                 // 使用 UseTableToolBar 渲染按钮区域
-                tableToolBar.render()
+//                tableToolBar.render()
 
                 // 表头区域
                 Row(
@@ -134,8 +73,6 @@ class UseTableContent<E : Any>(
                                     } else {
                                         selectedItems = emptyList()
                                     }
-                                    // 同步状态到工具栏
-                                    syncToolBarState()
                                 }
                             )
                         }
@@ -216,8 +153,6 @@ class UseTableContent<E : Any>(
                                                 } else {
                                                     selectedItems - item
                                                 }
-                                                // 同步状态到工具栏
-                                                syncToolBarState()
                                             }
                                         )
                                     }

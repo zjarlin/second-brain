@@ -2,7 +2,7 @@ package com.addzero.web.ui.hooks.table.generic.dialog
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.addzero.web.ui.hooks.table.common.UseTableContent
+import com.addzero.web.ui.hooks.table.table.UseTableContent
 
 /**
  * 删除确认对话框组件

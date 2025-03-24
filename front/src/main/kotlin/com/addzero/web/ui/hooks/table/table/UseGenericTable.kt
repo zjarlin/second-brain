@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks.table.generic
+package com.addzero.web.ui.hooks.table.table
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,27 +7,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.addzero.common.consts.DEFAULT_EXCLUDE_FIELDS
-import com.addzero.common.consts.sql
-import com.addzero.common.kt_util.*
+import com.addzero.common.kt_util.getMetadata
+import com.addzero.common.kt_util.ignoreCaseNotIn
+import com.addzero.common.kt_util.isNotEmpty
+import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.ui.hooks.UseHook
-import com.addzero.web.ui.hooks.table.common.UseSearch
-import com.addzero.web.ui.hooks.table.common.UseTableContent
-import com.addzero.web.ui.hooks.table.common.UseTablePagination
 import com.addzero.web.ui.hooks.table.entity.IColumn
 import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.hooks.table.generic.dialog.DeleteDialog
 import com.addzero.web.ui.hooks.table.generic.dialog.FormDialog
-import kotlinx.coroutines.selects.select
 import org.babyfish.jimmer.Page
-import org.babyfish.jimmer.sql.kt.ast.expression.`ilike?`
-import org.babyfish.jimmer.sql.kt.ast.expression.like
-import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
-import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery
-import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
-import kotlin.collections.filter
+import java.io.InputStream
 import kotlin.reflect.KClass
-import kotlin.text.isBlank
 
 
 fun <E : Any> getDefaultColumns(
@@ -68,6 +60,10 @@ class UseTable<E : Any>(
     val onLoadData: (UseTable<E>) -> Page<E>? = { null },
     val onSave: (E) -> Unit,
     val onDelete: (Any) -> Unit,
+    val onBatchDeleted: (List<Any>) -> Unit,
+    val onImport: (InputStream) -> Unit,
+    val onExport: () -> Unit,
+    val otherFilter: @Composable () -> Unit = {}
 ) : UseHook<UseTable<E>> {
 
 
@@ -76,7 +72,8 @@ class UseTable<E : Any>(
             useTablePagination.pageNo = 1
             useTablePagination.pageSize = 10
             refreshData()
-        })
+        }, otherFilter = otherFilter
+    )
 
 
     fun refreshData() {
@@ -84,6 +81,13 @@ class UseTable<E : Any>(
         useTableContent.dataList = pageResult.rows
         useTablePagination.totalPages = pageResult.totalPageCount.toInt()
     }
+
+    val useTableToolBar = UseTableToolBar<E>(
+        onAddSubmit = {  },
+        onBatchDeleteSubmit = {},
+        onImport = {},
+        onExport ={}
+    )
 
     private val useTableContent = UseTableContent<E>()
 
@@ -99,6 +103,10 @@ class UseTable<E : Any>(
     }
 
     init {
+
+
+
+
         val defaultColumns = getDefaultColumns(clazz, excludeFields)
         val existingTitles = mutableSetOf<String>()
 
@@ -145,37 +153,38 @@ class UseTable<E : Any>(
     }
 
 
+    override val render: @Composable () -> Unit
+        get() = {
+            val useSearch = useSearch.getState()
+            val useTableToolBar = useTableToolBar.getState()
+            val useTableContent = useTableContent.getState()
+            val useTablePagination = useTablePagination.getState()
 
+            Column(modifier = Modifier.fillMaxSize()) {
+                useSearch.render()
 
-override val render: @Composable () -> Unit
-    get() = {
-        val useSearch = useSearch.getState()
-        val useTableContent = useTableContent.getState()
-        val useTablePagination = useTablePagination.getState()
+                useTableToolBar.render()
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            useSearch.render()
-
-            Box(modifier = Modifier.weight(1f)) {
-                Column {
-                    useTableContent.render()
-                    FormDialog(useTableContent, onFormSubmit = { item ->
-                        withRefresh { onSave(item) }
-                    })
-                    DeleteDialog(useTableContent, onDelete = { id ->
-                        withRefresh { onDelete(id) }
-                    })
+                Box(modifier = Modifier.weight(1f)) {
+                    Column {
+                        useTableContent.render()
+                        FormDialog(useTableContent, onFormSubmit = { item ->
+                            withRefresh { onSave(item) }
+                        })
+                        DeleteDialog(useTableContent, onDelete = { id ->
+                            withRefresh { onDelete(id) }
+                        })
+                    }
                 }
-            }
 
-            // 优化LaunchedEffect依赖项
-            LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize) {
-                refreshData()
-            }
+                // 优化LaunchedEffect依赖项
+                LaunchedEffect(useTablePagination.pageNo, useTablePagination.pageSize) {
+                    refreshData()
+                }
 
-            useTablePagination.render()
+                useTablePagination.render()
+            }
         }
-    }
 }
 
 @Composable
@@ -195,7 +204,10 @@ inline fun <reified E : Any> GenericTable(
         getIdFun = getIdFun,
         onSave = onSave,
         onDelete = onDelete,
-        onLoadData = onLoadData
+        onLoadData = onLoadData,
+        onBatchDeleted = {},
+        onImport = {},
+        onExport = { }
     ).getState()
 
     useTable.render()

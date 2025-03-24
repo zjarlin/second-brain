@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks.table.common
+package com.addzero.web.ui.hooks.table.table
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -18,13 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
-import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
 
 class UseSearch(
-val onSearch: () -> Unit
+    val onSearch: () -> Unit,
+    val otherFilter: @Composable () -> Unit={},
 ) : UseHook<UseSearch> {
     var searchText by mutableStateOf("")
-
 
     override val render: @Composable
         () -> Unit
@@ -51,32 +50,7 @@ val onSearch: () -> Unit
                     Text("搜索")
                 }
             }
-
+            otherFilter()
         }
 }
 
-@Composable
-fun SearchBar(
-    searchText: String, onSearchTextChange: (String) -> Unit, onSearch: () -> Unit, modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = onSearchTextChange,
-            modifier = Modifier.weight(1f).padding(end = 8.dp),
-            placeholder = { Text("请输入搜索关键词... 键入Enter可执行搜索") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearch() })
-        )
-        OutlinedButton(
-            onClick = onSearch, modifier = Modifier.height(56.dp)
-        ) {
-            Text("搜索")
-        }
-    }
-}

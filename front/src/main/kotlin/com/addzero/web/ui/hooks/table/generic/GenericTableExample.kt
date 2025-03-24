@@ -10,8 +10,10 @@ import androidx.compose.ui.unit.dp
 import com.addzero.common.consts.sql
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.dto.SysAreaSpec
+import com.addzero.web.ui.hooks.table.table.GenericTable
+import com.addzero.web.ui.hooks.table.table.UseTable
 import com.addzero.web.ui.hooks.table.entity.JimmerColumn
-import com.addzero.web.ui.hooks.table.generic.dialog.UseDialog
+import com.addzero.web.ui.hooks.table.generic.dialog.UseAutoDisableDialog
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
 import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery
@@ -23,14 +25,14 @@ fun GenericTableExample() {
     val addColumn = JimmerColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }).apply {
         customRender = {
             val blackFlag = it.blackFlag
-            val useDialog = UseDialog("点我干嘛")
+            val useAutoDisableDialog = UseAutoDisableDialog("点我干嘛")
             Switch(
                 checked = blackFlag == true, onCheckedChange = {
-                    useDialog.apply {
+                    useAutoDisableDialog.apply {
                         showFlag = true
                     }
                 })
-            useDialog.getState().render()
+            useAutoDisableDialog.getState().render()
         }
     }
     //随机生成100个自定义列

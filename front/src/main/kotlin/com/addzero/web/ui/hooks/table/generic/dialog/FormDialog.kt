@@ -2,8 +2,7 @@ package com.addzero.web.ui.hooks.table.generic.dialog
 
 import androidx.compose.runtime.Composable
 import com.addzero.web.ui.hooks.form.UseDynamicForm
-import com.addzero.web.ui.hooks.table.common.UseTableContent
-import kotlinx.serialization.json.JsonNull.content
+import com.addzero.web.ui.hooks.table.table.UseTableContent
 
 /**
  * 编辑对话框组件
@@ -14,7 +13,12 @@ fun <E : Any> FormDialog(
 ) {
     val item = useTableContent.currentSelectItem ?: return
 
-    val useDynamicForm = UseDynamicForm(useTableContent, columnCount).getState()
+    val useDynamicForm = UseDynamicForm<E>(columnCount)
+        .apply {
+            this.columns = useTableContent.columns
+            this.currentSelectItem = useTableContent.currentSelectItem
+        }.getState()
+
 
     GenericDialog(
         showFlag = useTableContent.showFormFlag,

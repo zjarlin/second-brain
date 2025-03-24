@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks.table.common
+package com.addzero.web.ui.hooks.table.table
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

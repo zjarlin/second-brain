@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import com.addzero.web.ui.hooks.UseHook
 import kotlinx.coroutines.delay
 
-class UseDialog(val text: String) : UseHook<UseDialog> {
+class UseAutoDisableDialog(val text: String) : UseHook<UseAutoDisableDialog> {
     // 使用 LaunchedEffect 实现 2 秒后自动关闭
     var showFlag by mutableStateOf(false)
 

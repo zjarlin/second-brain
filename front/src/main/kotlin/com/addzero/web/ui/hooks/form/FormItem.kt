@@ -10,11 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import cn.hutool.core.util.NumberUtil
 import com.addzero.common.kt_util.toNotBlankStr
-import com.addzero.web.ui.hooks.table.common.UseTableContent
 import com.addzero.web.ui.hooks.table.entity.IColumn
-import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -25,9 +22,9 @@ import java.util.*
 fun <E : Any> FormItem(
     icolumn: IColumn<E>,
     useDynamicForm: UseDynamicForm<E>,
-    useTableContent: UseTableContent<E>
+    currentSelectItem: E?
 ) {
-    val currentFormItem = useTableContent.currentSelectItem
+    val currentFormItem = currentSelectItem
     val renderType = icolumn.renderType
     val getFun = icolumn.getFun
     val setFun = icolumn.setFun
