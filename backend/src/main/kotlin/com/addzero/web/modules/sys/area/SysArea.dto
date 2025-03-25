@@ -1,4 +1,5 @@
 specification SysAreaSpec {
-   like/i(name,city) as keyword
+    like/i(name, city) as keyword
+    like/i(leveltype) as leveltype
 }
 

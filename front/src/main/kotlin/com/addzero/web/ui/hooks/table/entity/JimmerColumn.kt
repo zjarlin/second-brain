@@ -3,21 +3,14 @@ package com.addzero.web.ui.hooks.table.entity
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import cn.hutool.core.bean.BeanUtil
 import cn.hutool.core.util.ObjUtil
-import com.addzero.common.kt_util.*
-import com.addzero.web.modules.sys.area.SysArea
+import com.addzero.common.kt_util.FieldMetadata
+import com.addzero.common.kt_util.toNotBlankStr
+import com.addzero.web.infra.jimmer.copy
 import com.addzero.web.ui.hooks.table.entity.RenderType.*
-import org.babyfish.jimmer.DraftObjects
 import org.babyfish.jimmer.Formula
-import org.babyfish.jimmer.meta.ImmutableType
-import org.babyfish.jimmer.runtime.Internal
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.reflect.full.hasAnnotation
+
 
 
 /**
@@ -88,37 +81,6 @@ class JimmerColumn<E : Any>(
     }
 
 
-
 }
 
-fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity ->
-    val copy = this.copy {
-        DraftObjects.set(it, fieldName, value)
-    }
-    return copy
-}
 
-fun <E : Any> E?.copy(block: (Any) -> Unit = {}): E? = this?.let { entity ->
-    Internal.produce(ImmutableType.get(entity.javaClass), entity) { d ->
-        block(d)
-        d
-    } as E
-}
-
-fun <E : Any> E.fromMap(updates: Map<String, Any?>, block: (String, Any?) -> Unit = { _, _ -> }): E? {
-    val newItem = this.copy { draft ->
-        updates.forEach { (fieldName, value) ->
-            DraftObjects.set(draft, fieldName, value)
-            block(fieldName, value)
-        }
-    }
-    return newItem
-}
-
-fun <E : Any> E?.toMap(): MutableMap<String, Any>? {
-    if (this == null) {
-        return null
-    }
-    val beanToMap = BeanUtil.beanToMap(this, false, true)
-    return beanToMap
-}

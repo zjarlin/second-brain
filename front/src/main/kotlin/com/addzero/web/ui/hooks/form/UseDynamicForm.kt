@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.IColumn
-import com.addzero.web.ui.hooks.table.entity.fromMap
+import com.addzero.web.infra.jimmer.fromMap
 
 class UseDynamicForm<E : Any>(
 //    private val useTableContent: UseTableContent<E>,

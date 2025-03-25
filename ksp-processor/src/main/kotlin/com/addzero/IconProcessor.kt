@@ -6,6 +6,7 @@
 //import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 //import com.google.devtools.ksp.symbol.KSAnnotation
 //import com.google.devtools.ksp.symbol.KSDeclaration
+//import androidx.compose.ui.graphics.vector.ImageVector
 //import kotlin.jvm.java
 //
 //class IconProcessor(
@@ -41,12 +42,12 @@
 //            }
 //
 //            enum class OutlinedIcon {
-//                ${Icons.Outlined::class.java.declaredFields.joinToString(",\n                ") { field -> field.name }};
+//                ${Icons.Outlined.javaClass.declaredMethods.filter { it.name.startsWith("get") && it.returnType == ImageVector::class.java }.joinToString(",\n                ") { method -> method.name.removePrefix("get") }};
 //
 //                fun getIcon(): ImageVector {
-//                    val field = Icons.Outlined::class.java.getDeclaredField(this.name)
-//                    field.isAccessible = true
-//                    return field.get(null) as ImageVector
+//                    val method = Icons.Outlined.javaClass.getDeclaredMethod("get${this.name}")
+//                    method.isAccessible = true
+//                    return method.invoke(Icons.Outlined) as ImageVector
 //                }
 //            }
 //
