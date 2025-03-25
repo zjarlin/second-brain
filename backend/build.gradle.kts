@@ -4,7 +4,15 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.ksp)
+    id("org.jetbrains.kotlin.plugin.noarg") version "+"
 //    application
+}
+
+noArg {
+    annotation("com.addzero.common.anno.NoArg")
+}
+allOpen {
+    annotation("com.addzero.common.anno.NoArg")
 }
 
 version = "1.0.0"
