@@ -25,6 +25,22 @@ fun <T : Any> KSqlClient.list(entityType: KClass<T>): List<T> {
     return execute1
 }
 
+
+//inline fun <reified E : Any, P : Any> E.set(propName: String, value: P): E {
+//    val kClass: KClass<E> = E::class
+////    val otherProperties: List<KProperty1<E, *>> = kClass.memberProperties.filter { it.name != propName }
+//    val constructor: KFunction<E>? = kClass.primaryConstructor
+//    val newParams: List<Unit> = constructor
+//        ?.parameters
+//        ?.map {
+//            val paramKClass: KClass<*> = it.type.classifier as KClass<*>
+//            if (paramKClass == value::class) {
+//                // 这里原代码块内没有内容，可按需补充
+//            }
+//        }?: emptyList()
+//    return constructor?.call(*newParams.toTypedArray()) ?: this
+//}
+
 fun <E : Any> E?.copy(fieldName: String, value: Any?): E? = this?.let { entity ->
     val copy = this.copy {
         DraftObjects.set(it, fieldName, value)

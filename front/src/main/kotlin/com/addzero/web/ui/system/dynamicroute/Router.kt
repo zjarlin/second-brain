@@ -6,9 +6,7 @@ package com.addzero.web.ui.system.dynamicroute
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-@Deprecated("暂未实现")
 annotation class Router(
-
     val routerPath: String = "",
     val parentName: String = "",
     val title: String = "标题",
