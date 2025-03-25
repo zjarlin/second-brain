@@ -3,7 +3,6 @@ package com.addzero.addzero_common
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.city
 import com.addzero.web.modules.sys.area.copy
-import org.babyfish.jimmer.Draft
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.KSqlClient
 import org.babyfish.jimmer.sql.kt.ast.expression.KExpression
@@ -54,29 +53,20 @@ class 测试jimmer实体修改值(
         }.fetchPage(pageNo - 1, pageSize)
         val rows = createQuery.rows
 
-        val toList = rows.map {
 
-            val draft = it as Draft
-
-
-            it.apply {
-                val e = this
-                println()
-            }
-
-
-
-            it
-        }.toList()
-
-
-        return toList
+        return rows
     }
 
 
     @Test
     fun test(): Unit {
-        val selectGeneric = selectGeneric<SysArea>("", null, 1, 10)
+        val selectGeneric = selectGeneric<SysArea>("", null, 1, 20)
+        val sortedBy = selectGeneric.sortedBy {
+//            it.leveltype
+            val toInt = it.leveltype?.toInt()
+            toInt
+        }
+        println(sortedBy)
 
 //        val createQuery = selectArea("", 1, 10)
 //        val rows = createQuery.rows

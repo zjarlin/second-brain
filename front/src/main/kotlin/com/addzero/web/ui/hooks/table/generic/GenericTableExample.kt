@@ -10,10 +10,10 @@ import androidx.compose.ui.unit.dp
 import com.addzero.common.consts.sql
 import com.addzero.web.modules.sys.area.SysArea
 import com.addzero.web.modules.sys.area.dto.SysAreaSpec
-import com.addzero.web.ui.hooks.table.table.GenericTable
-import com.addzero.web.ui.hooks.table.table.UseTable
 import com.addzero.web.ui.hooks.table.entity.JimmerColumn
 import com.addzero.web.ui.hooks.table.generic.dialog.UseAutoDisableDialog
+import com.addzero.web.ui.hooks.table.table.GenericTable
+import com.addzero.web.ui.hooks.table.table.UseTable
 import org.babyfish.jimmer.Page
 import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
 import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery

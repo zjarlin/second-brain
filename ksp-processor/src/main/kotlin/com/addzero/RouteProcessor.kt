@@ -97,7 +97,13 @@ class RouteProcessor(
             codeGenerator.createNewFile(
                 dependencies = Dependencies(
                     aggregating = true,
-                    *resolver.getAllFiles().toList().toTypedArray()
+                    *resolver.getAllFiles()
+                        .filter { it.declarations.any { declaration ->
+                            declaration.annotations.any { annotation ->
+                                annotation.shortName.asString() == "Route"
+                            }
+                        } }
+                    .toList().toTypedArray()
                 ),
                 packageName = PKG,
                 fileName = FILE_NAME

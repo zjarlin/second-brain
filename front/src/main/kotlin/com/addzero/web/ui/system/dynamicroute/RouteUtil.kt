@@ -1,21 +1,16 @@
 package com.addzero.web.ui.system.dynamicroute
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import cn.hutool.core.util.ClassUtil
-import cn.hutool.core.util.StrUtil
 import com.addzero.common.kt_util.isNotBlank
 import com.addzero.common.kt_util.isNotNull
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.common.util.data_structure.tree.List2TreeUtil
 import com.addzero.ksp.route.RouteTable
 import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.functions
 
 
 /**
@@ -51,7 +46,6 @@ object RouteUtil {
 
 
         val metaSpecRoutes = getMetaSpecMetaData(packageName)
-//        val functionRoutes = getFunctionsRouteMetaData(packageName)
         val kspRoute = getKspRouteMetaData(packageName)
 
 //        allRoutes.addAll(functionRoutes)
@@ -107,61 +101,10 @@ object RouteUtil {
 
     }
 
+
     private fun getIconByString(string: String): ImageVector? {
-        return when (string) {
-            "Apps" -> Icons.Default.Apps
-            else -> null
-        }
-    }
-
-    private fun getFunctionsRouteMetaData(packageName: String): List<RouteMetadata> {
-
-
-        // 获取所有带有 @Composable 注解的方法
-
-
-        val scanPackage = ClassUtil.scanPackage(packageName, {
-            val functions = it.kotlin.functions
-            val hasRouter = functions.any {
-                it.annotations.any {
-                    val b = it.annotationClass == Router::class
-                    b
-                }
-            }
-            hasRouter
-        })
-        val toList1 = scanPackage.flatMap {
-            val kotlin = it.kotlin
-            val qualifiedName = kotlin.qualifiedName
-            val functions = kotlin.declaredFunctions
-            functions
-                .mapNotNull {
-                    //函数限定名作为路由路径
-                    val refPath = "$qualifiedName#${it.name}"
-
-                    val routorAnno = it.findAnnotation<Router>() ?: return@mapNotNull null
-                    val routerPath = routorAnno.routerPath
-                    val firstNonNullRouterPath = StrUtil.firstNonBlank(routerPath, refPath)
-
-                    RouteMetadata(
-                        routerPath = firstNonNullRouterPath,
-                        title = routorAnno.title,
-                        parentName = routorAnno.parentName,
-                        icon = Icons.Default.Apps,
-                        visible = true,
-                        permissions = emptyList(),
-                        order = 0.0,
-                        children = emptyList(),
-                        func = { it.call() },
-                        clazz = kotlin
-                    )
-
-
-                }
-        }.toList()
-
-
-        return toList1
+        val get = ICON_MAP.get(string.toNotBlankStr()?.lowercase())
+        return get
     }
 
     private fun getMetaSpecMetaData(packageName: String): List<RouteMetadata> {
