@@ -22,33 +22,18 @@ class RouteProcessor(
 
     override fun extractMetaData(declaration: KSDeclaration, annotation: KSAnnotation): KspRouteMeta {
         val declarationSimpleName = declaration.simpleName.asString()
-        //限定类名
         val declarationQulifiedName = declaration.qualifiedName?.asString() ?: ""
-        //包含类名
         val containingClassName =
             (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
         val path = getAnnoProperty(annotation, "path", String::class).ifBlank { declarationQulifiedName }
         val title = getAnnoProperty(annotation, "title", String::class).ifBlank { declarationSimpleName }
         val parent = getAnnoProperty(annotation, "parent", String::class)
         val icon = getAnnoProperty(annotation, "icon", String::class)
-
         val visible = getAnnoProperty(annotation, "visible", Boolean::class)
         val order = getAnnoProperty(annotation, "order", Double::class)
         val permissions = getAnnoProperty(annotation, "permissions", String::class)
 
-        val className = when (declaration) {
-            is KSClassDeclaration -> {
-                declarationQulifiedName
-            }
-
-            is KSFunctionDeclaration -> {
-                "$containingClassName#$declarationSimpleName"
-            }
-
-            else -> ""
-        }
-
-        val kspRouteMeta = KspRouteMeta(
+        return KspRouteMeta(
             declarationQulifiedName = declarationQulifiedName,
             path = path,
             title = title,
@@ -57,60 +42,47 @@ class RouteProcessor(
             visible = visible,
             order = order,
             permissions = permissions
-
         )
-        return kspRouteMeta
     }
 
-
     override fun generateCode(resolver: Resolver, metaList: List<KspRouteMeta>) {
-        logger.info("Generating route table")
-        if (metaList.isNotEmpty()) {
+        if (metaList.isEmpty()) return
 
-            val routeTableContent = """
-        package $PKG
-        import com.addzero.KspRouteMeta
-        import androidx.compose.runtime.Composable
+        val dependencies = Dependencies(
+            aggregating = true,
+            sources = resolver.getAllFiles().toList().toTypedArray()
+        )
 
-        object RouteTable {
-            val routes = mapOf(
-                ${
-                metaList.joinToString(",\n") { meta ->
-                    """
-                    KspRouteMeta(
+        val routeTableContent = """
+            package $PKG
+            
+            import com.addzero.KspRouteMeta
+            import androidx.compose.runtime.Composable
+            
+            object RouteTable {
+                val routes = mapOf(
+                    ${metaList.joinToString(",\n                    ") { meta ->
+                    """KspRouteMeta(
                         path = "${meta.path}",
                         title = "${meta.title}",
                         parent = "${meta.parent}",
                         icon = "${meta.icon}",
                         visible = ${meta.visible},
                         order = ${meta.order},
-                        declarationQulifiedName = "${meta.declarationQulifiedName}", 
-                        permissions = "${meta.permissions}" 
-                    ) to @Composable { ${meta.declarationQulifiedName}() }
-                    """.trimIndent()
-                }
+                        declarationQulifiedName = "${meta.declarationQulifiedName}",
+                        permissions = "${meta.permissions}"
+                    ) to @Composable { ${meta.declarationQulifiedName}() }"""
+                    }}
+                )
             }
-            )
-        }
-    """.trimIndent()
+        """.trimIndent()
 
-            // Create file with overwrite option to handle 'File already exists' error
-            codeGenerator.createNewFile(
-                dependencies = Dependencies(
-                    aggregating = true,
-                    *resolver.getAllFiles()
-                        .filter { it.declarations.any { declaration ->
-                            declaration.annotations.any { annotation ->
-                                annotation.shortName.asString() == "Route"
-                            }
-                        } }
-                    .toList().toTypedArray()
-                ),
-                packageName = PKG,
-                fileName = FILE_NAME
-            ).use { output ->
-                output.write(routeTableContent.toByteArray())
-            }
+        codeGenerator.createNewFile(
+            dependencies = dependencies,
+            packageName = PKG,
+            fileName = FILE_NAME
+        ).use { output ->
+            output.write(routeTableContent.toByteArray())
         }
     }
 

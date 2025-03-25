@@ -11,14 +11,13 @@ import com.addzero.web.ui.hooks.table.table.UseTableContent
 fun <E : Any> FormDialog(
     useTableContent: UseTableContent<E>, onFormSubmit: (E) -> Unit, columnCount: Int = 2
 ) {
-    val item = useTableContent.currentSelectItem ?: return
+    useTableContent.currentSelectItem ?: return
 
     val useDynamicForm = UseDynamicForm<E>(columnCount)
         .apply {
-            this.columns = useTableContent.columns
-            this.currentSelectItem = useTableContent.currentSelectItem
+            columns = useTableContent.columns
+            currentSelectItem = useTableContent.currentSelectItem
         }.getState()
-
 
     GenericDialog(
         showFlag = useTableContent.showFormFlag,
@@ -28,11 +27,7 @@ fun <E : Any> FormDialog(
             //验证表单
             val validate = useDynamicForm.validate()
             if (validate) {
-                // 使用useDynamicForm中的currentFormItem而不是原始的item
-                useTableContent.currentSelectItem?.let { updatedItem ->
-                    onFormSubmit(updatedItem)
-                }
-
+                onFormSubmit(useTableContent.currentSelectItem!!)
             }
             useTableContent.showFormFlag = false
         },
