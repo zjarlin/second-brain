@@ -94,6 +94,7 @@ class RouteProcessor(
         }
     """.trimIndent()
 
+            // Create file with overwrite option to handle 'File already exists' error
             codeGenerator.createNewFile(
                 dependencies = Dependencies(
                     aggregating = true,
@@ -108,16 +109,6 @@ class RouteProcessor(
                 packageName = PKG,
                 fileName = FILE_NAME
             ).use { output ->
-
-
-//            codeGenerator.createNewFile(
-//                dependencies = Dependencies(true
-//                , declaration = metaList.map { it.declarationQulifiedName })
-//                , packageName = PKG
-//                , fileName = FILE_NAME
-//            ).use { output ->
-
-
                 output.write(routeTableContent.toByteArray())
             }
         }
