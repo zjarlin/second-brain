@@ -34,14 +34,14 @@ fun <E : Any> DefaultFieldRenderer(
         // 根据渲染类型选择不同的表单控件
         when (field.renderType) {
             RenderType.TEXT -> TextFieldRenderer(field, value, onChange, error)
-            RenderType.TEXTAREA -> TextAreaRenderer(field, value, onChange, error)
+            RenderType.TEXT_AREA -> TextAreaRenderer(field, value, onChange, error)
             RenderType.NUMBER -> NumberFieldRenderer(field, value, onChange, error)
-            RenderType.SWITCH -> SwitchRenderer(field, value, onChange, error)
-            RenderType.CHECKBOX -> CheckboxRenderer(field, value, onChange, error)
+            RenderType.BOOL_SWITCH -> SwitchRenderer(field, value, onChange, error)
+            RenderType.BOOL_CHECKBOX -> CheckboxRenderer(field, value, onChange, error)
             RenderType.SELECT -> SelectRenderer(field, value, onChange, error)
             RenderType.DATE -> DateFieldRenderer(field, value, onChange, error)
             RenderType.RADIO -> RadioRenderer(field, value, onChange, error)
-            RenderType.MULTISELECT -> MultiSelectRenderer(field, value, onChange, error)
+            RenderType.SELECT_MULTI -> MultiSelectRenderer(field, value, onChange, error)
             // 其他类型...
             else -> TextFieldRenderer(field, value, onChange, error)
         }

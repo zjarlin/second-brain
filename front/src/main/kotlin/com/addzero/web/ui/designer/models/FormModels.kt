@@ -4,7 +4,6 @@ import com.addzero.web.ui.hooks.table.entity.OptionItem
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.lowcode.metadata.FieldMetadata
 import com.alibaba.fastjson2.JSON
-import com.alibaba.fastjson2.JSONObject
 
 /**
  * 表单配置
@@ -66,7 +65,7 @@ data class FieldOption(
  * 字段验证器
  */
 data class FieldValidator(
-    val type: String, // "required", "regex", "min", "max", etc.
+    val type: String,
     val message: String,
     val params: Map<String, String> = emptyMap()
 )
@@ -80,14 +79,14 @@ fun <E : Any> FormField.toFieldMetadata(
 ): FieldMetadata<E> {
     val renderType = when (this.type) {
         "text" -> RenderType.TEXT
-        "textarea" -> RenderType.TEXTAREA
+        "textarea" -> RenderType.TEXT_AREA
         "number" -> RenderType.NUMBER
         "select" -> RenderType.SELECT
-        "checkbox" -> RenderType.CHECKBOX
-        "switch" -> RenderType.SWITCH
+        "checkbox" -> RenderType.BOOL_CHECKBOX
+        "switch" -> RenderType.BOOL_SWITCH
         "date" -> RenderType.DATE
         "radio" -> RenderType.RADIO
-        "multiselect" -> RenderType.MULTISELECT
+        "multiselect" -> RenderType.SELECT_MULTI
         else -> RenderType.TEXT
     }
     

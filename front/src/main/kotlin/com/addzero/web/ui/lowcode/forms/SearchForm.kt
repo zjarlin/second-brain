@@ -222,7 +222,7 @@ private fun <E : Any> CompactFieldRenderer(
                     }
                 }
             }
-            RenderType.SWITCH -> {
+            RenderType.BOOL_SWITCH -> {
                 Row(
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     verticalAlignment = Alignment.CenterVertically

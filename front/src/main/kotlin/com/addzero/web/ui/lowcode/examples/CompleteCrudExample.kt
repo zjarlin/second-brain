@@ -3,8 +3,6 @@ package com.addzero.web.ui.lowcode.examples
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -146,7 +144,7 @@ fun CompleteCrudExample() {
         FieldMetadata(
             name = "isActive",
             title = "是否上架",
-            renderType = RenderType.SWITCH,
+            renderType = RenderType.BOOL_SWITCH,
             getValue = { it.isActive },
             setValue = { product, value -> product.copy(isActive = value as? Boolean ?: false) },
             showInSearch = true,
@@ -156,7 +154,7 @@ fun CompleteCrudExample() {
         FieldMetadata(
             name = "description",
             title = "描述",
-            renderType = RenderType.TEXTAREA,
+            renderType = RenderType.TEXT_AREA,
             getValue = { it.description },
             setValue = { product, value -> product.copy(description = value as? String ?: "") },
             placeholder = "请输入产品描述",

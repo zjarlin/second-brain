@@ -41,7 +41,8 @@ enum class RenderType {
     IMAGE,              // 图片
     FILE,               // 文件
     COMPUTED,           // 计算字段
-    CUSTOM;             // 自定义
+    RADIO, //视频
+    CUSTOM          ;
 
     companion object {
         fun fromJdbcType(jdbcType: JDBCType): RenderType {

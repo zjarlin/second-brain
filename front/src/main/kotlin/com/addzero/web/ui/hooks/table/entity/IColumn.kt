@@ -2,7 +2,12 @@ package com.addzero.web.ui.hooks.table.entity
 
 import androidx.compose.runtime.Composable
 import com.addzero.common.kt_util.containsAnyIgnoreCase
-import com.addzero.web.ui.hooks.table.entity.RenderType.*
+import com.addzero.web.ui.hooks.table.entity.RenderType.CUSTOM
+import com.addzero.web.ui.hooks.table.entity.RenderType.DATE
+import com.addzero.web.ui.hooks.table.entity.RenderType.DATE_TIME
+import com.addzero.web.ui.hooks.table.entity.RenderType.FILE
+import com.addzero.web.ui.hooks.table.entity.RenderType.IMAGE
+import com.addzero.web.ui.hooks.table.entity.RenderType.TEXT_AREA
 
 /**
  * 表格列定义接口
@@ -21,8 +26,8 @@ interface IColumn<E : Any> {
             fieldName.containsAnyIgnoreCase("url,file") -> FILE
             fieldName.containsAnyIgnoreCase("image") -> IMAGE
             fieldName.containsAnyIgnoreCase("date") && !fieldName.containsAnyIgnoreCase("time") -> DATE
-            fieldName.containsAnyIgnoreCase("time", "datetime") -> DATETIME
-            fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXTAREA
+            fieldName.containsAnyIgnoreCase("time", "datetime") -> DATE_TIME
+            fieldName.contains("description") || fieldName.contains("content") || fieldName.contains("text") -> TEXT_AREA
             else -> CUSTOM
         }
         set(value) = value.run {}

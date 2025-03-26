@@ -1,16 +1,22 @@
 package com.addzero.web.ui.hooks.table.entity
 
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.FieldMetadata
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.infra.jimmer.copy
-import com.addzero.web.ui.hooks.table.entity.RenderType.*
+import com.addzero.web.ui.hooks.table.entity.RenderType.BOOL_SWITCH
+import com.addzero.web.ui.hooks.table.entity.RenderType.CUSTOM
+import com.addzero.web.ui.hooks.table.entity.RenderType.TEXT
 import org.babyfish.jimmer.Formula
 import kotlin.reflect.full.hasAnnotation
-
 
 
 /**
@@ -36,7 +42,7 @@ class JimmerColumn<E : Any>(
             val property1 = currentField?.property
             return when {
                 property1?.returnType?.classifier == String::class -> TEXT
-                property1?.returnType?.classifier == Boolean::class -> SWITCH
+                property1?.returnType?.classifier == Boolean::class -> BOOL_SWITCH
                 property?.hasAnnotation<Transient>() == true || property?.hasAnnotation<Formula>() == true -> CUSTOM
                 else -> super.renderType
             }
