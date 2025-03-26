@@ -11,8 +11,7 @@ annotation class Route(
     val visible: Boolean = true,
     val order: Double = 0.0,
     val permissions: String = "",
-
-    val declarationQulifiedName : String=""
-
+    val declarationQulifiedName : String="",
+    val homePageFlag: Boolean = false,
 
 )

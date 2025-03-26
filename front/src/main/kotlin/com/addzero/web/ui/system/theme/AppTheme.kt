@@ -10,7 +10,9 @@ private val LightColorScheme = lightColorScheme(
     primary = Color(AppConfig.Theme.primaryGradient[1]),
     onPrimary = Color.White,
     surface = Color.White.copy(alpha = 0.95f),
-    background = Color(AppConfig.Theme.backgroundGradient[0])
+    background = Color(AppConfig.Theme.backgroundGradient[0]),
+    primaryContainer = Color.White.copy(alpha = 0.95f),
+    surfaceVariant = Color.White
 )
 
 

@@ -22,7 +22,8 @@ class RouteProcessor(
     override fun extractMetaData(declaration: KSDeclaration, annotation: KSAnnotation): Route {
         val declarationSimpleName = declaration.simpleName.asString()
         val declarationQulifiedName = declaration.qualifiedName?.asString() ?: ""
-        val containingClassName = (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
+        val containingClassName =
+            (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
         val value = getAnnoProperty(annotation, "value", String::class)
 
         val path = getAnnoProperty(annotation, "path", String::class).ifBlank { declarationQulifiedName }
@@ -33,6 +34,7 @@ class RouteProcessor(
         val visible = getAnnoProperty(annotation, "visible", Boolean::class)
         val order = getAnnoProperty(annotation, "order", Double::class)
         val permissions = getAnnoProperty(annotation, "permissions", String::class)
+        val homePageFlag = getAnnoProperty(annotation, "homePageFlag", Boolean::class)
 
         return Route(
             value = value,
@@ -43,8 +45,8 @@ class RouteProcessor(
             visible = visible,
             order = order,
             permissions = permissions,
-           declarationQulifiedName=declarationQulifiedName
-
+            declarationQulifiedName = declarationQulifiedName,
+            homePageFlag = homePageFlag
         )
     }
 
@@ -63,11 +65,12 @@ class RouteProcessor(
             
             object RouteTable {
                 val routes = mapOf(
-                    ${metaList.joinToString(",\n                    ") { meta ->
-                        
-            val parent = meta.parent.ifBlank { meta.value }
-            
-            """Route(
+                    ${
+            metaList.joinToString(",\n                    ") { meta ->
+
+                val parent = meta.parent.ifBlank { meta.value }
+
+                """Route(
                         value = "${meta.value}",
                         path = "${meta.path}",
                         title = "${meta.title}",
@@ -76,9 +79,11 @@ class RouteProcessor(
                         visible = ${meta.visible},
                         order = ${meta.order},
                         declarationQulifiedName = "${meta.declarationQulifiedName}",
+                        homePageFlag =  ${meta.homePageFlag},
                         permissions = "${meta.permissions}"
                     ) to @Composable { ${meta.declarationQulifiedName}() }"""
-                    }}
+            }
+        }
                 )
             }
         """.trimIndent()
