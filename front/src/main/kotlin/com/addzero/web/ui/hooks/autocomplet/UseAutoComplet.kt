@@ -32,19 +32,19 @@ import com.addzero.web.ui.hooks.UseHook
 
 @OptIn(ExperimentalMaterial3Api::class)
 class UseAutoComplet<T>(
-    val title: String,
-    val suggestions: List<T>,
-    val maxSuggestions: Int = 5,
-    val getLabelFun: (T) -> String,
+    private val title: String,
+    private val suggestions: List<T>,
+    private val maxSuggestions: Int = 5,
+    private val getLabelFun: (T) -> String = { it as String },
 ) : UseHook<UseAutoComplet<T>> {
 
-    private var textFieldValue by mutableStateOf(TextFieldValue(text = ""))
+    var inputValue by mutableStateOf(TextFieldValue(text = ""))
     var selected by mutableStateOf<T?>(null)
 
     private fun onSuggestionSelected(suggestion: T) {
         selected = suggestion
         val newText = getLabelFun(suggestion)
-        textFieldValue = TextFieldValue(
+        inputValue = TextFieldValue(
             text = newText,
             selection = TextRange(newText.length) // 光标定位在末尾
         )
@@ -59,21 +59,21 @@ class UseAutoComplet<T>(
             val keyboardController = LocalSoftwareKeyboardController.current
 
             // Filter suggestions based on input
-            val filteredSuggestions = remember(textFieldValue.text, suggestions) {
-                if (textFieldValue.text.isBlank()) {
+            val filteredSuggestions = remember(inputValue.text, suggestions) {
+                if (inputValue.text.isBlank()) {
                     suggestions.take(maxSuggestions)
                 } else {
                     suggestions.filter {
-                        getLabelFun(it).contains(textFieldValue.text, ignoreCase = true)
+                        getLabelFun(it).contains(inputValue.text, ignoreCase = true)
                     }.take(maxSuggestions)
                 }
             }
 
             Column(modifier = modifier) {
                 OutlinedTextField(
-                    value = textFieldValue,
+                    value = inputValue,
                     onValueChange = { newValue ->
-                        textFieldValue = newValue
+                        inputValue = newValue
                         showSuggestions = newValue.text.isNotBlank() || hasFocus
                         selectedSuggestionIndex = -1
                         selected = null
@@ -85,8 +85,8 @@ class UseAutoComplet<T>(
                             showSuggestions = focusState.isFocused
                             if (focusState.isFocused) {
                                 // 聚焦时将光标移到末尾
-                                textFieldValue = textFieldValue.copy(
-                                    selection = TextRange(textFieldValue.text.length)
+                                inputValue = inputValue.copy(
+                                    selection = TextRange(inputValue.text.length)
                                 )
                             }
                         }
@@ -133,7 +133,7 @@ class UseAutoComplet<T>(
                                 }
 
                                 Key.Backspace -> {
-                                    if (textFieldValue.text.isEmpty()) {
+                                    if (inputValue.text.isEmpty()) {
                                         showSuggestions = hasFocus
                                     }
                                     false

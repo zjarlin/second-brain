@@ -1,4 +1,5 @@
 package  com.addzero.web.ui.hooks
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,13 +16,10 @@ interface UseHook<T : UseHook<T>> {
     val render: @Composable () -> Unit
 
     @Composable
-    fun render(content: @Composable T.() -> Unit ) {
+    fun render(content: @Composable T.() -> Unit) {
         val state = getState()
-        if (content == {}) {
-            state.render()
-        } else {
-            content(state)
-        }
+        content(state)
+        state.render()
     }
 
     @Composable
