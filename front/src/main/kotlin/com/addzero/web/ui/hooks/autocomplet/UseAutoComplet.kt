@@ -1,4 +1,4 @@
-package com.addzero.web.ui.components
+package com.addzero.web.ui.hooks.autocomplet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -23,23 +24,30 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.addzero.web.ui.hooks.UseHook
 
-class UseAutoCompleteTextField<T>(
+@OptIn(ExperimentalMaterial3Api::class)
+class UseAutoComplet<T>(
     val title: String,
     val suggestions: List<T>,
+    val maxSuggestions: Int = 5,
     val getLabelFun: (T) -> String,
-    val maxSuggestions: Int = 5
-) : UseHook<UseAutoCompleteTextField<T>> {
+) : UseHook<UseAutoComplet<T>> {
 
-    var inputValue by mutableStateOf("")
+    private var textFieldValue by mutableStateOf(TextFieldValue(text = ""))
     var selected by mutableStateOf<T?>(null)
 
     private fun onSuggestionSelected(suggestion: T) {
         selected = suggestion
-        inputValue = getLabelFun(suggestion)
+        val newText = getLabelFun(suggestion)
+        textFieldValue = TextFieldValue(
+            text = newText,
+            selection = TextRange(newText.length) // 光标定位在末尾
+        )
     }
 
     override val render: @Composable () -> Unit
@@ -51,36 +59,43 @@ class UseAutoCompleteTextField<T>(
             val keyboardController = LocalSoftwareKeyboardController.current
 
             // Filter suggestions based on input
-            val filteredSuggestions = remember(inputValue, suggestions) {
-                if (inputValue.isBlank()) {
+            val filteredSuggestions = remember(textFieldValue.text, suggestions) {
+                if (textFieldValue.text.isBlank()) {
                     suggestions.take(maxSuggestions)
                 } else {
                     suggestions.filter {
-                        getLabelFun(it).contains(inputValue, ignoreCase = true)
+                        getLabelFun(it).contains(textFieldValue.text, ignoreCase = true)
                     }.take(maxSuggestions)
                 }
             }
 
             Column(modifier = modifier) {
                 OutlinedTextField(
-                    value = inputValue,
-                    onValueChange = { newVal ->
-                        inputValue = newVal
-                        showSuggestions = newVal.isNotBlank() || hasFocus
+                    value = textFieldValue,
+                    onValueChange = { newValue ->
+                        textFieldValue = newValue
+                        showSuggestions = newValue.text.isNotBlank() || hasFocus
                         selectedSuggestionIndex = -1
-                        selected = null // Clear selection when typing
+                        selected = null
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { focusState ->
                             hasFocus = focusState.isFocused
                             showSuggestions = focusState.isFocused
+                            if (focusState.isFocused) {
+                                // 聚焦时将光标移到末尾
+                                textFieldValue = textFieldValue.copy(
+                                    selection = TextRange(textFieldValue.text.length)
+                                )
+                            }
                         }
                         .onKeyEvent { keyEvent ->
                             when (keyEvent.key) {
                                 Key.Tab -> {
                                     if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                                        selectedSuggestionIndex = (selectedSuggestionIndex + 1) % filteredSuggestions.size
+                                        selectedSuggestionIndex =
+                                            (selectedSuggestionIndex + 1) % filteredSuggestions.size
                                         true
                                     } else {
                                         false
@@ -98,7 +113,8 @@ class UseAutoCompleteTextField<T>(
 
                                 Key.DirectionDown -> {
                                     if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                                        selectedSuggestionIndex = (selectedSuggestionIndex + 1) % filteredSuggestions.size
+                                        selectedSuggestionIndex =
+                                            (selectedSuggestionIndex + 1) % filteredSuggestions.size
                                         true
                                     } else {
                                         false
@@ -117,10 +133,10 @@ class UseAutoCompleteTextField<T>(
                                 }
 
                                 Key.Backspace -> {
-                                    if (inputValue.isEmpty()) {
+                                    if (textFieldValue.text.isEmpty()) {
                                         showSuggestions = hasFocus
                                     }
-                                    false // Let the default backspace behavior happen
+                                    false
                                 }
 
                                 Key.Escape -> {
