@@ -7,7 +7,7 @@ import com.addzero.Route
 
 
 @Composable
-@Route()
+@Route(title = "测试自动完成")
 fun AutoCompleteDemo() {
     Column {
         (1..3).map { index ->
