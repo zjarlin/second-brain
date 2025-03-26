@@ -29,6 +29,7 @@ open class SpringBootApp {
         Application is running! Access URLs:
         Knife4j文档: http://$ip:$port$path/doc.html
         Jimmer接口文档:  http://$ip:$port$path/openapi-ui.html
+        Jimmer接口代理文档:  http://localhost:63342/second-brain/openapi.html 
         Jimmer面对接ts.zip:  http://localhost:$port$path/ts.zip
     ----------------------------------------------------------
     """

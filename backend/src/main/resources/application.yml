@@ -13,7 +13,7 @@ server:
     context-path: /api
 jimmer:
   dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
-  #      ref-path: ${server.servlet.context-path}${jimmer.client.openapi.path}
+  #  ref-path: ${server.servlet.context-path}${jimmer.client.openapi.path}
   language: kotlin
   database-validation-mode: none    #验证数据库结构与实体
   in-list-padding-enabled: true     #开启Padding优化
@@ -28,14 +28,28 @@ jimmer:
     ts:
       path: /ts.zip
     openapi:
-      path: /openapi.yml
+      path: /openapi.yaml
       ui-path: /openapi-ui.html
       properties:
         info:
           description: document
 
 
+
+
+
+
 spring:
+  mvc:
+    cors:
+      mappings:
+        - path: /api/**                 # API路径跨域规则
+#          allowed-origins: "https://api.yourdomain.com"
+          allowed-methods: "GET, POST"
+        - path: /public/**              # 公共路径更宽松的规则
+          allowed-origins: "*"
+          allowed-methods: "*"
+
   profiles:
     active: local
 

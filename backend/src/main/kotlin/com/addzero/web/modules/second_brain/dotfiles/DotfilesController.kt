@@ -5,7 +5,6 @@ import cn.idev.excel.cache.Ehcache.BATCH_COUNT
 import cn.idev.excel.context.AnalysisContext
 import cn.idev.excel.read.listener.ReadListener
 import cn.idev.excel.util.ListUtils
-import com.addzero.common.anno.Shit
 import com.addzero.common.kt_util.isNotEmpty
 import com.addzero.common.kt_util.isNotNew
 import com.addzero.web.infra.jimmer.base.pagefactory.PageResult
@@ -29,6 +28,11 @@ import org.springframework.web.multipart.MultipartFile
 class DotfilesController(
     private val sql: KSqlClient
 ) {
+
+
+
+
+
     @GetMapping("/page")
     @Operation(summary = "分页查询")
     fun page(
@@ -72,7 +76,7 @@ class DotfilesController(
      */
     @GetMapping("/findById")
     @Operation(summary = "id查询单条")
-    fun findById(id: String): BizDotfiles? {
+    fun findById(@RequestParam id: String): BizDotfiles? {
         val byId = sql.findById(BizDotfiles::class, id)
         return byId
     }
@@ -148,7 +152,7 @@ class DotfilesController(
 
     @GetMapping("/export")
     fun exportExcel(
-        fileName: String, spec: BizDotfilesSpec, sheetName: String = "sheet1"
+        @RequestParam fileName: String, spec: BizDotfilesSpec, @RequestParam sheetName: String = "sheet1"
     ) {
         val data = sql.createQuery(BizDotfiles::class) {
             where(spec)
@@ -164,15 +168,17 @@ class DotfilesController(
         }
     }
 
-    fun searchDotfiles(name: String, platforms: Set<String>, osTypes:
-    Set<String>, page: Int, size: Int): PageResult<BizDotfiles> ?{
+    fun searchDotfiles(
+        name: String, platforms: Set<String>, osTypes:
+        Set<String>, page: Int, size: Int
+    ): PageResult<BizDotfiles>? {
         val createPageFactory = createPageFactory<BizDotfiles>()
 
 
         val fetchPage = sql.createQuery(BizDotfiles::class) {
             where(table.name eq name)
             select(table)
-        }.fetchPage(page, size,null,createPageFactory)
+        }.fetchPage(page, size, null, createPageFactory)
         return fetchPage
     }
 
