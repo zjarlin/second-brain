@@ -1,50 +1,90 @@
-# Second Brain - 个人知识管理系统
+image.png# Second Brain - 现代化知识管理系统
 
-Second Brain 是一个现代化的个人知识管理系统，集成了知识库管理、知识图谱可视化、智能问答以及个人配置文件管理等功能。它旨在帮助用户构建自己的第二大脑，更好地组织和利用个人知识。
+Second Brain 是一个基于 Kotlin 和 Compose Multiplatform 开发的现代化桌面应用，旨在提供强大的个人知识管理解决方案。本项目采用前后端分离架构，并集成了智能化的知识管理功能，帮助用户更好地组织和利用个人知识。
 
-## 核心功能
+## 项目特性
 
-### 1. 知识库管理
-- 支持多种格式文档的上传和管理（Markdown、PDF、Word、Excel等）
-- 文档分类和标签管理
-- 全文检索
-- 版本控制
+### 1. 现代化技术栈
+- 基于 Kotlin 和 Compose Multiplatform 的跨平台开发
+- 前后端分离架构设计
+- KSP (Kotlin Symbol Processing) 注解处理
+- 响应式UI设计
 
-### 2. 知识图谱
-- 知识点关系可视化
-- 交互式图谱展示
-- 知识点属性详情查看
-- 智能搜索和过滤
+### 2. 核心功能
+- **知识库管理**
+  - Markdown 文档支持
+  - 智能标签系统
+  - 全文检索
+  - 版本控制
+- **知识图谱**
+  - 可视化知识关联
+  - 交互式浏览
+  - 智能推荐
+- **智能助手**
+  - 基于知识库的问答
+  - 上下文感知
+  - 实时响应
 
-### 3. 智能问答
-- 基于知识库的智能问答
-- 问答历史记录
-- 参考来源追溯
-- 实时响应
+## 技术架构
 
-### 4. Dotfiles 管理
-- 个人配置文件版本控制
-- 配置文件同步
-- 快速部署
-- 多环境支持
+### 前端技术栈
+- **UI框架**: Compose Multiplatform
+- **状态管理**: Kotlin Coroutines Flow
+- **UI组件**: Material 3 Design
+- **动画效果**: Compose Animation
 
-### 5. 软件管理
-- 个人软件清单
-- dotfiles配置备份
-- 一键安装脚本
-- 跨平台支持
-
-## 技术栈
-
-- **前端框架**: Compose Multiplatform
-- **编程语言**: Kotlin
-- **UI组件**: Material 3
-- **网络请求**: Ktor Client
+### 后端技术栈
+- **开发语言**: Kotlin
+- **注解处理**: KSP
+- **网络通信**: Ktor
 - **序列化**: Kotlinx Serialization
-- **异步处理**: Kotlin Coroutines
 
-## 系统要求
-- 支持的操作系统：
-  - Windows 10/11
-  - macOS 10.14+
-  - Linux (主流发行版)
+## 项目结构
+
+```
+.
+├── backend/          # 后端服务实现
+├── front/            # 前端桌面应用
+├── ksp-annotation/   # 注解定义
+├── ksp-processor/    # 注解处理器
+```
+
+## 开发环境配置
+
+### 系统要求
+- JDK 11+
+- Kotlin 1.8+
+- Gradle 7.x
+
+### 快速开始
+
+1. 克隆项目
+```bash
+git clone <repository-url>
+cd second-brain
+```
+
+2. 构建项目
+```bash
+./gradlew build
+```
+
+3. 运行应用
+```bash
+./gradlew :front:run
+```
+
+## 贡献指南
+
+我们欢迎各种形式的贡献，包括但不限于：
+
+- 提交问题和建议
+- 改进文档
+- 提交代码修复
+- 添加新功能
+
+提交PR前请确保：
+
+1. 代码符合项目规范
+2. 添加必要的测试用例
+3. 更新相关文档
