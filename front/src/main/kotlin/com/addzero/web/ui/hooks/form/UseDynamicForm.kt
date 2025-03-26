@@ -1,11 +1,6 @@
 package com.addzero.web.ui.hooks.form
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.addzero.web.infra.jimmer.fromMap
+import androidx.compose.runtime.*
 import com.addzero.web.ui.hooks.UseHook
 import com.addzero.web.ui.hooks.table.entity.IColumn
 
@@ -29,7 +24,7 @@ class UseDynamicForm<E : Any>(
      * 更新表单项，优化重组逻辑
      */
     fun updateFormItem(newItem: E?) {
-        currentSelectItem = null
+//        currentSelectItem = null
         currentSelectItem = newItem
         modifiedFields.clear()
     }
@@ -43,21 +38,6 @@ class UseDynamicForm<E : Any>(
         return validationErrors.isEmpty()
     }
 
-    /**
-     * 批量更新表单项属性
-     */
-    fun batchUpdateFields(updates: Map<String, Any?>) {
-        val currentItem = currentSelectItem ?: return
-        val newItem = currentItem.fromMap(updates) { fieldName, value ->
-            modifiedFields[fieldName] = value
-        }
-        currentSelectItem = newItem
-    }
-
-    /**
-     * 获取修改过的字段
-     */
-    fun getModifiedFields(): Map<String, Any?> = modifiedFields.toMap()
 
     override val render: @Composable () -> Unit
         get() = {

@@ -1,20 +1,13 @@
 package com.addzero.web.ui.hooks.table.entity
 
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import cn.hutool.core.util.ObjUtil
 import com.addzero.common.kt_util.FieldMetadata
 import com.addzero.common.kt_util.toNotBlankStr
 import com.addzero.web.infra.jimmer.copy
-import com.addzero.web.ui.hooks.table.entity.RenderType.BOOL_SWITCH
-import com.addzero.web.ui.hooks.table.entity.RenderType.CUSTOM
-import com.addzero.web.ui.hooks.table.entity.RenderType.TEXT
+import com.addzero.web.ui.hooks.table.entity.RenderType.*
 import org.babyfish.jimmer.Formula
 import kotlin.reflect.full.hasAnnotation
 
@@ -27,7 +20,8 @@ class JimmerColumn<E : Any>(
     override var title: String,
     override val getFun: (E) -> Any?,
     override val setFun: (E, IColumn<E>, Any?) -> E = { e, c, value ->
-        e.copy(c.fieldName, value)!!
+        val copy = e.copy(c.fieldName, value)!!
+        copy
     },
 ) : IColumn<E> {
 

@@ -103,8 +103,7 @@ object RouteUtil {
 
 
     private fun getIconByString(string: String): ImageVector? {
-        val get = ICON_MAP.get(string.toNotBlankStr()?.lowercase())
-        return get
+        return ICON_MAP[string]
     }
 
     private fun getMetaSpecMetaData(packageName: String): List<RouteMetadata> {

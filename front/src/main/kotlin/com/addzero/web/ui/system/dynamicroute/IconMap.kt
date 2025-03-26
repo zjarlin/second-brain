@@ -15,10 +15,7 @@ fun main() {
 
     val scanPackage = ClassUtil.scanPackage("androidx.compose.material.icons.filled")
     val toList = scanPackage.flatMap {
-        it.declaredFields.filter {
-            it.isAccessible = true // 关键步骤：设置字段可访问
-            !it.name .startsWith("_")
-        }
+        it.declaredFields.map { it.name }
     }
     println(scanPackage)
 }
