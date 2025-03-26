@@ -77,6 +77,7 @@ fun FormDesigner() {
     
     val handleDragUpdate = { position: Offset ->
         dragCurrentPosition = position
+        // 计算相对于起始位置的偏移量
         dragOffset = position - dragStartPosition
     }
     
@@ -370,17 +371,7 @@ fun DesignCanvas(
                         draggingFieldId = draggingFieldId,
                         dragOffset = dragOffset,
                         onDragStart = onDragStart,
-                        onDragEnd = {
-                            // 计算放置位置
-                            val dropIndex = calculateDropIndex(dragOffset, formConfig.fields, formConfig.columnCount)
-                            if (draggingFieldId != null) {
-                                val fromIndex = formConfig.fields.indexOfFirst { it.id == draggingFieldId }
-                                if (fromIndex != -1 && fromIndex != dropIndex) {
-                                    onFieldMoved(fromIndex, dropIndex)
-                                }
-                            }
-                            onDragEnd()
-                        },
+                        onDragEnd = onDragEnd,
                         onDragUpdate = onDragUpdate,
                         onAddField = { rowIndex, colIndex ->
                             val insertPosition = rowIndex * formConfig.columnCount + colIndex
@@ -400,7 +391,8 @@ fun DesignCanvas(
                             onUpdateFormConfig(formConfig.copy(fields = updatedFields))
                             onFieldSelected(newField)
                         },
-                        onUpdateFormConfig = onUpdateFormConfig
+                        onUpdateFormConfig = onUpdateFormConfig,
+                        onFieldMoved = onFieldMoved
                     )
                 } else {
                     // 单列布局
@@ -450,7 +442,8 @@ fun DesignGrid(
     onDragEnd: () -> Unit,
     onDragUpdate: (Offset) -> Unit,
     onAddField: (Int, Int) -> Unit,
-    onUpdateFormConfig: (FormConfig) -> Unit
+    onUpdateFormConfig: (FormConfig) -> Unit,
+    onFieldMoved: (Int, Int) -> Unit
 ) {
     // 将字段分组为行
     val rows = formConfig.fields.chunked(formConfig.columnCount)
@@ -474,16 +467,27 @@ fun DesignGrid(
                     ) {
                         if (colIndex < rowFields.size) {
                             // 有字段时渲染字段
+                            val field = rowFields[colIndex]
                             FieldItem(
-                                field = rowFields[colIndex],
-                                isSelected = selectedField?.id == rowFields[colIndex].id,
+                                field = field,
+                                isSelected = selectedField?.id == field.id,
                                 onFieldSelected = onFieldSelected,
                                 onFieldRemoved = onFieldRemoved,
                                 modifier = Modifier.fillMaxWidth(),
                                 draggingFieldId = draggingFieldId,
-                                dragOffset = dragOffset,
+                                dragOffset = if (field.id == draggingFieldId) dragOffset else Offset.Zero,
                                 onDragStart = onDragStart,
-                                onDragEnd = onDragEnd,
+                                onDragEnd = {
+                                    // 使用当前拖拽位置计算放置位置
+                                    val dropIndex = calculateDropIndex(dragOffset, formConfig.fields, formConfig.columnCount)
+                                    if (draggingFieldId != null) {
+                                        val fromIndex = formConfig.fields.indexOfFirst { it.id == draggingFieldId }
+                                        if (fromIndex != -1 && fromIndex != dropIndex) {
+                                            onFieldMoved(fromIndex, dropIndex)
+                                        }
+                                    }
+                                    onDragEnd()
+                                },
                                 onDragUpdate = onDragUpdate
                             )
                         } else {
@@ -590,40 +594,19 @@ fun FieldItem(
                         },
                         onDrag = { change, _ ->
                             change.consume()
+                            // 使用绝对位置
                             onDragUpdate(change.position)
                         }
                     )
                 }
         ) {
             // 字段拖动手柄
-            Box(
-                modifier = Modifier
-                    .pointerInput(field.id) {
-                        detectDragGestures(
-                            onDragStart = { offset ->
-                                // 开始拖拽时传递字段ID和初始位置
-                                onDragStart(field.id, offset)
-                            },
-                            onDragEnd = {
-                                onDragEnd()
-                            },
-                            onDragCancel = {
-                                onDragEnd()
-                            },
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                onDragUpdate(dragAmount)
-                            }
-                        )
-                    }
-                    .padding(end = 8.dp)
-            ) {
-                Icon(
-                    Icons.Default.DragIndicator,
-                    contentDescription = "拖动",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            Icon(
+                Icons.Default.DragIndicator,
+                contentDescription = "拖动",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(end = 8.dp)
+            )
             
             // 字段内容预览
             val component = getComponentByType(field.type)
@@ -654,15 +637,24 @@ fun FieldItem(
 
 // 根据拖拽位置计算应该插入的索引
 private fun calculateDropIndex(
-    offset: Offset,
+    position: Offset,
     fields: List<FormField>,
     columnCount: Int
 ): Int {
     // 计算行和列
     val rowHeight = 80.dp.value // 每行高度
-    val row = (offset.y / rowHeight).toInt().coerceAtLeast(0)
+    val headerHeight = 80.dp.value // 顶部标题的高度
+    val verticalPadding = 16.dp.value // 垂直内边距
+    
+    // 调整Y坐标，考虑顶部标题和内边距
+    val adjustedY = position.y - headerHeight - verticalPadding
+    val row = (adjustedY / rowHeight).toInt().coerceAtLeast(0)
+    
+    // 计算列宽并调整X坐标
+    val horizontalPadding = 16.dp.value // 水平内边距
+    val availableWidth = position.x - horizontalPadding
     val columnWidth = 1f / columnCount
-    val column = (offset.x / columnWidth).toInt().coerceIn(0, columnCount - 1)
+    val column = (availableWidth / columnWidth).toInt().coerceIn(0, columnCount - 1)
     
     // 计算目标索引
     val targetIndex = (row * columnCount + column).coerceIn(0, fields.size)

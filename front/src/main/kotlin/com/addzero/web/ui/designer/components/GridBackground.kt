@@ -25,17 +25,13 @@ fun GridBackground(
     val rowHeight = 80.dp
     val columnWidth = 1f / columnCount
 
-    // 计算当前拖拽位置对应的网格单元
-    val row = (dragPosition.y / rowHeight.value).toInt().coerceAtLeast(0)
-    val column = (dragPosition.x / columnWidth).toInt().coerceIn(0, columnCount - 1)
-
     Box(modifier = modifier) {
         // 列网格
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            for (i in 1..columnCount) {
+            repeat(columnCount) { i ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -48,7 +44,7 @@ fun GridBackground(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "列 $i",
+                        "列 ${i + 1}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                     )
@@ -58,7 +54,7 @@ fun GridBackground(
         
         // 列分隔线
         Row(modifier = Modifier.fillMaxSize()) {
-            for (i in 1 until columnCount) {
+            repeat(columnCount - 1) { i ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -78,16 +74,17 @@ fun GridBackground(
         
         // 拖拽放置指示器
         if (isDragging) {
-            val cellWidth = (modifier.fillMaxWidth().toString().toFloat() / columnCount)
+            val row = ((dragPosition.y - 80.dp.value) / rowHeight.value).toInt().coerceAtLeast(0)
+            val column = (dragPosition.x / (modifier.fillMaxWidth().toString().toFloat() / columnCount)).toInt().coerceIn(0, columnCount - 1)
             
             // 网格单元高亮
             Box(
                 modifier = Modifier
                     .offset(
-                        x = (column * cellWidth).dp,
+                        x = (column * (modifier.fillMaxWidth().toString().toFloat() / columnCount)).dp,
                         y = (row * rowHeight.value).dp
                     )
-                    .width(cellWidth.dp)
+                    .width((modifier.fillMaxWidth().toString().toFloat() / columnCount).dp)
                     .height(rowHeight)
                     .background(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
@@ -99,7 +96,7 @@ fun GridBackground(
             Box(
                 modifier = Modifier
                     .offset(
-                        x = (column * cellWidth).dp,
+                        x = (column * (modifier.fillMaxWidth().toString().toFloat() / columnCount)).dp,
                         y = 0.dp
                     )
                     .width(2.dp)
