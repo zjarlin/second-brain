@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.addzero.Route
 import com.addzero.web.ui.hooks.table.entity.OptionItem
 import com.addzero.web.ui.hooks.table.entity.RenderType
 import com.addzero.web.ui.lowcode.forms.EditForm
@@ -31,6 +32,7 @@ data class Product(
  * 包含搜索区、表格和表单
  */
 @Composable
+@Route(title = "测试低代码表格")
 fun CompleteCrudExample() {
     // 状态
     var products by remember {

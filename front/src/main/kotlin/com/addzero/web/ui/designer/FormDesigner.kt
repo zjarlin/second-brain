@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.addzero.Route
 import com.addzero.web.ui.designer.components.*
 import com.addzero.web.ui.designer.editor.FormPropertiesEditor
 import com.addzero.web.ui.designer.editor.PropertiesEditor
@@ -28,6 +29,7 @@ import kotlin.math.roundToInt
  * 支持拖拽配置表单并生成JSON
  */
 @Composable
+@Route
 fun FormDesigner() {
     var formConfig by remember { mutableStateOf(FormConfig()) }
     var selectedField by remember { mutableStateOf<FormField?>(null) }

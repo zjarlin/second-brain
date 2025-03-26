@@ -7,7 +7,7 @@ import com.addzero.Route
 
 
 @Composable
-@Route("自动完成组件测试", homePageFlag = true)
+@Route()
 fun AutoCompleteDemo() {
     Column {
         (1..3).map { index ->
@@ -25,8 +25,7 @@ fun AutoCompleteDemo() {
             ).map { it + index }
             Text("测试自动完成" + index)
             val useAutoComplet = UseAutoComplet("水果", map)
-            useAutoComplet.render {
-            }
+            useAutoComplet.render {}
 //            useAutoComplet.render()
 
         }

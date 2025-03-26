@@ -9,20 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.web.ui.system.dynamicroute.MetaSpec
-import com.addzero.web.ui.system.dynamicroute.RouteMetadata
+import com.addzero.Route
 
-class SurfaceDemo : MetaSpec {
-
-    override val metadata: RouteMetadata
-        get() = RouteMetadata(
-            parentName = "测试demo",
-            title = "测试Surface",
-            visible = true,
-        )
-
-    @Composable
-    override fun render() {
+@Composable
+@Route
+     fun 测试Surface() {
         Surface(
             shape = RoundedCornerShape(8.dp)
 //            , elevation = 10.dp
@@ -46,4 +37,3 @@ class SurfaceDemo : MetaSpec {
         }
     }
 
-}

@@ -3,7 +3,7 @@ package com.addzero
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class Route(
-    val value: String = "默认分组",
+    val value: String = "测试demo",
     val path: String = "",
     val title: String="",
     val parent: String = "",
