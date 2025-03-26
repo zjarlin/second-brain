@@ -24,7 +24,7 @@ class UseDynamicForm<E : Any>(
      * 更新表单项，优化重组逻辑
      */
     fun updateFormItem(newItem: E?) {
-//        currentSelectItem = null
+        currentSelectItem = null
         currentSelectItem = newItem
         modifiedFields.clear()
     }

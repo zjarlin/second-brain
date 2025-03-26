@@ -6,26 +6,27 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
-import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 
 private const val PKG = "com.addzero.ksp.route"
 private const val FILE_NAME = "RouteTable"
 
 class RouteProcessor(
     environment: SymbolProcessorEnvironment
-) : AbsProcessor<KspRouteMeta>(environment) {
+) : AbsProcessor<Route>(environment) {
 
 //    private val codeGenerator = environment.codeGenerator
 //    private val logger = environment.logger
 
     override fun getAnnotationName(): String = Route::class.qualifiedName!!
 
-    override fun extractMetaData(declaration: KSDeclaration, annotation: KSAnnotation): KspRouteMeta {
+    override fun extractMetaData(declaration: KSDeclaration, annotation: KSAnnotation): Route {
         val declarationSimpleName = declaration.simpleName.asString()
         val declarationQulifiedName = declaration.qualifiedName?.asString() ?: ""
-        val containingClassName =
-            (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
+        val containingClassName = (declaration.parentDeclaration as? KSClassDeclaration)?.qualifiedName?.asString() ?: ""
+        val value = getAnnoProperty(annotation, "value", String::class)
+
         val path = getAnnoProperty(annotation, "path", String::class).ifBlank { declarationQulifiedName }
+
         val title = getAnnoProperty(annotation, "title", String::class).ifBlank { declarationSimpleName }
         val parent = getAnnoProperty(annotation, "parent", String::class)
         val icon = getAnnoProperty(annotation, "icon", String::class)
@@ -33,19 +34,21 @@ class RouteProcessor(
         val order = getAnnoProperty(annotation, "order", Double::class)
         val permissions = getAnnoProperty(annotation, "permissions", String::class)
 
-        return KspRouteMeta(
-            declarationQulifiedName = declarationQulifiedName,
+        return Route(
+            value = value,
             path = path,
             title = title,
             parent = parent,
             icon = icon,
             visible = visible,
             order = order,
-            permissions = permissions
+            permissions = permissions,
+           declarationQulifiedName=declarationQulifiedName
+
         )
     }
 
-    override fun generateCode(resolver: Resolver, metaList: List<KspRouteMeta>) {
+    override fun generateCode(resolver: Resolver, metaList: List<Route>) {
         if (metaList.isEmpty()) return
 
         val dependencies = Dependencies(
@@ -55,17 +58,20 @@ class RouteProcessor(
 
         val routeTableContent = """
             package $PKG
-            
-            import com.addzero.KspRouteMeta
+            import com.addzero.Route
             import androidx.compose.runtime.Composable
             
             object RouteTable {
                 val routes = mapOf(
                     ${metaList.joinToString(",\n                    ") { meta ->
-                    """KspRouteMeta(
+                        
+            val parent = meta.parent.ifBlank { meta.value }
+            
+            """Route(
+                        value = "${meta.value}",
                         path = "${meta.path}",
                         title = "${meta.title}",
-                        parent = "${meta.parent}",
+                        parent = "$parent",
                         icon = "${meta.icon}",
                         visible = ${meta.visible},
                         order = ${meta.order},
