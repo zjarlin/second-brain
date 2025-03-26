@@ -2,34 +2,26 @@ package com.addzero.web.ui.designer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.addzero.web.ui.designer.components.ComponentPanel
-import com.addzero.web.ui.designer.components.EmptyFieldPlaceholder
-import com.addzero.web.ui.designer.components.FormComponent
-import com.addzero.web.ui.designer.components.GridBackground
-import com.addzero.web.ui.designer.components.getComponentByType
+import com.addzero.web.ui.designer.components.*
 import com.addzero.web.ui.designer.editor.FormPropertiesEditor
 import com.addzero.web.ui.designer.editor.PropertiesEditor
 import com.addzero.web.ui.designer.models.FormConfig
 import com.addzero.web.ui.designer.models.FormField
 import com.addzero.web.ui.designer.preview.FormPreview
-import com.addzero.web.ui.hooks.table.entity.RenderType
-import com.addzero.web.ui.lowcode.metadata.FieldMetadata
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.foundation.gestures.detectDragGestures
+import kotlin.math.roundToInt
 
 /**
  * 表单设计器
@@ -45,7 +37,8 @@ fun FormDesigner() {
     // 拖拽相关状态
     var draggingFieldId by remember { mutableStateOf<String?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
-    var initialDragPosition by remember { mutableStateOf(Offset.Zero) }
+    var dragStartPosition by remember { mutableStateOf(Offset.Zero) }
+    var dragCurrentPosition by remember { mutableStateOf(Offset.Zero) }
     
     // 判断当前是否有字段在拖拽中
     val isDragging = draggingFieldId != null
@@ -53,7 +46,8 @@ fun FormDesigner() {
     // 拖拽操作处理函数
     val handleDragStart = { fieldId: String, position: Offset ->
         draggingFieldId = fieldId
-        initialDragPosition = position
+        dragStartPosition = position
+        dragCurrentPosition = position
         dragOffset = Offset.Zero
     }
     
@@ -61,10 +55,9 @@ fun FormDesigner() {
         // 根据最终位置计算新的字段顺序
         val draggedField = formConfig.fields.find { it.id == draggingFieldId }
         if (draggedField != null) {
-            // 根据最终拖拽位置确定应该插入的索引
-            // 这部分逻辑可以根据UI布局和需求进行调整
             val fromIndex = formConfig.fields.indexOf(draggedField)
-            val toIndex = calculateDropIndex(dragOffset, formConfig.fields, formConfig.columnCount)
+            // 使用当前拖拽位置计算目标索引
+            val toIndex = calculateDropIndex(dragCurrentPosition, formConfig.fields, formConfig.columnCount)
             
             if (fromIndex != toIndex && toIndex >= 0) {
                 // 移动字段
@@ -78,10 +71,13 @@ fun FormDesigner() {
         // 重置拖拽状态
         draggingFieldId = null
         dragOffset = Offset.Zero
+        dragStartPosition = Offset.Zero
+        dragCurrentPosition = Offset.Zero
     }
     
-    val handleDragUpdate = { amount: Offset ->
-        dragOffset += amount
+    val handleDragUpdate = { position: Offset ->
+        dragCurrentPosition = position
+        dragOffset = position - dragStartPosition
     }
     
     Column(modifier = Modifier.fillMaxSize()) {
@@ -292,14 +288,16 @@ fun DesignCanvas(
             .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
             .padding(16.dp)
     ) {
-        // 显示网格背景 (现在我们使用 GridBackground 组件)
+        // 显示网格背景
         if (formConfig.columnCount > 1) {
             GridBackground(
                 columnCount = formConfig.columnCount,
+                isDragging = draggingFieldId != null,
+                dragPosition = dragOffset,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(top = 80.dp) // 为顶部信息腾出空间
+                    .padding(top = 80.dp)
             )
         }
         
@@ -361,7 +359,7 @@ fun DesignCanvas(
                 }
             }
             
-            // 表单字段列表 - 当列数大于1时，使用Grid布局渲染
+            // 表单字段列表
             item {
                 if (formConfig.columnCount > 1 && formConfig.fields.isNotEmpty()) {
                     DesignGrid(
@@ -372,37 +370,40 @@ fun DesignCanvas(
                         draggingFieldId = draggingFieldId,
                         dragOffset = dragOffset,
                         onDragStart = onDragStart,
-                        onDragEnd = onDragEnd,
+                        onDragEnd = {
+                            // 计算放置位置
+                            val dropIndex = calculateDropIndex(dragOffset, formConfig.fields, formConfig.columnCount)
+                            if (draggingFieldId != null) {
+                                val fromIndex = formConfig.fields.indexOfFirst { it.id == draggingFieldId }
+                                if (fromIndex != -1 && fromIndex != dropIndex) {
+                                    onFieldMoved(fromIndex, dropIndex)
+                                }
+                            }
+                            onDragEnd()
+                        },
                         onDragUpdate = onDragUpdate,
                         onAddField = { rowIndex, colIndex ->
-                            // 计算新字段应该插入的位置
                             val insertPosition = rowIndex * formConfig.columnCount + colIndex
-                            
-                            // 确保插入位置有效
                             val validPosition = insertPosition.coerceIn(0, formConfig.fields.size)
-                            
+
                             // 创建新字段
                             val newField = FormField(
                                 id = "field_${System.currentTimeMillis()}",
                                 name = "field_${formConfig.fields.size + 1}",
                                 label = "字段 ${formConfig.fields.size + 1}",
-                                type = "text" // 默认类型，可以根据需要修改
+                                type = "text"
                             )
-                            
-                            // 插入新字段到指定位置
+
+                            // 插入新字段
                             val updatedFields = formConfig.fields.toMutableList()
                             updatedFields.add(validPosition, newField)
-                            
-                            // 使用回调更新表单配置，而不是直接修改
                             onUpdateFormConfig(formConfig.copy(fields = updatedFields))
-                            
-                            // 选中新添加的字段
                             onFieldSelected(newField)
                         },
                         onUpdateFormConfig = onUpdateFormConfig
                     )
                 } else {
-                    // 单列布局时直接使用垂直布局
+                    // 单列布局
                     Column {
                         formConfig.fields.forEach { field ->
                             FieldItem(
@@ -420,6 +421,15 @@ fun DesignCanvas(
                     }
                 }
             }
+        }
+        
+        // 拖拽提示
+        if (draggingFieldId != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            )
         }
     }
 }
@@ -540,6 +550,18 @@ fun FieldItem(
     Surface(
         modifier = modifier
             .padding(vertical = 4.dp)
+            .then(
+                if (isDragging) {
+                    Modifier.offset {
+                        IntOffset(
+                            dragOffset.x.roundToInt(),
+                            dragOffset.y.roundToInt()
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            )
             .border(
                 width = if (isSelected) 2.dp else 1.dp,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
@@ -553,7 +575,25 @@ fun FieldItem(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(field.id) {
+                    detectDragGestures(
+                        onDragStart = { offset ->
+                            onDragStart(field.id, offset)
+                        },
+                        onDragEnd = {
+                            onDragEnd()
+                        },
+                        onDragCancel = {
+                            onDragEnd()
+                        },
+                        onDrag = { change, _ ->
+                            change.consume()
+                            onDragUpdate(change.position)
+                        }
+                    )
+                }
         ) {
             // 字段拖动手柄
             Box(
@@ -618,17 +658,13 @@ private fun calculateDropIndex(
     fields: List<FormField>,
     columnCount: Int
 ): Int {
-    // 这个函数需要根据UI布局实际情况实现
-    // 以下是简化的实现示例
+    // 计算行和列
+    val rowHeight = 80.dp.value // 每行高度
+    val row = (offset.y / rowHeight).toInt().coerceAtLeast(0)
+    val columnWidth = 1f / columnCount
+    val column = (offset.x / columnWidth).toInt().coerceIn(0, columnCount - 1)
     
-    // 向下拖动较多时，放在后面
-    return if (offset.y > 100) {
-        fields.size
-    } else {
-        // 向上拖动较多时，放在前面
-        0
-    }
-    
-    // 注意：实际应用中应该更精确地计算放置位置
-    // 例如根据每个字段的位置判断最近的放置点
+    // 计算目标索引
+    val targetIndex = (row * columnCount + column).coerceIn(0, fields.size)
+    return targetIndex
 } 

@@ -192,8 +192,8 @@ fun ComponentPanel(
             modifier = Modifier
                 .offset {
                     IntOffset(
-                        (dragPosition.x + 10).roundToInt(),
-                        (dragPosition.y + 10).roundToInt()
+                        dragPosition.x.roundToInt(),
+                        dragPosition.y.roundToInt()
                     )
                 }
                 .zIndex(100f)
@@ -216,7 +216,8 @@ fun ComponentPanel(
                             label = component.name,
                             type = component.id
                         ),
-                        component = component
+                        component = component,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -254,15 +255,13 @@ fun DraggableComponent(
             .shadow(elevation) // 阴影效果
             .pointerInput(type) {
                 detectDragGestures(
-                    onDragStart = {
+                    onDragStart = { offset ->
                         isDragging = true
                         onDragStart()
                     },
                     onDragEnd = {
-                        // 检测是否拖放到了有效区域
-                        val dropped = true // 这里需要实际检测是否在有效区域
                         isDragging = false
-                        onDragEnd(dropped)
+                        onDragEnd(true)
                     },
                     onDragCancel = {
                         isDragging = false
@@ -270,6 +269,7 @@ fun DraggableComponent(
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
+                        // 使用绝对位置而不是相对位置
                         onDragMove(change.position)
                     }
                 )
