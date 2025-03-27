@@ -66,6 +66,7 @@ dependencies {
     implementation("org.tomlj:tomlj:1.1.1")
     // 引入 Spring Boot 相关依赖
     api(libs.bundles.spring.boot)
+//    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     // 引入工具库
     api(libs.bundles.tools)
