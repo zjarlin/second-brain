@@ -41,9 +41,11 @@ data class User(
 )
 
 fun main() {
-    User {
-       testPropty1=0.toByte()
+    val (id, name, age, age1, age2, date1, date2, date3, date4, testPropty1, testPropty2, testPropty3, testPropty4, testPropty5, testPropty6, testPropty7, testPropty8, self, children) = User {
+        id="1111111111"
+        testPropty1 = 0.toByte()
     }
+    println(id)
 }
 
 
