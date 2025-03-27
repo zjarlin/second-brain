@@ -3,14 +3,9 @@ package com.addzero.web.ui.system
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.addzero.common.anno.Shit
 import com.addzero.web.ui.system.dynamicroute.RouteUtil.nagive
 
 /**
@@ -21,15 +16,10 @@ import com.addzero.web.ui.system.dynamicroute.RouteUtil.nagive
 fun MainContent(
     currentRoute: String,
 ) {
-
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Box(modifier = Modifier.padding(16.dp)) {
-            nagive(currentRoute)
-        }
+    // 直接使用Box来包装内容，避免与内部可能存在的LazyColumn嵌套
+    Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        nagive(currentRoute)
     }
+
 }
 

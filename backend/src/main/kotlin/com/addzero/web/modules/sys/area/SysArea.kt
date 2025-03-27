@@ -22,6 +22,7 @@ import org.babyfish.jimmer.sql.Table
 
 public interface SysArea  {
 
+
     @get:Schema(description = "名字是否有黑")
     @Formula(dependencies = ["delflag"])
     val blackFlag: Boolean?

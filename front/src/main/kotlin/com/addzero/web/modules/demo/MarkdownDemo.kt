@@ -1,28 +1,26 @@
 package com.addzero.web.modules.demo
 
 import androidx.compose.runtime.Composable
+import cn.hutool.core.io.FileUtil
 import com.addzero.Route
+import com.addzero.common.kt_util.getParentPathAndmkdir
 import com.mikepenz.markdown.m3.Markdown
+import java.io.File
 
+fun main() {
+    val absolutePath = File("").absolutePath
+    val baseProject = absolutePath.getParentPathAndmkdir("")
+
+}
 
 @Composable
 @Route
 fun 测试markdown() {
-    val markdown = """
-### What's included 🚀
-
-- Super simple setup
-- Cross-platform ready
-- Lightweight
-""".trimIndent()
+    val absolutePath = File("").absolutePath
+    val parent = FileUtil.getParent(absolutePath,1)
+    val readmeContent = FileUtil.readUtf8String(parent + File.separator + "README.md")
 
     Markdown(
-        content = markdown,
-//            components = markdownComponents(
-//                codeBlock = { MarkdownHighlightedCodeBlock(it.content, it.node, highlightsBuilder) },
-//                codeFence = { MarkdownHighlightedCodeFence(it.content, it.node, highlightsBuilder) },
-//
-//
-//                )
+        content = readmeContent
     )
 }
