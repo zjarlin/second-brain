@@ -23,15 +23,15 @@ import org.babyfish.jimmer.sql.kt.ast.table.makeOrders
 fun GenericTableExample() {
 // 自定义列配置
     val addColumn = JimmerColumn<SysArea>("名字是否有黑", getFun = { it.blackFlag }) {
-            val blackFlag = it.blackFlag
-            val useAutoDisableDialog = UseAutoDisableDialog("点我干嘛")
-            Switch(
-                checked = blackFlag == true, onCheckedChange = {
-                    useAutoDisableDialog.apply {
-                        showFlag = true
-                    }
-                })
-            useAutoDisableDialog.getState().render()
+        val blackFlag = it.blackFlag
+        val useAutoDisableDialog = UseAutoDisableDialog("点我干嘛")
+        Switch(
+            checked = blackFlag == true, onCheckedChange = {
+                useAutoDisableDialog.apply {
+                    showFlag = true
+                }
+            })
+        useAutoDisableDialog.getState().render()
     }
     //随机生成100个自定义列
     val toList = (1..100).map {

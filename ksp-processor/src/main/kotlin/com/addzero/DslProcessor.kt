@@ -40,15 +40,16 @@ class DslProcessor(
         }
 
         // 收集所有需要导入的类型
+        val parameters = constructor.parameters
         val imports = mutableSetOf<String>().apply {
             add("${packageName}.${className}")
-            constructor.parameters.forEach { param ->
+            parameters.forEach { param ->
                 collectImportsFromType(param.type.resolve(), this)
             }
         }
 
         // 生成Builder类内容
-        val builderProperties = constructor.parameters.joinToString("\n    ") { param ->
+        val builderProperties = parameters.joinToString("\n    ") { param ->
             val paramName = param.name?.asString() ?: ""
             val paramType = getTypeWithGenerics(param.type)
             val defaultValue = getDefaultValueForType(param.type, className, resolver)
@@ -56,9 +57,17 @@ class DslProcessor(
         }
 
         // 生成build()方法参数
-        val buildParams = constructor.parameters.joinToString(", ") {
-            it.name?.asString() ?: ""
-        }
+
+        val associate = parameters.associate {  (it.name?.asString() ?: "")  to getDefaultValueForType(it.type,className,resolver) }
+
+        val buildParams = associate.keys.joinToString(",")
+        val emptyParams = associate.values.joinToString(",")
+        val map = associate.map {
+            """
+           ${it.key}= ${it.value},
+           """.trimIndent()
+        }.joinToString(System.lineSeparator())
+
 
         val fileContent = """
             |package $packageName
@@ -68,7 +77,11 @@ class DslProcessor(
             |class ${className}Builder {
             |    $builderProperties
             |
-            |    fun build(): $className = $className($buildParams)
+            |    fun build(): $className = ${className}Builder().build()
+            |
+            |    companion object {
+            |        fun empty$className(): $className = ${className}($map)
+            |    }
             |}
             |
             |/**
@@ -153,7 +166,7 @@ class DslProcessor(
             typeWithGenerics.contains("Map<") -> "emptyMap()"
             typeWithGenerics.contains("MutableMap<") -> "mutableMapOf()"
             typeWithGenerics.contains("Array<") -> "emptyArray()"
-            simpleType == className -> "${simpleType}Builder().build()"
+            simpleType == className -> "${className}Builder.empty$className()"
             else -> {
                 try {
                     val typeDecl = resolver.getClassDeclarationByName(
