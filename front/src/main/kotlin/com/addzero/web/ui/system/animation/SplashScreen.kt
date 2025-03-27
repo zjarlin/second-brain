@@ -29,7 +29,7 @@ fun SplashScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            FishboneAnimation()
+            MonsterEyeAnimation()
         }
     }
 }
