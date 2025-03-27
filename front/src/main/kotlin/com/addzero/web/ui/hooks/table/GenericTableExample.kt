@@ -1,4 +1,4 @@
-package com.addzero.web.ui.hooks.table.generic
+package com.addzero.web.ui.hooks.table
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

@@ -1,7 +1,7 @@
 package com.addzero.web.modules.demo
 
 import androidx.compose.runtime.Composable
-import com.addzero.web.ui.hooks.table.generic.GenericTableExample
+import com.addzero.web.ui.hooks.table.GenericTableExample
 import com.addzero.web.ui.system.dynamicroute.MetaSpec
 import com.addzero.web.ui.system.dynamicroute.RouteMetadata
 
