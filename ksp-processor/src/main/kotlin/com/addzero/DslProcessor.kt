@@ -40,16 +40,15 @@ class DslProcessor(
         }
 
         // 收集所有需要导入的类型
-        val parameters = constructor.parameters
         val imports = mutableSetOf<String>().apply {
             add("${packageName}.${className}")
-            parameters.forEach { param ->
+            constructor.parameters.forEach { param ->
                 collectImportsFromType(param.type.resolve(), this)
             }
         }
 
-        // 生成Builder类内容
-        val builderProperties = parameters.joinToString("\n    ") { param ->
+        // 生成Builder属性
+        val builderProperties = constructor.parameters.joinToString("\n    ") { param ->
             val paramName = param.name?.asString() ?: ""
             val paramType = getTypeWithGenerics(param.type)
             val defaultValue = getDefaultValueForType(param.type, className, resolver)
@@ -57,17 +56,16 @@ class DslProcessor(
         }
 
         // 生成build()方法参数
+        val buildParams = constructor.parameters.joinToString(", ") {
+            it.name?.asString() ?: ""
+        }
 
-        val associate = parameters.associate {  (it.name?.asString() ?: "")  to getDefaultValueForType(it.type,className,resolver) }
-
-        val buildParams = associate.keys.joinToString(",")
-        val emptyParams = associate.values.joinToString(",")
-        val map = associate.map {
-            """
-           ${it.key}= ${it.value},
-           """.trimIndent()
-        }.joinToString(System.lineSeparator())
-
+        // 生成empty方法参数
+        val emptyParams = constructor.parameters.joinToString(", ") { param ->
+            val paramName = param.name?.asString() ?: ""
+            val defaultValue = getDefaultValueForType(param.type, className, resolver)
+            "$paramName = $defaultValue"
+        }
 
         val fileContent = """
             |package $packageName
@@ -77,10 +75,14 @@ class DslProcessor(
             |class ${className}Builder {
             |    $builderProperties
             |
-            |    fun build(): $className = ${className}Builder().build()
+            |    fun build(): $className = $className(
+            |        $buildParams
+            |    )
             |
             |    companion object {
-            |        fun empty$className(): $className = ${className}($map)
+            |        fun empty$className(): $className = $className(
+            |            $emptyParams
+            |        )
             |    }
             |}
             |
@@ -134,14 +136,11 @@ class DslProcessor(
     }
 
     private fun getDefaultValueForType(type: KSTypeReference, className: String, resolver: Resolver): String {
-        val typeWithGenerics = getTypeWithGenerics(type)
         val resolvedType = type.resolve()
         val isNullable = resolvedType.isMarkedNullable
         val typeName = resolvedType.declaration.qualifiedName?.asString() ?: ""
         val simpleType = typeName.substringAfterLast('.')
-
-
-
+        val fullType = getTypeWithGenerics(type)
 
         return when {
             isNullable -> "null"
@@ -159,13 +158,13 @@ class DslProcessor(
             simpleType == "LocalTime" -> "java.time.LocalTime.now()"
             simpleType == "Date" -> "java.util.Date()"
             simpleType == "Instant" -> "java.time.Instant.now()"
-            typeWithGenerics.contains("List<") -> "emptyList()"
-            typeWithGenerics.contains("MutableList<") -> "mutableListOf()"
-            typeWithGenerics.contains("Set<") -> "emptySet()"
-            typeWithGenerics.contains("MutableSet<") -> "mutableSetOf()"
-            typeWithGenerics.contains("Map<") -> "emptyMap()"
-            typeWithGenerics.contains("MutableMap<") -> "mutableMapOf()"
-            typeWithGenerics.contains("Array<") -> "emptyArray()"
+            fullType.contains("List<") -> "emptyList()"
+            fullType.contains("MutableList<") -> "mutableListOf()"
+            fullType.contains("Set<") -> "emptySet()"
+            fullType.contains("MutableSet<") -> "mutableSetOf()"
+            fullType.contains("Map<") -> "emptyMap()"
+            fullType.contains("MutableMap<") -> "mutableMapOf()"
+            fullType.contains("Array<") -> "emptyArray()"
             simpleType == className -> "${className}Builder.empty$className()"
             else -> {
                 try {

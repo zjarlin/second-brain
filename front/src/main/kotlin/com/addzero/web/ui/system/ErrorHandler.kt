@@ -2,7 +2,6 @@ package com.addzero.web.ui.system
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import com.addzero.web.log
 import com.addzero.web.ui.components.dialog.AddDialog
 import com.addzero.web.ui.components.dialog.DefaultDialogButton
 
@@ -36,7 +35,6 @@ fun ErrorHandler(content: @Composable () -> Unit) {
     val currentHandler = LocalUncaughtExceptionHandler.current
     DisposableEffect(Unit) {
         val handler = Thread.UncaughtExceptionHandler { thread, throwable ->
-            log.error("未捕获的异常: ${throwable.message}", throwable)
             ErrorState.showError(throwable)
             // 调用原始处理器
             currentHandler?.uncaughtException(thread, throwable)

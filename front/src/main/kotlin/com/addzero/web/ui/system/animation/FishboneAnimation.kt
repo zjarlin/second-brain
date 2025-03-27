@@ -10,17 +10,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.addzero.common.anno.Shit
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
+@Shit
 fun FishboneAnimation(
     modifier: Modifier = Modifier,
     color: Color = Color(0xFF2196F3),
     onAnimationComplete: () -> Unit = {}
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
-    
     val infiniteTransition = rememberInfiniteTransition()
     val rotationAngle by infiniteTransition.animateFloat(
         initialValue = 0f,

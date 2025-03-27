@@ -9,8 +9,22 @@ import org.babyfish.jimmer.ImmutableObjects
 import org.babyfish.jimmer.meta.ImmutableType
 import org.babyfish.jimmer.runtime.Internal
 import org.babyfish.jimmer.sql.kt.KSqlClient
+import org.babyfish.jimmer.sql.kt.ast.query.KConfigurableRootQuery
+import org.babyfish.jimmer.sql.kt.ast.query.KMutableRootQuery
 import org.babyfish.jimmer.sql.kt.ast.query.specification.KSpecification
 import kotlin.reflect.KClass
+
+inline fun <reified E : Any, R> KSqlClient.createQuery(noinline block: KMutableRootQuery<E>.() -> KConfigurableRootQuery<E, R>) =
+    createQuery(E::class, block)
+
+
+
+
+
+
+
+
+
 
 fun <T : Any> KSqlClient.list(entityType: KClass<T>): List<T> {
     val bean = SpringUtil.getBean(KSqlClient::class.java)
