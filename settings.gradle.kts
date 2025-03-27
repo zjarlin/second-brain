@@ -7,7 +7,6 @@ pluginManagement {
     repositories {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://repo.spring.io/milestone")
-
         google()
         gradlePluginPortal()
         mavenCentral()

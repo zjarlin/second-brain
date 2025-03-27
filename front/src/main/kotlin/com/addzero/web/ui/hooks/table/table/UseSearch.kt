@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -40,6 +43,7 @@ class UseSearch(
                     },
                     modifier = Modifier.weight(1f).padding(end = 8.dp),
                     placeholder = { Text("请输入搜索关键词... 键入Enter可执行搜索") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "搜索") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { onSearch() })

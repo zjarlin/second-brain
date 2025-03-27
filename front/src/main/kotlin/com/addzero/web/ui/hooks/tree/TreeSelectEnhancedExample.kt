@@ -10,6 +10,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.addzero.Dsl
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.*
+
+
+@Dsl
+data class User(
+   val id: String ,
+    val name: String,
+   val age: Int,
+   val age1: Double,
+   val age2: Long,
+   val date1: LocalDateTime,
+   val date2: LocalDate,
+   val date3: LocalTime,
+   val date4: Date,
+   val testPropty1: Byte,
+   val testPropty2: Short,
+   val testPropty3: Float,
+   val testPropty4: Double,
+   val testPropty5: Char,
+   val testPropty6: String?,
+   val testPropty7: Int?,
+   val testPropty8: Long?,
+   val self: User,
+   val children: List<User>,
+)
+
+fun main() {
+    User {
+       testPropty1=0.toByte()
+    }
+}
+
+
 
 @Composable
 fun TreeSelectEnhancedExample() {

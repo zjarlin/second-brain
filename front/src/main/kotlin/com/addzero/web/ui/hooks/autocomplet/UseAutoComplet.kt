@@ -52,151 +52,156 @@ class UseAutoComplet<T>(
 
     override val render: @Composable () -> Unit
         get() = {
-            var showSuggestions by remember { mutableStateOf(false) }
-            var selectedSuggestionIndex by remember { mutableStateOf(-1) }
-            var hasFocus by remember { mutableStateOf(false) }
-            val focusRequester = remember { FocusRequester() }
-            val keyboardController = LocalSoftwareKeyboardController.current
+            AutoComplet()
+        }
 
-            // Filter suggestions based on input
-            val filteredSuggestions = remember(inputValue.text, suggestions) {
-                if (inputValue.text.isBlank()) {
-                    suggestions.take(maxSuggestions)
-                } else {
-                    suggestions.filter {
-                        getLabelFun(it).contains(inputValue.text, ignoreCase = true)
-                    }.take(maxSuggestions)
-                }
+    @Composable
+    private fun AutoComplet() {
+        var showSuggestions by remember { mutableStateOf(false) }
+        var selectedSuggestionIndex by remember { mutableStateOf(-1) }
+        var hasFocus by remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        // Filter suggestions based on input
+        val filteredSuggestions = remember(inputValue.text, suggestions) {
+            if (inputValue.text.isBlank()) {
+                suggestions.take(maxSuggestions)
+            } else {
+                suggestions.filter {
+                    getLabelFun(it).contains(inputValue.text, ignoreCase = true)
+                }.take(maxSuggestions)
             }
+        }
 
-            Column(modifier = modifier) {
-                OutlinedTextField(
-                    value = inputValue,
-                    onValueChange = { newValue ->
-                        inputValue = newValue
-                        showSuggestions = newValue.text.isNotBlank() || hasFocus
-                        selectedSuggestionIndex = -1
-                        selected = null
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            hasFocus = focusState.isFocused
-                            showSuggestions = focusState.isFocused
-                            if (focusState.isFocused) {
-                                // 聚焦时将光标移到末尾
-                                inputValue = inputValue.copy(
-                                    selection = TextRange(inputValue.text.length)
-                                )
-                            }
+        Column(modifier = modifier) {
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = { newValue ->
+                    inputValue = newValue
+                    showSuggestions = newValue.text.isNotBlank() || hasFocus
+                    selectedSuggestionIndex = -1
+                    selected = null
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        hasFocus = focusState.isFocused
+                        showSuggestions = focusState.isFocused
+                        if (focusState.isFocused) {
+                            // 聚焦时将光标移到末尾
+                            inputValue = inputValue.copy(
+                                selection = TextRange(inputValue.text.length)
+                            )
                         }
-                        .onKeyEvent { keyEvent ->
-                            when (keyEvent.key) {
-                                Key.Tab -> {
-                                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                                        selectedSuggestionIndex =
-                                            (selectedSuggestionIndex + 1) % filteredSuggestions.size
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                }
-
-                                Key.DirectionUp -> {
-                                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                                        selectedSuggestionIndex = (selectedSuggestionIndex - 1).coerceAtLeast(0)
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                }
-
-                                Key.DirectionDown -> {
-                                    if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                                        selectedSuggestionIndex =
-                                            (selectedSuggestionIndex + 1) % filteredSuggestions.size
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                }
-
-                                Key.Enter -> {
-                                    if (showSuggestions && selectedSuggestionIndex >= 0) {
-                                        onSuggestionSelected(filteredSuggestions[selectedSuggestionIndex])
-                                        showSuggestions = false
-                                        keyboardController?.hide()
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                }
-
-                                Key.Backspace -> {
-                                    if (inputValue.text.isEmpty()) {
-                                        showSuggestions = hasFocus
-                                    }
+                    }
+                    .onKeyEvent { keyEvent ->
+                        when (keyEvent.key) {
+                            Key.Tab -> {
+                                if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                                    selectedSuggestionIndex =
+                                        (selectedSuggestionIndex + 1) % filteredSuggestions.size
+                                    true
+                                } else {
                                     false
                                 }
+                            }
 
-                                Key.Escape -> {
-                                    showSuggestions = false
+                            Key.DirectionUp -> {
+                                if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                                    selectedSuggestionIndex = (selectedSuggestionIndex - 1).coerceAtLeast(0)
                                     true
+                                } else {
+                                    false
                                 }
+                            }
 
-                                else -> false
+                            Key.DirectionDown -> {
+                                if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                                    selectedSuggestionIndex =
+                                        (selectedSuggestionIndex + 1) % filteredSuggestions.size
+                                    true
+                                } else {
+                                    false
+                                }
                             }
-                        }
-                        .focusRequester(focusRequester),
-                    label = { Text(title) },
-                    placeholder = { Text("请输入$title") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (showSuggestions && selectedSuggestionIndex >= 0) {
-                                onSuggestionSelected(filteredSuggestions[selectedSuggestionIndex])
+
+                            Key.Enter -> {
+                                if (showSuggestions && selectedSuggestionIndex >= 0) {
+                                    onSuggestionSelected(filteredSuggestions[selectedSuggestionIndex])
+                                    showSuggestions = false
+                                    keyboardController?.hide()
+                                    true
+                                } else {
+                                    false
+                                }
                             }
-                            showSuggestions = false
-                            keyboardController?.hide()
+
+                            Key.Backspace -> {
+                                if (inputValue.text.isEmpty()) {
+                                    showSuggestions = hasFocus
+                                }
+                                false
+                            }
+
+                            Key.Escape -> {
+                                showSuggestions = false
+                                true
+                            }
+
+                            else -> false
                         }
-                    )
+                    }
+                    .focusRequester(focusRequester),
+                label = { Text(title) },
+                placeholder = { Text("请输入$title") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (showSuggestions && selectedSuggestionIndex >= 0) {
+                            onSuggestionSelected(filteredSuggestions[selectedSuggestionIndex])
+                        }
+                        showSuggestions = false
+                        keyboardController?.hide()
+                    }
                 )
+            )
 
-                if (showSuggestions && filteredSuggestions.isNotEmpty()) {
-                    Box(
+            if (showSuggestions && filteredSuggestions.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                ) {
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 4.dp)
+                            .border(1.dp, Color.Gray)
+                            .background(Color.White)
                     ) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .border(1.dp, Color.Gray)
-                                .background(Color.White)
-                        ) {
-                            items(filteredSuggestions) { suggestion ->
-                                val isSelected = filteredSuggestions.indexOf(suggestion) == selectedSuggestionIndex
-                                Text(
-                                    text = getLabelFun(suggestion),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            onSuggestionSelected(suggestion)
-                                            showSuggestions = false
-                                            keyboardController?.hide()
-                                        }
-                                        .background(if (isSelected) Color.LightGray else Color.White)
-                                        .padding(16.dp)
-                                )
-                            }
+                        items(filteredSuggestions) { suggestion ->
+                            val isSelected = filteredSuggestions.indexOf(suggestion) == selectedSuggestionIndex
+                            Text(
+                                text = getLabelFun(suggestion),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onSuggestionSelected(suggestion)
+                                        showSuggestions = false
+                                        keyboardController?.hide()
+                                    }
+                                    .background(if (isSelected) Color.LightGray else Color.White)
+                                    .padding(16.dp)
+                            )
                         }
                     }
                 }
             }
-
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
-            }
         }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+    }
 }

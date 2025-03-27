@@ -54,6 +54,10 @@ dependencies {
     // Kotlin Dependencies
     // ----------------------------------------
 //    implementation(libs.kotlinx.serialization.json)
+
+//    implementation("com.expediagroup:ksp-builder-annotations:1.0.0")
+//    ksp("com.expediagroup:ksp-builder-processor:1.0.0")
+
     implementation(libs.kotlinx.coroutines.core)
 
 

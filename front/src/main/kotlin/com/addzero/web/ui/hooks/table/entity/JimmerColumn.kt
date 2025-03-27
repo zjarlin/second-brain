@@ -16,12 +16,35 @@ import kotlin.reflect.full.hasAnnotation
  * 表格列定义类
  * @param E 数据实体类型
  */
+@OptIn(ExperimentalMaterial3Api::class)
 class JimmerColumn<E : Any>(
     override var title: String,
     override val getFun: (E) -> Any?,
     override val setFun: (E, IColumn<E>, Any?) -> E = { e, c, value ->
         val copy = e.copy(c.fieldName, value)!!
         copy
+    },
+    /** 自定义列表渲染函数 */
+    @property:OptIn(ExperimentalMaterial3Api::class) override var customRender: @Composable (E) -> Unit = {
+        val currentItem = getFun(it)
+
+        val content = currentItem.toNotBlankStr()
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
+                PlainTooltip {
+                    Text(content)
+                }
+            }, state = rememberTooltipState()
+        ) {
+            SelectionContainer {
+                val displayText = if (content.length > 30) {
+                    content.take(30) + "..."
+                } else {
+                    content
+                }
+                Text(text = displayText)
+            }
+        }
     },
 ) : IColumn<E> {
 
@@ -43,30 +66,6 @@ class JimmerColumn<E : Any>(
         }
         set(value) = value.run {}
 
-
-    /** 自定义列表渲染函数 */
-    @OptIn(ExperimentalMaterial3Api::class)
-    override var customRender: @Composable (E) -> Unit = {
-        val currentItem = getFun(it)
-
-        val content = currentItem.toNotBlankStr()
-        TooltipBox(
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
-                PlainTooltip {
-                    Text(content)
-                }
-            }, state = rememberTooltipState()
-        ) {
-            SelectionContainer {
-                val displayText = if (content.length > 30) {
-                    content.take(30) + "..."
-                } else {
-                    content
-                }
-                Text(text = displayText)
-            }
-        }
-    }
 
     /** 自定义验证函数 */
     /** 自定义验证函数 */
