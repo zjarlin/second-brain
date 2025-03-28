@@ -1,24 +1,19 @@
 package com.addzero.web.modules.demo
 
-import com.addzero.DslBuilder
-import junit.runner.Version.id
+import com.addzero.Dsl
 
 // 使用isCollection=true标记为集合类型
-@DslBuilder(genCollectionDslBuilder = true)
+@Dsl(genCollectionDslBuilder = true)
 //@Dsl
 data class Item(
-    val id: String,
-    val name: String,
-    val value: Int
+    val id: String, val name: String, val value: Int
 )
 
 // 自定义DSL函数名称
-@DslBuilder(value = "myproduct", genCollectionDslBuilder = true)
+@Dsl(value = "myproduct", genCollectionDslBuilder = true)
 //@Dsl
 data class Product(
-    val id: String,
-    val name: String,
-    val price: Double
+    val id: String, val name: String, val price: Double
 )
 
 fun main() {
@@ -51,13 +46,13 @@ fun main() {
     println("Item集合大小: ${itemList.size}")
 
     // 使用自定义名称的Product集合DSL
-    val productList = productxxs {
-        productxx {
+    val productList = myproducts {
+        myproduct {
             id = "p1"
             name = "产品1"
             price = 99.9
         }
-        productxx {
+        myproduct {
             id = "p2"
             name = "产品2"
             price = 199.9

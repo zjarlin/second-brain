@@ -10,7 +10,7 @@ package com.addzero
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class DslBuilder(
+annotation class Dsl(
     val value: String = "",
     val removePrefix: String = "",
     val removeSuffix: String = "",
