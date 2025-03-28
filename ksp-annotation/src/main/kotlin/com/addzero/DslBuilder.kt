@@ -10,9 +10,9 @@ package com.addzero
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class Dsl(
+annotation class DslBuilder(
     val value: String = "",
     val removePrefix: String = "",
     val removeSuffix: String = "",
-    val isCollection:Boolean=false
+    val genCollectionDslBuilder:Boolean=false
 )

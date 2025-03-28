@@ -34,18 +34,18 @@ class DslProcessor(
         val packageName = klass.packageName.asString()
         val className = klass.simpleName.asString()
         val fileName = "${className}DslExt"
-        
+
         // 获取@Dsl注解实例
         val dslAnnotation = klass.annotations.find { it.shortName.asString() == "Dsl" }
-        
+
         // 获取isCollection属性值，默认为false
-        val isCollection = dslAnnotation?.arguments?.find { it.name?.asString() == "isCollection" }?.value as? Boolean ?: false
-        
+        val isCollection = dslAnnotation?.arguments?.find { it.name?.asString() == "genCollectionDslBuilder" }?.value as? Boolean ?: false
+
         // 获取自定义DSL函数名称
         val customDslName = dslAnnotation?.arguments?.find { it.name?.asString() == "value" }?.value as? String ?: ""
         val removePrefix = dslAnnotation?.arguments?.find { it.name?.asString() == "removePrefix" }?.value as? String ?: ""
         val removeSuffix = dslAnnotation?.arguments?.find { it.name?.asString() == "removeSuffix" }?.value as? String ?: ""
-        
+
         val constructor = klass.primaryConstructor ?: run {
             logger.warn("Class $className has no primary constructor, skipping DSL generation")
             return
@@ -93,10 +93,10 @@ class DslProcessor(
                 name.replaceFirstChar { it.lowercase() }
             }
         }
-        
+
         // 生成集合DSL函数名称（默认为单数形式+s）
         val collectionDslFunctionName = "${dslFunctionName}s"
-        
+
         val fileContent = if (isCollection) {
             // 为集合类型生成DSL
             """
