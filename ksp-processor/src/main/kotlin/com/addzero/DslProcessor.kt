@@ -9,8 +9,7 @@ import com.google.devtools.ksp.validate
 
 class DslProcessor(
     private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger,
-    private val options: Map<String, String>
+    private val logger: KSPLogger
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -268,8 +267,7 @@ class DslProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return DslProcessor(
             environment.codeGenerator,
-            environment.logger,
-            environment.options
+            environment.logger
         )
     }
 }
