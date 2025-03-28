@@ -205,7 +205,8 @@ class FlexibleDslProcessor(
             constructor = constructor,
             parentClasses = parentClasses,
             resolver = resolver,
-            dslConfig = dslConfig
+            dslConfig = dslConfig,
+            packageName = packageName
         )
 
         try {
@@ -243,7 +244,8 @@ class FlexibleDslProcessor(
         constructor: KSFunctionDeclaration,
         parentClasses: List<KSClassDeclaration>,
         resolver: Resolver,
-        dslConfig: DslConfig
+        dslConfig: DslConfig,
+        packageName: String
     ): String {
         val builderProperties = generateBuilderProperties(constructor, className, resolver, parentClasses)
         val buildParams = constructor.parameters.joinToString(", ") { it.name?.asString() ?: "" }
@@ -257,7 +259,8 @@ class FlexibleDslProcessor(
                 builderProperties = builderProperties,
                 validationCode = validationCode,
                 buildParams = buildParams,
-                dslFunctionName = dslFunctionName
+                dslFunctionName = dslFunctionName,
+                packageName = packageName
             )
         } else {
             generateSimpleDslContent(
@@ -266,7 +269,8 @@ class FlexibleDslProcessor(
                 builderProperties = builderProperties,
                 validationCode = validationCode,
                 buildParams = buildParams,
-                dslFunctionName = dslFunctionName
+                dslFunctionName = dslFunctionName,
+                packageName = packageName
             )
         }
     }
@@ -319,14 +323,16 @@ class FlexibleDslProcessor(
         builderProperties: String,
         validationCode: String,
         buildParams: String,
-        dslFunctionName: String
+        dslFunctionName: String,
+        packageName: String
     ): String {
-        val outerClassChain = fullClassName.substringAfter("${fullClassName.substringBeforeLast('.').substringBeforeLast('.')}.")
+        val outerClassChain = fullClassName.substringAfter("$packageName.")
+        val outerClassImport = fullClassName.substringBeforeLast('.')
         
         return """
-        |package ${fullClassName.substringBeforeLast('.').substringBeforeLast('.')}
+        |package $packageName
         |
-        |import ${fullClassName.substringBeforeLast('.')}
+        |import $outerClassImport
         |import com.addzero.dsl.flexible.RequiredProperty
         |import com.addzero.dsl.flexible.required
         |import com.addzero.dsl.flexible.optional
@@ -368,14 +374,16 @@ class FlexibleDslProcessor(
         builderProperties: String,
         validationCode: String,
         buildParams: String,
-        dslFunctionName: String
+        dslFunctionName: String,
+        packageName: String
     ): String {
-        val outerClassChain = fullClassName.substringAfter("${fullClassName.substringBeforeLast('.').substringBeforeLast('.')}.")
+        val outerClassChain = fullClassName.substringAfter("$packageName.")
+        val outerClassImport = fullClassName.substringBeforeLast('.')
         
         return """
-        |package ${fullClassName.substringBeforeLast('.').substringBeforeLast('.')}
+        |package $packageName
         |
-        |import ${fullClassName.substringBeforeLast('.')}
+        |import $outerClassImport
         |import com.addzero.dsl.flexible.RequiredProperty
         |import com.addzero.dsl.flexible.required
         |import com.addzero.dsl.flexible.optional
