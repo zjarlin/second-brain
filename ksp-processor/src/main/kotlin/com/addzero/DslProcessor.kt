@@ -39,7 +39,7 @@ class DslProcessor(
         val dslAnnotation = klass.annotations.find { it.shortName.asString() == "Dsl" }
 
         // 获取isCollection属性值，默认为false
-        val isCollection = dslAnnotation?.arguments?.find { it.name?.asString() == "genCollectionDslBuilder" }?.value as? Boolean ?: false
+        val genCollectionDslBuilder = dslAnnotation?.arguments?.find { it.name?.asString() == "genCollectionDslBuilder" }?.value as? Boolean ?: false
 
         // 获取自定义DSL函数名称
         val customDslName = dslAnnotation?.arguments?.find { it.name?.asString() == "value" }?.value as? String ?: ""
@@ -97,7 +97,7 @@ class DslProcessor(
         // 生成集合DSL函数名称（默认为单数形式+s）
         val collectionDslFunctionName = "${dslFunctionName}s"
 
-        val fileContent = if (isCollection) {
+        val fileContent = if (genCollectionDslBuilder) {
             // 为集合类型生成DSL
             """
             |package $packageName
