@@ -1,8 +1,6 @@
 package com.addzero.web.modules.demo
 
 import com.addzero.dsl.flexible.FlexibleDsl
-import com.addzero.web.modules.demo.Http.jsonFlexible
-import com.addzero.web.modules.httpFlexible
 import org.springframework.http.HttpMethod
 
 
@@ -16,7 +14,7 @@ data class Http(
      data class Body(val bb: String) {
 
         @FlexibleDsl
-        data class Json(val bb1: String) {}
+        data class Json(val bb1: String,val bb3 :Int?) {}
     }
 
 

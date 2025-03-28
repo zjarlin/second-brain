@@ -35,6 +35,8 @@ class FlexibleDslProcessor(
             "java.util.Date" to "java.util.Date()",
             "java.time.Instant" to "java.time.Instant.now()"
         )
+
+        private val FUNCTION_TYPE_REGEX = Regex("""kotlin\.Function\d+""")
     }
 
     // 缓存已处理的类型
@@ -88,13 +90,9 @@ class FlexibleDslProcessor(
         return if (parentClasses.isEmpty()) {
             "${klass.packageName.asString()}.${klass.simpleName.asString()}"
         } else {
-            buildString {
-                append(parentClasses.first().qualifiedName?.asString() ?: "")
-                parentClasses.drop(1).forEach { parent ->
-                    append(".${parent.simpleName.asString()}")
-                }
-                append(".${klass.simpleName.asString()}")
-            }
+            val parentChain = parentClasses.first().qualifiedName?.asString() +
+                parentClasses.drop(1).joinToString("") { ".${it.simpleName.asString()}" }
+            "$parentChain.${klass.simpleName.asString()}"
         }
     }
 
@@ -113,20 +111,15 @@ class FlexibleDslProcessor(
             else -> declaration.qualifiedName?.asString() ?: ""
         }
 
-        return buildString {
-            append(typeName)
-            
-            // 处理泛型参数
-            if (resolvedType.arguments.isNotEmpty()) {
-                append("<")
-                append(resolvedType.arguments.joinToString(", ") { arg ->
-                    arg.type?.let { getTypeWithGenerics(it, parentClasses) } ?: "*"
-                })
-                append(">")
-            }
-
-            if (resolvedType.isMarkedNullable) append("?")
-        }
+        val generics = if (resolvedType.arguments.isNotEmpty()) {
+            "<${resolvedType.arguments.joinToString(", ") { arg ->
+                arg.type?.let { getTypeWithGenerics(it, parentClasses) } ?: "*"
+            }}>"
+        } else ""
+        
+        val nullableMark = if (resolvedType.isMarkedNullable) "?" else ""
+        
+        return "$typeName$generics$nullableMark"
     }
 
     private fun getDefaultValueForType(type: KSTypeReference, className: String, resolver: Resolver): String {
@@ -138,6 +131,7 @@ class FlexibleDslProcessor(
             typeName in DEFAULT_VALUES -> DEFAULT_VALUES[typeName]!!
             isCollectionType(typeName) -> getDefaultCollectionValue(type)
             typeName.endsWith(className) -> "${className}FlexibleBuilder().build()"
+            isFunctionType(typeName) -> getDefaultFunctionValue(resolvedType)
             else -> tryGetDefaultConstructorValue(typeName, resolver)
         }
     }
@@ -180,6 +174,18 @@ class FlexibleDslProcessor(
         } catch (e: Exception) {
             logger.warn("Cannot determine default value for type $typeName", null)
             "null"
+        }
+    }
+
+    private fun isFunctionType(typeName: String): Boolean =
+        FUNCTION_TYPE_REGEX.matches(typeName)
+
+    private fun getDefaultFunctionValue(type: KSType): String {
+        val parameterCount = type.arguments.dropLast(1).size
+        return when (parameterCount) {
+            0 -> "{}"
+            1 -> "{ _ -> }"
+            else -> "{ ${(1..parameterCount).joinToString(", ") { "_" }} -> }"
         }
     }
 
@@ -283,10 +289,15 @@ class FlexibleDslProcessor(
     ): String = constructor.parameters.joinToString("\n    ") { param ->
         val paramName = param.name?.asString() ?: ""
         val paramType = getTypeWithGenerics(param.type, parentClasses)
+        val defaultValue = if (param.type.resolve().isMarkedNullable) {
+            getDefaultValueForType(param.type, className, resolver)
+        } else null
         val delegateType = if (param.type.resolve().isMarkedNullable) OPTIONAL_DELEGATE else REQUIRED_DELEGATE
         
+        val defaultValueStr = if (defaultValue != null) "<$paramType>($defaultValue)" else "<$paramType>()"
+        
         """
-        |    private val _$paramName = $delegateType<$paramType>()
+        |    private val _$paramName = $delegateType$defaultValueStr
         |
         |    var $paramName: $paramType
         |        get() = _$paramName.getValue(this, ::$paramName)
