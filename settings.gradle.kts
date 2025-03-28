@@ -1,8 +1,3 @@
-include(
-    ":front",
-    ":backend",
-)
-
 pluginManagement {
     repositories {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -26,5 +21,7 @@ pluginManagement {
 
 
 rootProject.name = "second-brain"
-include("ksp-processor")
-include("ksp-annotation")
+include(":front")
+include(":backend")
+include(":ksp-annotation")
+include(":ksp-processor")

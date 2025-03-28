@@ -20,7 +20,6 @@ dependencies {
 
     implementation("com.mikepenz:multiplatform-markdown-renderer-code:+")
 
-
     implementation(project(":ksp-annotation"))
     ksp(project(":ksp-processor"))
 
