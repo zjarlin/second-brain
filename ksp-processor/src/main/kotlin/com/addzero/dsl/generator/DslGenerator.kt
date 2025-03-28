@@ -12,11 +12,6 @@ class DslGenerator(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger
 ) {
-    companion object {
-        private const val REQUIRED_DELEGATE = "com.addzero.dsl.required"
-        private const val OPTIONAL_DELEGATE = "com.addzero.dsl.optional"
-    }
-
     /**
      * 批量生成DSL代码
      */
@@ -33,8 +28,8 @@ class DslGenerator(
     /**
      * 生成单个类的DSL代码
      */
-    private fun generate(meta: DslMeta) {
-        val fileName = "${meta.className}DslExt"
+    private fun generate(meta: DslMeta, metaclassSuffixName: String = "DslExt") {
+        val fileName = "${meta.className}$metaclassSuffixName"
         val content = generateContent(meta)
 
         codeGenerator.createNewFile(
@@ -49,17 +44,16 @@ class DslGenerator(
     /**
      * 生成DSL内容
      */
-    private fun generateContent(meta: DslMeta): String {
+    private fun generateContent(meta: DslMeta, builderClassNameSuffix: String = "BuilderGen"): String {
         val builderProperties = generateBuilderProperties(meta)
         val buildParams = meta.constructor.parameters.joinToString(", ") { it.name }
-        val validationCode = generateValidationCode(meta)
         val dslFunctionName = generateDslFunctionName(meta)
-        val builderClassName = "${meta.className}BuilderGen"
+        val builderClassName = "${meta.className}$builderClassNameSuffix"
 
         return if (meta.genCollectionDslBuilder) {
-            generateCollectionDslContent(meta, builderProperties, buildParams, validationCode, dslFunctionName, builderClassName)
+            generateCollectionDslContent(meta, builderProperties, buildParams, dslFunctionName, builderClassName)
         } else {
-            generateSimpleDslContent(meta, builderProperties, buildParams, validationCode, dslFunctionName, builderClassName)
+            generateSimpleDslContent(meta, builderProperties, buildParams, dslFunctionName, builderClassName)
         }
     }
 
@@ -68,33 +62,28 @@ class DslGenerator(
      */
     private fun generateBuilderProperties(meta: DslMeta): String {
         return meta.constructor.parameters.joinToString("\n    ") { param ->
-            val delegateType = if (param.isNullable) OPTIONAL_DELEGATE else REQUIRED_DELEGATE
-            
-            val delegateCall = if (param.isNullable) {
-                "$delegateType<${param.fullTypeName}>(null)"
+            if (param.isNullable) {
+                // 可空类型使用null默认值
+                "var ${param.name}: ${param.fullTypeName} = null"
             } else {
-                "$delegateType<${param.fullTypeName}>()"
+                // 处理原始类型不能使用lateinit的问题
+                when (param.type) {
+                    // 原始类型需要默认值
+                    "kotlin.Int" -> "var ${param.name}: ${param.fullTypeName} = 0"
+                    "kotlin.Long" -> "var ${param.name}: ${param.fullTypeName} = 0L"
+                    "kotlin.Double" -> "var ${param.name}: ${param.fullTypeName} = 0.0"
+                    "kotlin.Float" -> "var ${param.name}: ${param.fullTypeName} = 0.0f"
+                    "kotlin.Boolean" -> "var ${param.name}: ${param.fullTypeName} = false"
+                    "kotlin.Char" -> "var ${param.name}: ${param.fullTypeName} = ' '"
+                    "kotlin.Byte" -> "var ${param.name}: ${param.fullTypeName} = 0"
+                    "kotlin.Short" -> "var ${param.name}: ${param.fullTypeName} = 0"
+                    // 字符串类型
+                    "kotlin.String" -> "var ${param.name}: ${param.fullTypeName} = \"\""
+                    // 对于其他引用类型，使用lateinit
+                    else -> "lateinit var ${param.name}: ${param.fullTypeName}"
+                }
             }
-            
-            """
-            |    private val _${param.name} = $delegateCall
-            |
-            |    var ${param.name}: ${param.fullTypeName}
-            |        get() = _${param.name}.getValue(this, ::${param.name})
-            |        set(value) = _${param.name}.setValue(this, ::${param.name}, value)
-            """.trimMargin()
         }
-    }
-
-    /**
-     * 生成验证代码
-     */
-    private fun generateValidationCode(meta: DslMeta): String {
-        return meta.constructor.parameters
-            .filter { !it.isNullable }
-            .joinToString("\n        ") { param ->
-                "_${param.name}.validate(\"${param.name}\")"
-            }
     }
 
     /**
@@ -111,7 +100,7 @@ class DslGenerator(
                 if (meta.removeSuffix.isNotBlank() && name.endsWith(meta.removeSuffix)) {
                     name = name.substring(0, name.length - meta.removeSuffix.length)
                 }
-                name.replaceFirstChar { it.lowercase() } + "Gen"
+                name.replaceFirstChar { it.lowercase() }
             }
         }
     }
@@ -123,12 +112,11 @@ class DslGenerator(
         meta: DslMeta,
         builderProperties: String,
         buildParams: String,
-        validationCode: String,
         dslFunctionName: String,
         builderClassName: String
     ): String {
         val outerClassChain = getOuterClassChain(meta)
-        
+
         // 只导入需要的类，避免导入自己的包
         val imports = generateImports(meta)
 
@@ -140,12 +128,7 @@ class DslGenerator(
         |class $builderClassName {
         |    $builderProperties
         |
-        |    fun validate() {
-        |        $validationCode
-        |    }
-        |
         |    fun build(): ${meta.qualifiedName} {
-        |        validate()
         |        return $outerClassChain($buildParams)
         |    }
         |}
@@ -175,12 +158,11 @@ class DslGenerator(
         meta: DslMeta,
         builderProperties: String,
         buildParams: String,
-        validationCode: String,
         dslFunctionName: String,
         builderClassName: String
     ): String {
         val outerClassChain = getOuterClassChain(meta)
-        
+
         // 只导入需要的类，避免导入自己的包
         val imports = generateImports(meta)
 
@@ -192,12 +174,7 @@ class DslGenerator(
         |class $builderClassName {
         |    $builderProperties
         |
-        |    fun validate() {
-        |        $validationCode
-        |    }
-        |
         |    fun build(): ${meta.qualifiedName} {
-        |        validate()
         |        return $outerClassChain($buildParams)
         |    }
         |}
@@ -219,14 +196,14 @@ class DslGenerator(
             "$parentChain.${meta.className}"
         }
     }
-    
+
     /**
      * 生成导入语句，避免导入自己的包
      */
     private fun generateImports(meta: DslMeta): String {
         // 如果类所在的包是其他包，才需要导入
         val outerClassImport = meta.qualifiedName.substringBeforeLast('.')
-        
+
         return if (outerClassImport != meta.packageName) {
             "import $outerClassImport"
         } else {
@@ -234,4 +211,4 @@ class DslGenerator(
             ""
         }
     }
-} 
+}
