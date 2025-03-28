@@ -1,4 +1,4 @@
-package com.addzero.dsl.flexible
+package com.addzero.dsl
 
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

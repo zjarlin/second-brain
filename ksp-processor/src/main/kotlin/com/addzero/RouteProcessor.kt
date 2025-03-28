@@ -1,8 +1,6 @@
 package com.addzero
 
-import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
@@ -99,5 +97,11 @@ class RouteProcessor(
 
     override fun onError() {
         logger.error("Error occurred during route processing")
+    }
+}
+
+class RouteProcessorProvider : SymbolProcessorProvider {
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+        return RouteProcessor(environment)
     }
 }

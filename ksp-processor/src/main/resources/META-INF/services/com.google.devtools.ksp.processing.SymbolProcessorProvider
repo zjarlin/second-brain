@@ -1,4 +1,3 @@
 com.addzero.RouteProcessorProvider
 #com.addzero.IconProcessorProvider
-#com.addzero.DslProcessorProvider
-com.addzero.dsl.flexible.FlexibleDslProcessorProvider
+com.addzero.dsl.DslProcessorProvider
