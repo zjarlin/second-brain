@@ -34,6 +34,18 @@ class DslProcessor(
         val packageName = klass.packageName.asString()
         val className = klass.simpleName.asString()
         val fileName = "${className}DslExt"
+        
+        // 获取@Dsl注解实例
+        val dslAnnotation = klass.annotations.find { it.shortName.asString() == "Dsl" }
+        
+        // 获取isCollection属性值，默认为false
+        val isCollection = dslAnnotation?.arguments?.find { it.name?.asString() == "isCollection" }?.value as? Boolean ?: false
+        
+        // 获取自定义DSL函数名称
+        val customDslName = dslAnnotation?.arguments?.find { it.name?.asString() == "value" }?.value as? String ?: ""
+        val removePrefix = dslAnnotation?.arguments?.find { it.name?.asString() == "removePrefix" }?.value as? String ?: ""
+        val removeSuffix = dslAnnotation?.arguments?.find { it.name?.asString() == "removeSuffix" }?.value as? String ?: ""
+        
         val constructor = klass.primaryConstructor ?: run {
             logger.warn("Class $className has no primary constructor, skipping DSL generation")
             return
@@ -67,7 +79,72 @@ class DslProcessor(
             "$paramName = $defaultValue"
         }
 
-        val fileContent = """
+        // 生成DSL函数名称
+        val dslFunctionName = when {
+            customDslName.isNotBlank() -> customDslName
+            else -> {
+                var name = className
+                if (removePrefix.isNotBlank() && name.startsWith(removePrefix)) {
+                    name = name.substring(removePrefix.length)
+                }
+                if (removeSuffix.isNotBlank() && name.endsWith(removeSuffix)) {
+                    name = name.substring(0, name.length - removeSuffix.length)
+                }
+                name.replaceFirstChar { it.lowercase() }
+            }
+        }
+        
+        // 生成集合DSL函数名称（默认为单数形式+s）
+        val collectionDslFunctionName = "${dslFunctionName}s"
+        
+        val fileContent = if (isCollection) {
+            // 为集合类型生成DSL
+            """
+            |package $packageName
+            |
+            |${imports.joinToString("\n") { "import $it" }}
+            |
+            |class ${className}Builder {
+            |    $builderProperties
+            |
+            |    fun build(): $className = $className(
+            |        $buildParams
+            |    )
+            |
+            |    companion object {
+            |        fun empty$className(): $className = $className(
+            |            $emptyParams
+            |        )
+            |    }
+            |}
+            |
+            |class ${className}CollectionBuilder {
+            |    private val items = mutableListOf<$className>()
+            |
+            |    fun $dslFunctionName(block: ${className}Builder.() -> Unit) {
+            |        items.add(${className}Builder().apply(block).build())
+            |    }
+            |
+            |    fun build(): List<$className> = items.toList()
+            |}
+            |
+            |/**
+            | * DSL扩展函数，用于构建[$className]实例
+            | */
+            |fun $dslFunctionName(block: ${className}Builder.() -> Unit): $className {
+            |    return ${className}Builder().apply(block).build()
+            |}
+            |
+            |/**
+            | * DSL扩展函数，用于构建[$className]集合
+            | */
+            |fun $collectionDslFunctionName(block: ${className}CollectionBuilder.() -> Unit): List<$className> {
+            |    return ${className}CollectionBuilder().apply(block).build()
+            |}
+            |""".trimMargin()
+        } else {
+            // 为普通类型生成DSL
+            """
             |package $packageName
             |
             |${imports.joinToString("\n") { "import $it" }}
@@ -89,10 +166,11 @@ class DslProcessor(
             |/**
             | * DSL扩展函数，用于构建[$className]实例
             | */
-            |fun $className(block: ${className}Builder.() -> Unit): $className {
+            |fun $dslFunctionName(block: ${className}Builder.() -> Unit): $className {
             |    return ${className}Builder().apply(block).build()
             |}
             |""".trimMargin()
+        }
 
         codeGenerator.createNewFile(
             dependencies = Dependencies(true),
