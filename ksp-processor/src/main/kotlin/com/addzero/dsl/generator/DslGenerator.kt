@@ -17,11 +17,7 @@ class DslGenerator(
      */
     fun generateAll(metaList: List<DslMeta>) {
         metaList.forEach { meta ->
-            try {
-                generate(meta)
-            } catch (e: Exception) {
-                logger.error("Error generating DSL for ${meta.qualifiedName}: ${e.message}", null)
-            }
+            generate(meta)
         }
     }
 
@@ -122,9 +118,7 @@ class DslGenerator(
 
         return """
         |package ${meta.packageName}
-        |
         |$imports
-        |
         |class $builderClassName {
         |    $builderProperties
         |
@@ -168,9 +162,7 @@ class DslGenerator(
 
         return """
         |package ${meta.packageName}
-        |
         |$imports
-        |
         |class $builderClassName {
         |    $builderProperties
         |
@@ -192,7 +184,7 @@ class DslGenerator(
             meta.qualifiedName.substringAfter("${meta.packageName}.")
         } else {
             val parentChain = meta.parentClasses.first().qualifiedName +
-                meta.parentClasses.drop(1).joinToString("") { ".${it.className}" }
+                    meta.parentClasses.drop(1).joinToString("") { ".${it.className}" }
             "$parentChain.${meta.className}"
         }
     }

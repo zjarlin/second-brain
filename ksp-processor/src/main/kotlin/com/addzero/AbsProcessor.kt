@@ -32,25 +32,25 @@ abstract class AbsProcessor<Meta>(
 
     // 存储收集到的元数据
     protected val metaList = mutableListOf<Meta>()
-    
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // 获取所有带有指定注解的类声明
         val symbols = resolver.getSymbolsWithAnnotation(getAnnotationName())
-        
+
         // 处理类声明上的注解
         symbols.filterIsInstance<KSClassDeclaration>().forEach { processDeclaration(it) }
-        
+
         // 处理函数声明上的注解
         symbols.filterIsInstance<KSFunctionDeclaration>().forEach { processDeclaration(it) }
-        
+
         // 处理声明上的注解
 
         // 生成目标代码
         try {
             generateCode(resolver,metaList)
-        } catch (e: FileAlreadyExistsException) {
+        } catch (e: Exception) {
             // 处理文件已存在异常
-            logger.warn("File already exists: ${e.message}")
+            logger.warn(e.stackTraceToString())
         }
 
 
@@ -71,17 +71,17 @@ abstract class AbsProcessor<Meta>(
 
     override fun finish() {
     }
-    
+
     /**
      * 获取要处理的注解全限定名
      */
     protected abstract fun getAnnotationName(): String
-    
+
     /**
      * 从注解中提取元数据
      */
     protected abstract fun extractMetaData(declaration: KSDeclaration, annotation: KSAnnotation): Meta
-    
+
     /**
      * 根据收集的元数据生成代码
      */
